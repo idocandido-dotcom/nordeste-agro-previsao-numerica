@@ -2,9 +2,10 @@ name: Atualizar Clima Regional Open-Meteo
 
 on:
   schedule:
-    # Roda todos os dias às 06:35 no horário de Brasília
-    # 09:35 UTC = 06:35 BRT
-    - cron: "35 9 * * *"
+    # Roda de hora em hora.
+    # O GitHub usa horário UTC.
+    # Exemplo: 00:35, 01:35, 02:35... UTC
+    - cron: "35 * * * *"
   workflow_dispatch:
 
 permissions:
