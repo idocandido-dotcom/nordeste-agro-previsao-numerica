@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Gerar JSON de cotações
+      - name: Gerar JSON real de cotações
         run: |
           python coletor_cotacoes_regionais.py
 
@@ -41,5 +41,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Atualiza cotações regionais"
+          git commit -m "Atualiza cotações regionais reais"
           git push
