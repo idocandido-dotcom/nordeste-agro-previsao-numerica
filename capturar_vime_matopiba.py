@@ -56,8 +56,7 @@ FRAMES_DESEJADOS = {
 }
 
 # Recorte proporcional do arquivo oficial do VIME para focar MATOPIBA.
-# O ZIP enviado tinha imagem parecida com: web_NE_prec24h_202605040000_+24.png
-# Este recorte mantém MA, TO, PI e BA e reduz excesso fora do foco.
+# Ajustado para o ZIP oficial baixado do VIME/INMET.
 MATOPIBA_CROP_RATIO = {
     "left": 0.00,
     "top": 0.00,
@@ -100,17 +99,15 @@ def salvar_debug(page, nome):
         print(f"Não foi possível salvar debug {nome}: {erro}")
 
 
-def tentar_clicar_texto(page, texto, timeout=5000):
-    try:
-        page.get_by_text(texto, exact=False).click(timeout=timeout)
-        print(f"Clique realizado por texto: {texto}")
-        return True
-    except Exception as erro:
-        print(f"Não clicou por texto '{texto}': {erro}")
-        return False
-
-
 def baixar_zip_vime(page):
+    """
+    Baixa o ZIP oficial do VIME usando o botão "Download de Todas as Imagens".
+
+    Correção importante:
+    No GitHub Actions, o clique normal pode falhar porque o <body> intercepta
+    o ponteiro. Por isso usamos clique forçado e também clique via JavaScript
+    diretamente no span.baixarZip.
+    """
     print("Preparando download do ZIP oficial do VIME...")
 
     salvar_debug(page, "_debug_antes_download.png")
@@ -118,19 +115,59 @@ def baixar_zip_vime(page):
     zip_path = OUT_DIR / "_vime_download.zip"
 
     try:
-        with page.expect_download(timeout=180000) as download_info:
-            clicou = tentar_clicar_texto(
-                page,
-                "Download de Todas as Imagens",
-                timeout=7000
-            )
+        with page.expect_download(timeout=240000) as download_info:
+            clicou = False
 
+            # Tentativa 1: clique forçado no elemento real do botão.
+            try:
+                print("Tentando clique forçado em span.baixarZip...")
+                page.locator("span.baixarZip").first.click(
+                    timeout=15000,
+                    force=True
+                )
+                clicou = True
+                print("Clique forçado realizado em span.baixarZip.")
+            except Exception as erro:
+                print(f"Clique forçado em span.baixarZip falhou: {erro}")
+
+            # Tentativa 2: clique via JavaScript no elemento.
+            if not clicou:
+                try:
+                    print("Tentando clique via JavaScript em span.baixarZip...")
+                    page.locator("span.baixarZip").first.evaluate(
+                        "el => el.click()"
+                    )
+                    clicou = True
+                    print("Clique via JavaScript realizado em span.baixarZip.")
+                except Exception as erro:
+                    print(f"Clique via JavaScript falhou: {erro}")
+
+            # Tentativa 3: clique pelo texto.
+            if not clicou:
+                try:
+                    print("Tentando clique por texto...")
+                    page.get_by_text("Download de Todas as Imagens", exact=False).click(
+                        timeout=15000,
+                        force=True
+                    )
+                    clicou = True
+                    print("Clique por texto realizado.")
+                except Exception as erro:
+                    print(f"Clique por texto falhou: {erro}")
+
+            # Tentativa 4: clique por coordenada.
             if not clicou:
                 print(
-                    "Clique por texto falhou. "
-                    f"Tentando por coordenada x={DOWNLOAD_BUTTON_X}, y={DOWNLOAD_BUTTON_Y}"
+                    "Tentando clique por coordenada "
+                    f"x={DOWNLOAD_BUTTON_X}, y={DOWNLOAD_BUTTON_Y}"
                 )
                 page.mouse.click(DOWNLOAD_BUTTON_X, DOWNLOAD_BUTTON_Y)
+                clicou = True
+
+            if not clicou:
+                raise RuntimeError(
+                    "Nenhuma estratégia conseguiu clicar no botão de download."
+                )
 
         download = download_info.value
         download.save_as(str(zip_path))
@@ -360,6 +397,7 @@ def main():
             timeout=120000
         )
 
+        # Aguarda o painel lateral montar.
         time.sleep(12)
 
         zip_path = baixar_zip_vime(page)
