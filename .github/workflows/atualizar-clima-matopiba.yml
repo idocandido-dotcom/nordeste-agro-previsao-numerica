@@ -1,4 +1,4 @@
-name: Atualizar Clima MATOPIBA INMET
+name: Atualizar Clima MATOPIBA Open-Meteo
 
 on:
   schedule:
@@ -23,17 +23,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instalar dependências
+      - name: Gerar dados reais de previsão Open-Meteo
         run: |
-          python -m pip install --upgrade pip
-          pip install playwright pillow
-          python -m playwright install --with-deps chromium
+          python coletor_openmeteo_matopiba.py
 
-      - name: Baixar imagens oficiais do VIME / INMET
-        run: |
-          xvfb-run -a python capturar_vime_matopiba.py
-
-      - name: Commitar imagens atualizadas
+      - name: Commitar dados atualizados
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -45,5 +39,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Atualiza imagens oficiais clima MATOPIBA INMET"
+          git commit -m "Atualiza previsão MATOPIBA Open-Meteo"
           git push
