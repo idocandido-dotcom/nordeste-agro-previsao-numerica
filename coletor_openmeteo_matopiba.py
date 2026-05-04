@@ -1,6 +1,8 @@
 import json
+import time
 import urllib.parse
 import urllib.request
+import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,9 +16,13 @@ from pathlib import Path
 # - calcula precipitação acumulada prevista para 24h, 48h e 72h;
 # - salva JSON para o WordPress gerar o mapa e o slide.
 #
-# Não usa simulação.
-# Não inventa valores.
-# Não gera imagem fixa.
+# Correções desta versão:
+# - reduz tamanho dos lotes;
+# - adiciona retentativas em erro 502/503/504;
+# - adiciona pausa entre chamadas;
+# - se um lote falhar, tenta ponto por ponto;
+# - não simula dados;
+# - registra pontos com erro no JSON.
 # ============================================================
 
 
@@ -30,6 +36,12 @@ MODELO = "Best match / modelos meteorológicos combinados pela Open-Meteo"
 AREA = "Nordeste + Tocantins + Pará"
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
+
+TAMANHO_LOTE = 5
+MAX_TENTATIVAS = 5
+PAUSA_ENTRE_LOTES = 2
+PAUSA_BASE_RETRY = 6
+MINIMO_PONTOS_VALIDOS = 35
 
 
 PONTOS = [
@@ -144,21 +156,6 @@ PONTOS = [
 ]
 
 
-def abrir_json(url):
-    req = urllib.request.Request(
-        url,
-        headers={
-            "Accept": "application/json",
-            "User-Agent": "NordesteAgro-Clima/1.0"
-        },
-        method="GET"
-    )
-
-    with urllib.request.urlopen(req, timeout=120) as response:
-        texto = response.read().decode("utf-8")
-        return json.loads(texto)
-
-
 def montar_url(pontos_lote):
     latitudes = ",".join(str(p["lat"]) for p in pontos_lote)
     longitudes = ",".join(str(p["lon"]) for p in pontos_lote)
@@ -173,6 +170,46 @@ def montar_url(pontos_lote):
     }
 
     return API_URL + "?" + urllib.parse.urlencode(params)
+
+
+def abrir_json_com_retry(url, descricao):
+    ultimo_erro = None
+
+    for tentativa in range(1, MAX_TENTATIVAS + 1):
+        try:
+            print(f"{descricao} - tentativa {tentativa}/{MAX_TENTATIVAS}")
+
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "NordesteAgro-Clima/1.0"
+                },
+                method="GET"
+            )
+
+            with urllib.request.urlopen(req, timeout=120) as response:
+                texto = response.read().decode("utf-8")
+                return json.loads(texto)
+
+        except urllib.error.HTTPError as erro:
+            ultimo_erro = erro
+
+            if erro.code in (429, 500, 502, 503, 504):
+                espera = PAUSA_BASE_RETRY * tentativa
+                print(f"Erro HTTP {erro.code}. Aguardando {espera}s e tentando novamente...")
+                time.sleep(espera)
+                continue
+
+            raise
+
+        except Exception as erro:
+            ultimo_erro = erro
+            espera = PAUSA_BASE_RETRY * tentativa
+            print(f"Erro na consulta: {erro}. Aguardando {espera}s e tentando novamente...")
+            time.sleep(espera)
+
+    raise RuntimeError(f"Falha após {MAX_TENTATIVAS} tentativas em {descricao}: {ultimo_erro}")
 
 
 def soma_intervalo(valores, inicio, fim):
@@ -230,21 +267,59 @@ def processar_resposta_lote(pontos_lote, dados):
     return resultados
 
 
+def consultar_lote(pontos_lote, numero_lote):
+    url = montar_url(pontos_lote)
+    dados = abrir_json_com_retry(url, f"Consultando lote {numero_lote} com {len(pontos_lote)} pontos")
+    return processar_resposta_lote(pontos_lote, dados)
+
+
+def consultar_ponto_individual(ponto):
+    url = montar_url([ponto])
+    dados = abrir_json_com_retry(url, f"Consultando ponto individual {ponto['nome']} - {ponto['uf']}")
+    return processar_resposta_lote([ponto], dados)[0]
+
+
 def consultar_openmeteo():
     todos_resultados = []
-    tamanho_lote = 10
+    erros = []
 
-    for i in range(0, len(PONTOS), tamanho_lote):
-        lote = PONTOS[i:i + tamanho_lote]
-        url = montar_url(lote)
+    numero_lote = 0
 
-        print(f"Consultando lote {i // tamanho_lote + 1}: {len(lote)} pontos")
-        dados = abrir_json(url)
+    for i in range(0, len(PONTOS), TAMANHO_LOTE):
+        numero_lote += 1
+        lote = PONTOS[i:i + TAMANHO_LOTE]
 
-        resultados = processar_resposta_lote(lote, dados)
-        todos_resultados.extend(resultados)
+        try:
+            resultados = consultar_lote(lote, numero_lote)
+            todos_resultados.extend(resultados)
 
-    return todos_resultados
+        except Exception as erro_lote:
+            print(f"Erro no lote {numero_lote}: {erro_lote}")
+            print("Tentando recuperar lote ponto por ponto...")
+
+            for ponto in lote:
+                try:
+                    resultado = consultar_ponto_individual(ponto)
+                    todos_resultados.append(resultado)
+                except Exception as erro_ponto:
+                    print(f"Erro no ponto {ponto['nome']} - {ponto['uf']}: {erro_ponto}")
+                    erros.append({
+                        "uf": ponto["uf"],
+                        "nome": ponto["nome"],
+                        "lat": ponto["lat"],
+                        "lon": ponto["lon"],
+                        "erro": str(erro_ponto)
+                    })
+
+        time.sleep(PAUSA_ENTRE_LOTES)
+
+    if len(todos_resultados) < MINIMO_PONTOS_VALIDOS:
+        raise RuntimeError(
+            f"Poucos pontos válidos retornados: {len(todos_resultados)}. "
+            f"Mínimo exigido: {MINIMO_PONTOS_VALIDOS}."
+        )
+
+    return todos_resultados, erros
 
 
 def gerar_periodos(pontos):
@@ -287,7 +362,7 @@ def resumo_periodo(pontos):
 def main():
     print("Iniciando coleta Open-Meteo: Nordeste + Tocantins + Pará...")
 
-    pontos = consultar_openmeteo()
+    pontos, erros = consultar_openmeteo()
     periodos = gerar_periodos(pontos)
 
     payload = {
@@ -301,6 +376,8 @@ def main():
         "metodo": "Consulta Open-Meteo Forecast API por pontos do Nordeste, Tocantins e Pará; cálculo de acumulados 24h, 48h e 72h",
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(),
         "total_pontos": len(pontos),
+        "total_erros": len(erros),
+        "erros": erros[:30],
         "periodos": {
             "24h": {
                 "label": "Previsão acumulada 24h",
@@ -326,10 +403,11 @@ def main():
     )
 
     print(f"Arquivo gerado: {OUT_JSON}")
-    print(f"Total de pontos: {len(pontos)}")
+    print(f"Total de pontos válidos: {len(pontos)}")
+    print(f"Total de erros: {len(erros)}")
 
-    for periodo, dados in payload["periodos"].items():
-        print(periodo, dados["resumo"])
+    for periodo, dados_periodo in payload["periodos"].items():
+        print(periodo, dados_periodo["resumo"])
 
 
 if __name__ == "__main__":
