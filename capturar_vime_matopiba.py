@@ -1,10 +1,12 @@
 import json
+import re
 import time
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 from PIL import Image
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 
 # ============================================================
@@ -12,22 +14,34 @@ from playwright.sync_api import sync_playwright
 # ============================================================
 # Este script:
 # - abre o VIME/INMET;
-# - captura mapas oficiais de precipitação acumulada;
-# - procura automaticamente a área colorida do mapa na tela;
-# - recorta a região MATOPIBA;
-# - gera 24h, 48h, 72h;
+# - usa o botão oficial "Download de Todas as Imagens";
+# - baixa o ZIP oficial gerado pelo VIME;
+# - extrai os frames +24, +48 e +72;
+# - recorta o foco MATOPIBA;
+# - gera PNGs finais;
 # - gera GIF animado;
 # - gera manifest.json para o WordPress.
 #
-# Não cria dados simulados.
-# Não publica imagem branca ou tela de carregamento.
+# Não cria valores numéricos.
+# Não cria grade própria.
+# Não publica imagem branca/carregando.
+# Usa apenas imagens baixadas do VIME/INMET.
 # ============================================================
 
 
-VIME_URL = "https://vime.inmet.gov.br/CO"
+# Região do VIME.
+# O ZIP enviado veio como NE:
+# web_NE_prec24h_202605040000_+24.png
+#
+# A região NE no VIME inclui o Nordeste e áreas vizinhas suficientes
+# para o foco visual do MATOPIBA. O recorte final remove o excesso.
+REGIAO_VIME = "NE"
 
-MODELO_DESEJADO = "COSMO 7x7km"
-MAPA_DESEJADO = "Precipitação Acumulada"
+VIME_URL = f"https://vime.inmet.gov.br/{REGIAO_VIME}"
+
+MODELO = "COSMO 7x7km"
+PRODUTO = "Precipitação Acumulada 24h"
+AREA = "MATOPIBA"
 
 OUT_DIR = Path("public/clima/matopiba")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,175 +55,181 @@ REPO_CDN_BASE = (
     "public/clima/matopiba"
 )
 
-# Coordenadas aproximadas dos horários no painel esquerdo do VIME.
-# Se o layout do VIME mudar, o script ainda tenta detectar o mapa depois.
-HORAS = [
-    {
-        "slug": "24h",
-        "label": "+024",
-        "click_x": 27,
-        "click_y": 386,
-    },
-    {
-        "slug": "48h",
-        "label": "+048",
-        "click_x": 104,
-        "click_y": 420,
-    },
-    {
-        "slug": "72h",
-        "label": "+072",
-        "click_x": 202,
-        "click_y": 456,
-    },
-]
+# Frames que serão usados no site.
+FRAMES_DESEJADOS = {
+    "24h": ["+24", "+024"],
+    "48h": ["+48", "+048"],
+    "72h": ["+72", "+072"],
+}
+
+# Recorte proporcional do arquivo oficial do VIME para focar MATOPIBA.
+# O ZIP oficial enviado tem imagem 774x700. Este recorte foi ajustado
+# para manter MA, TO, PI e BA e reduzir áreas fora do foco.
+#
+# Valores em porcentagem da imagem:
+# left, top, right, bottom
+MATOPIBA_CROP_RATIO = {
+    "left": 0.00,
+    "top": 0.00,
+    "right": 0.82,
+    "bottom": 0.965,
+}
+
+# Coordenada do botão "Download de Todas as Imagens", caso o clique por texto falhe.
+DOWNLOAD_BUTTON_X = 95
+DOWNLOAD_BUTTON_Y = 316
+
+
+def limpar_saida_antiga():
+    """
+    Remove arquivos temporários antigos para evitar confusão.
+    Mantém apenas os novos arquivos após a execução.
+    """
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    padroes = [
+        "_vime_download*.zip",
+        "_debug*.png",
+        "_raw_*.png",
+        "matopiba_24h.png",
+        "matopiba_48h.png",
+        "matopiba_72h.png",
+        "matopiba_animado.gif",
+        "manifest.json",
+    ]
+
+    for padrao in padroes:
+        for arquivo in OUT_DIR.glob(padrao):
+            try:
+                arquivo.unlink()
+            except Exception:
+                pass
 
 
 def salvar_debug(page, nome):
-    debug_path = OUT_DIR / nome
+    caminho = OUT_DIR / nome
 
     try:
-        page.screenshot(path=str(debug_path), full_page=True)
-        print(f"Debug salvo: {debug_path}")
+        page.screenshot(path=str(caminho), full_page=True)
+        print(f"Debug salvo: {caminho}")
     except Exception as erro:
         print(f"Não foi possível salvar debug {nome}: {erro}")
 
 
-def tentar_clicar_texto(page, texto, timeout=3000):
+def tentar_clicar_texto(page, texto, timeout=5000):
     try:
-        page.get_by_text(texto, exact=True).click(timeout=timeout)
-        print(f"Clique por texto realizado: {texto}")
+        page.get_by_text(texto, exact=False).click(timeout=timeout)
+        print(f"Clique realizado por texto: {texto}")
         return True
-    except Exception:
+    except Exception as erro:
+        print(f"Não clicou por texto '{texto}': {erro}")
         return False
 
 
-def tentar_selecionar_modelo_mapa(page):
+def baixar_zip_vime(page):
     """
-    Tenta selecionar modelo e produto.
-    Se o VIME não expuser os selects como HTML comum, segue com padrão carregado.
+    Baixa o ZIP oficial do VIME usando o botão "Download de Todas as Imagens".
     """
-    print("Tentando selecionar modelo e mapa no VIME...")
+    print("Preparando download do ZIP oficial do VIME...")
+
+    salvar_debug(page, "_debug_antes_download.png")
+
+    zip_path = OUT_DIR / "_vime_download.zip"
 
     try:
-        selects = page.locator("select")
-        qtd = selects.count()
-        print(f"Selects encontrados na página: {qtd}")
+        with page.expect_download(timeout=180000) as download_info:
+            clicou = tentar_clicar_texto(page, "Download de Todas as Imagens", timeout=7000)
 
-        for i in range(qtd):
-            try:
-                sel = selects.nth(i)
-                options = sel.locator("option")
-                opt_count = options.count()
-                labels = []
+            if not clicou:
+                print(
+                    "Clique por texto falhou. "
+                    f"Tentando por coordenada x={DOWNLOAD_BUTTON_X}, y={DOWNLOAD_BUTTON_Y}"
+                )
+                page.mouse.click(DOWNLOAD_BUTTON_X, DOWNLOAD_BUTTON_Y)
 
-                for j in range(opt_count):
-                    labels.append(options.nth(j).inner_text().strip())
+        download = download_info.value
+        download.save_as(str(zip_path))
 
-                print(f"Select {i} opções:", labels[:30])
-
-                for lab in labels:
-                    lab_lower = lab.lower()
-
-                    if "cosmo" in lab_lower and "7" in lab_lower:
-                        try:
-                            sel.select_option(label=lab)
-                            print(f"Modelo selecionado: {lab}")
-                            time.sleep(4)
-                            break
-                        except Exception as erro:
-                            print(f"Falha ao selecionar modelo {lab}: {erro}")
-
-                for lab in labels:
-                    lab_lower = lab.lower()
-
-                    if "precipitação acumulada" in lab_lower or "precipitacao acumulada" in lab_lower:
-                        try:
-                            sel.select_option(label=lab)
-                            print(f"Mapa selecionado: {lab}")
-                            time.sleep(4)
-                            break
-                        except Exception as erro:
-                            print(f"Falha ao selecionar mapa {lab}: {erro}")
-
-            except Exception as erro:
-                print(f"Erro lendo select {i}: {erro}")
+    except PlaywrightTimeoutError:
+        salvar_debug(page, "_debug_download_timeout.png")
+        raise RuntimeError(
+            "O VIME não iniciou o download do ZIP oficial dentro do tempo limite."
+        )
 
     except Exception as erro:
-        print("Não foi possível ler selects:", erro)
+        salvar_debug(page, "_debug_download_erro.png")
+        raise RuntimeError(f"Erro ao baixar ZIP oficial do VIME: {erro}")
+
+    if not zip_path.exists() or zip_path.stat().st_size < 10000:
+        raise RuntimeError(
+            "O arquivo ZIP do VIME não foi baixado corretamente ou veio vazio."
+        )
+
+    print(f"ZIP oficial baixado: {zip_path} ({zip_path.stat().st_size} bytes)")
+
+    return zip_path
 
 
-def clicar_hora_por_coordenada(page, item):
-    label = item["label"]
-    x = item["click_x"]
-    y = item["click_y"]
+def listar_zip(zip_path):
+    with zipfile.ZipFile(zip_path, "r") as z:
+        nomes = z.namelist()
 
-    print(f"Clicando horário {label} por coordenada x={x}, y={y}")
-    page.mouse.click(x, y)
-    time.sleep(5)
+    print(f"Arquivos dentro do ZIP: {len(nomes)}")
 
+    for nome in nomes[:10]:
+        print(" -", nome)
 
-def pixel_colorido(r, g, b):
-    maxc = max(r, g, b)
-    minc = min(r, g, b)
-
-    # Ignora branco/cinza claro e texto preto pequeno.
-    if r > 235 and g > 235 and b > 235:
-        return False
-
-    if r < 45 and g < 45 and b < 45:
-        return False
-
-    # Mapa tem cores fortes: azul, verde, amarelo, vermelho, rosa.
-    return (maxc - minc) > 35
+    return nomes
 
 
-def detectar_bbox_mapa_colorido(imagem):
+def encontrar_imagem_do_frame(nomes, labels):
     """
-    Detecta automaticamente a área colorida principal do mapa.
-    Ignora a barra lateral esquerda usando x_min_busca.
+    Encontra no ZIP a imagem correspondente ao frame desejado:
+    +24, +48, +72.
     """
-    img = imagem.convert("RGB")
-    w, h = img.size
+    candidatos = []
 
-    x_min_busca = int(w * 0.22)
-    x_max_busca = int(w * 0.98)
-    y_min_busca = int(h * 0.06)
-    y_max_busca = int(h * 0.88)
+    for nome in nomes:
+        nome_limpo = nome.strip()
 
-    xs = []
-    ys = []
+        if not nome_limpo.lower().endswith(".png"):
+            continue
 
-    step = 4
+        for label in labels:
+            label_regex = re.escape(label)
+            padrao = rf"_{label_regex}\.png$"
 
-    for y in range(y_min_busca, y_max_busca, step):
-      for x in range(x_min_busca, x_max_busca, step):
-          r, g, b = img.getpixel((x, y))
+            if re.search(padrao, nome_limpo):
+                candidatos.append(nome_limpo)
 
-          if pixel_colorido(r, g, b):
-              xs.append(x)
-              ys.append(y)
+    if not candidatos:
+        raise RuntimeError(
+            f"Não encontrei imagem no ZIP para labels {labels}."
+        )
 
-    if not xs or not ys:
-        return None
+    # Se houver mais de um, usa o primeiro em ordem alfabética.
+    candidatos = sorted(candidatos)
 
-    min_x = max(min(xs) - 20, 0)
-    max_x = min(max(xs) + 20, w)
-    min_y = max(min(ys) - 20, 0)
-    max_y = min(max(ys) + 20, h)
+    print(f"Frame {labels} encontrado:", candidatos[0])
 
-    largura = max_x - min_x
-    altura = max_y - min_y
-
-    if largura < 250 or altura < 220:
-        return None
-
-    return (min_x, min_y, max_x, max_y)
+    return candidatos[0]
 
 
-def calcular_indice_mapa(img):
+def extrair_imagem(zip_path, nome_interno, destino):
+    with zipfile.ZipFile(zip_path, "r") as z:
+        with z.open(nome_interno) as origem:
+            img = Image.open(origem).convert("RGB")
+            img.save(destino)
+
+    print(f"Imagem extraída: {destino}")
+
+    return destino
+
+
+def imagem_valida(img):
     """
-    Mede se o recorte tem conteúdo colorido suficiente.
+    Valida se a imagem não está branca/carregando.
+    Como o ZIP oficial contém PNG pronto, isso quase sempre passa.
     """
     img = img.convert("RGB")
     w, h = img.size
@@ -218,153 +238,84 @@ def calcular_indice_mapa(img):
     coloridos = 0
     quase_brancos = 0
 
-    step = 6
+    step = 8
 
     for y in range(0, h, step):
         for x in range(0, w, step):
             r, g, b = img.getpixel((x, y))
             total += 1
 
-            if pixel_colorido(r, g, b):
+            maxc = max(r, g, b)
+            minc = min(r, g, b)
+
+            if maxc - minc > 35:
                 coloridos += 1
 
             if r > 235 and g > 235 and b > 235:
                 quase_brancos += 1
 
     if total == 0:
-        return {
-            "color_ratio": 0,
-            "white_ratio": 1,
-        }
+        return False
 
-    return {
-        "color_ratio": coloridos / total,
-        "white_ratio": quase_brancos / total,
-    }
-
-
-def imagem_parece_mapa(img):
-    indice = calcular_indice_mapa(img)
+    color_ratio = coloridos / total
+    white_ratio = quase_brancos / total
 
     print(
-        "Índice do mapa:",
-        "color_ratio=", round(indice["color_ratio"], 4),
-        "white_ratio=", round(indice["white_ratio"], 4)
+        "Validação da imagem:",
+        "color_ratio=", round(color_ratio, 4),
+        "white_ratio=", round(white_ratio, 4)
     )
 
-    if indice["color_ratio"] >= 0.04 and indice["white_ratio"] <= 0.88:
-        return True
-
-    return False
+    return color_ratio >= 0.04 and white_ratio <= 0.90
 
 
-def aguardar_e_detectar_mapa(page, contexto, timeout_segundos=180):
+def recortar_matopiba(img):
     """
-    Aguarda o mapa colorido aparecer e retorna o bbox detectado.
+    Recorta a imagem oficial do VIME para foco visual MATOPIBA.
     """
-    print(f"Aguardando mapa colorido carregar: {contexto}")
+    img = img.convert("RGB")
+    w, h = img.size
 
-    inicio = time.time()
-    tentativa = 0
+    left = int(w * MATOPIBA_CROP_RATIO["left"])
+    top = int(h * MATOPIBA_CROP_RATIO["top"])
+    right = int(w * MATOPIBA_CROP_RATIO["right"])
+    bottom = int(h * MATOPIBA_CROP_RATIO["bottom"])
 
-    while time.time() - inicio < timeout_segundos:
-        tentativa += 1
-        temp_path = OUT_DIR / f"_temp_full_{contexto}_{tentativa}.png"
+    crop = img.crop((left, top, right, bottom))
 
-        try:
-            page.screenshot(path=str(temp_path), full_page=True)
-
-            img = Image.open(temp_path).convert("RGB")
-            bbox = detectar_bbox_mapa_colorido(img)
-
-            if bbox:
-                recorte = img.crop(bbox)
-                print(f"BBox detectado em {contexto}: {bbox}")
-
-                if imagem_parece_mapa(recorte):
-                    temp_path.unlink(missing_ok=True)
-                    print(f"Mapa colorido confirmado: {contexto}")
-                    return bbox
-
-            temp_path.unlink(missing_ok=True)
-
-        except Exception as erro:
-            print(f"Erro ao detectar mapa: {erro}")
-
-        time.sleep(6)
-
-    salvar_debug(page, f"_debug_timeout_{contexto}.png")
-
-    raise RuntimeError(
-        f"O mapa oficial do VIME não ficou disponível em {timeout_segundos}s "
-        f"durante {contexto}. Nenhuma imagem será publicada."
-    )
+    return crop
 
 
-def recortar_matopiba_a_partir_do_mapa(mapa_img):
+def processar_frame(zip_path, nomes_zip, slug, labels):
     """
-    Recorte proporcional dentro do mapa oficial detectado.
-
-    A imagem do VIME mostra área ampla. O recorte abaixo mantém o foco
-    visual no MATOPIBA e retira grande parte do entorno.
+    Extrai, valida, recorta e salva frame final.
     """
-    w, h = mapa_img.size
+    nome_interno = encontrar_imagem_do_frame(nomes_zip, labels)
 
-    # Recorte proporcional. Ajustado para foco MA, TO, PI e BA.
-    left = int(w * 0.12)
-    top = int(h * 0.05)
-    right = int(w * 0.98)
-    bottom = int(h * 0.92)
+    raw_path = OUT_DIR / f"_raw_{slug}.png"
+    final_path = OUT_DIR / f"matopiba_{slug}.png"
 
-    return mapa_img.crop((left, top, right, bottom))
+    extrair_imagem(zip_path, nome_interno, raw_path)
 
+    img_raw = Image.open(raw_path).convert("RGB")
 
-def capturar_frame(page, item):
-    slug = item["slug"]
-    label = item["label"]
-
-    print(f"Capturando frame {slug} ({label})...")
-
-    clicar_hora_por_coordenada(page, item)
-
-    bbox = aguardar_e_detectar_mapa(
-        page,
-        contexto=slug,
-        timeout_segundos=180
-    )
-
-    fullshot = OUT_DIR / f"_full_{slug}.png"
-    page.screenshot(path=str(fullshot), full_page=True)
-
-    img = Image.open(fullshot).convert("RGB")
-
-    mapa = img.crop(bbox)
-
-    if not imagem_parece_mapa(mapa):
-        salvar_debug(page, f"_debug_mapa_invalido_{slug}.png")
+    if not imagem_valida(img_raw):
         raise RuntimeError(
-            f"O frame {slug} não parece mapa válido. Imagem não será publicada."
+            f"A imagem oficial extraída para {slug} não parece válida."
         )
 
-    matopiba = recortar_matopiba_a_partir_do_mapa(mapa)
+    img_matopiba = recortar_matopiba(img_raw)
 
-    if not imagem_parece_mapa(matopiba):
-        salvar_debug(page, f"_debug_matopiba_invalido_{slug}.png")
+    if not imagem_valida(img_matopiba):
         raise RuntimeError(
-            f"O recorte MATOPIBA de {slug} não parece mapa válido."
+            f"O recorte MATOPIBA para {slug} não parece válido."
         )
 
-    out_png = OUT_DIR / f"matopiba_{slug}.png"
-    matopiba.save(out_png)
+    img_matopiba.save(final_path)
 
-    try:
-        fullshot.unlink()
-    except Exception:
-        pass
+    print(f"Frame final salvo: {final_path}")
 
-    print(f"Frame salvo: {out_png}")
-
-    return out_png
+    return final_path
 
 
 def gerar_gif(frames, gif_path):
@@ -385,18 +336,22 @@ def gerar_gif(frames, gif_path):
         loop=0
     )
 
-    print(f"GIF gerado: {gif_path}")
+    print(f"GIF animado gerado: {gif_path}")
+
+    return gif_path
 
 
 def gerar_manifest(arquivos):
     manifest = {
         "ok": True,
         "fonte": "INMET / VIME",
-        "modelo": MODELO_DESEJADO,
-        "produto": MAPA_DESEJADO,
-        "area": "MATOPIBA",
+        "modelo": MODELO,
+        "produto": PRODUTO,
+        "area": AREA,
+        "regiao_vime": REGIAO_VIME,
         "oficial": True,
         "simulado": False,
+        "metodo": "Download oficial do ZIP do VIME/INMET e recorte visual MATOPIBA",
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(),
         "frames": {
             "24h": {
@@ -431,6 +386,8 @@ def gerar_manifest(arquivos):
 
 
 def main():
+    limpar_saida_antiga()
+
     arquivos = {}
 
     with sync_playwright() as p:
@@ -448,7 +405,8 @@ def main():
             viewport={
                 "width": VIEWPORT_WIDTH,
                 "height": VIEWPORT_HEIGHT
-            }
+            },
+            accept_downloads=True
         )
 
         print(f"Abrindo VIME/INMET: {VIME_URL}")
@@ -459,34 +417,39 @@ def main():
             timeout=120000
         )
 
-        time.sleep(18)
+        # Aguarda o painel lateral montar.
+        time.sleep(12)
 
-        salvar_debug(page, "_debug_pagina_inicial.png")
-
-        tentar_clicar_texto(page, "CO", timeout=3000)
-        time.sleep(5)
-
-        tentar_selecionar_modelo_mapa(page)
-        time.sleep(8)
-
-        salvar_debug(page, "_debug_apos_configuracao.png")
-
-        # Confirma que há mapa colorido antes de capturar frames.
-        aguardar_e_detectar_mapa(
-            page,
-            contexto="inicial",
-            timeout_segundos=180
-        )
-
-        for item in HORAS:
-            slug = item["slug"]
-            arquivos[slug] = capturar_frame(page, item)
+        zip_path = baixar_zip_vime(page)
 
         browser.close()
 
+    nomes_zip = listar_zip(zip_path)
+
+    arquivos["24h"] = processar_frame(
+        zip_path,
+        nomes_zip,
+        "24h",
+        FRAMES_DESEJADOS["24h"]
+    )
+
+    arquivos["48h"] = processar_frame(
+        zip_path,
+        nomes_zip,
+        "48h",
+        FRAMES_DESEJADOS["48h"]
+    )
+
+    arquivos["72h"] = processar_frame(
+        zip_path,
+        nomes_zip,
+        "72h",
+        FRAMES_DESEJADOS["72h"]
+    )
+
     gif_path = OUT_DIR / "matopiba_animado.gif"
 
-    gerar_gif(
+    arquivos["gif"] = gerar_gif(
         [
             arquivos["24h"],
             arquivos["48h"],
@@ -494,8 +457,6 @@ def main():
         ],
         gif_path
     )
-
-    arquivos["gif"] = gif_path
 
     gerar_manifest(arquivos)
 
