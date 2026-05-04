@@ -1,4 +1,3 @@
-
 {
   "ok": true,
   "fonte": "CEPEA / CONAB / B3 / IBGE-MAPA",
@@ -8,5 +7,5 @@
   "ultima_sincronizacao": "04/05/2026",
   "total_registros": 0,
   "dados": [],
-  "aviso": "Arquivo inicial. Os dados serão alimentados pelo coletor automático."
+  "aviso": "Arquivo inicial das cotações regionais do Nordeste Agro. Os dados serão alimentados pelo coletor automático."
 }
