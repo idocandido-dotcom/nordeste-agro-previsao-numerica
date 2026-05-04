@@ -10,10 +10,24 @@ WORDPRESS_TOKEN = os.environ["WORDPRESS_TOKEN"]
 
 endpoint = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
 
-lat_min, lat_max = -15.2, -2.0
-lon_min, lon_max = -49.8, -34.5
+# Área expandida para cobrir:
+# - Pará produtivo / sudeste do Pará
+# - Maranhão
+# - Piauí
+# - Tocantins
+# - Bahia, incluindo sul da Bahia
+# - Nordeste litorâneo
+lat_min, lat_max = -18.4, -1.2
+lon_min, lon_max = -53.5, -34.2
 
+# 20 x 10 = 200 pontos
 rows, cols = 10, 20
+
+
+def gaussian(lat, lon, lat0, lon0, amp, spread_lat, spread_lon):
+    return amp * math.exp(
+        -(((lat - lat0) ** 2) / spread_lat + ((lon - lon0) ** 2) / spread_lon)
+    )
 
 
 def gerar_pontos(mult=1.0, shift=0.0):
@@ -25,32 +39,87 @@ def gerar_pontos(mult=1.0, shift=0.0):
         for j in range(cols):
             lon = lon_min + (lon_max - lon_min) * (j / (cols - 1))
 
+            # Campo base suave
             base = (
-                18
-                + 12 * math.sin((lat + 9.5 + shift) * 0.85)
-                + 9 * math.cos((lon + 42.0 - shift) * 0.72)
-                + 7 * math.sin((lat + lon + shift) * 0.55)
+                16
+                + 9 * math.sin((lat + 9.0 + shift) * 0.72)
+                + 8 * math.cos((lon + 43.0 - shift) * 0.64)
+                + 6 * math.sin((lat + lon + shift) * 0.45)
             )
 
-            nucleo_ba = 18 * math.exp(
-                -(((lat + 12.7) ** 2) / 10 + ((lon + 39.5) ** 2) / 8)
+            # Núcleos regionais de precipitação
+
+            # Sudeste / sul do Pará
+            nucleo_para = gaussian(
+                lat, lon,
+                lat0=-5.8,
+                lon0=-50.0,
+                amp=20,
+                spread_lat=10,
+                spread_lon=12
             )
 
-            nucleo_ma_to_pi = 14 * math.exp(
-                -(((lat + 7.5) ** 2) / 12 + ((lon + 46.0) ** 2) / 9)
+            # MATOPIBA — Maranhão, Tocantins, Piauí, oeste da Bahia
+            nucleo_matopiba = gaussian(
+                lat, lon,
+                lat0=-8.8,
+                lon0=-46.2,
+                amp=18,
+                spread_lat=16,
+                spread_lon=13
             )
 
-            nucleo_litoral = 11 * math.exp(
-                -(((lat + 8.5) ** 2) / 18 + ((lon + 35.8) ** 2) / 5)
+            # Oeste da Bahia / Luís Eduardo Magalhães / Barreiras
+            nucleo_oeste_ba = gaussian(
+                lat, lon,
+                lat0=-12.3,
+                lon0=-45.0,
+                amp=16,
+                spread_lat=9,
+                spread_lon=9
             )
 
-            mm = max(
-                0,
-                min(
-                    160,
-                    (base + nucleo_ba + nucleo_ma_to_pi + nucleo_litoral) * mult
-                )
+            # Sul da Bahia
+            nucleo_sul_ba = gaussian(
+                lat, lon,
+                lat0=-16.2,
+                lon0=-40.4,
+                amp=22,
+                spread_lat=10,
+                spread_lon=7
             )
+
+            # Litoral nordestino
+            nucleo_litoral = gaussian(
+                lat, lon,
+                lat0=-8.8,
+                lon0=-35.8,
+                amp=13,
+                spread_lat=20,
+                spread_lon=5
+            )
+
+            # Centro-norte do Nordeste
+            nucleo_semiarido = gaussian(
+                lat, lon,
+                lat0=-7.8,
+                lon0=-39.5,
+                amp=8,
+                spread_lat=20,
+                spread_lon=10
+            )
+
+            mm = (
+                base
+                + nucleo_para
+                + nucleo_matopiba
+                + nucleo_oeste_ba
+                + nucleo_sul_ba
+                + nucleo_litoral
+                + nucleo_semiarido
+            ) * mult
+
+            mm = max(0, min(180, mm))
 
             pontos.append({
                 "lat": round(lat, 5),
@@ -65,8 +134,17 @@ dados = {
     "ok": True,
     "fonte": "INMET - Previsão Numérica",
     "modo": "previsao_numerica_diaria",
-    "observacao": "Coletor configurado para 200 pontos por período. Estrutura preparada para substituir os pontos por grade numérica real do INMET/GRIB.",
+    "observacao": "Coletor configurado com 200 pontos expandidos para cobrir Pará, Sul da Bahia, MATOPIBA e Nordeste. Estrutura preparada para substituição futura por grade numérica real do INMET/GRIB.",
     "total_pontos_por_periodo": 200,
+    "cobertura": [
+        "Pará produtivo",
+        "Maranhão",
+        "Piauí",
+        "Tocantins",
+        "Oeste da Bahia",
+        "Sul da Bahia",
+        "Nordeste"
+    ],
     "atualizado_em": datetime.now(timezone.utc).isoformat(),
     "periodos": {
         "24h": {
@@ -75,11 +153,11 @@ dados = {
         },
         "48h": {
             "legenda": "Previsão 48h",
-            "pontos": gerar_pontos(1.16, 1.2)
+            "pontos": gerar_pontos(1.14, 1.1)
         },
         "72h": {
             "legenda": "Previsão 72h",
-            "pontos": gerar_pontos(1.32, 2.4)
+            "pontos": gerar_pontos(1.28, 2.2)
         }
     }
 }
@@ -101,6 +179,7 @@ req = Request(
 
 print(f"Enviando previsão para: {endpoint}")
 print("Pontos por período:", dados["total_pontos_por_periodo"])
+print("Cobertura:", ", ".join(dados["cobertura"]))
 
 try:
     with urlopen(req, timeout=60) as response:
