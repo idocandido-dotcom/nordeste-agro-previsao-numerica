@@ -1,4 +1,5 @@
 import json
+import math
 import time
 import urllib.parse
 import urllib.request
@@ -9,18 +10,26 @@ from pathlib import Path
 
 # ============================================================
 # COLETOR REGIONAL — NORDESTE + TOCANTINS + PARÁ
-# Fonte: Open-Meteo Forecast API
+# MALHA UNIFORME COM 200 PONTOS
+# Fonte meteorológica: Open-Meteo Forecast API
 # ============================================================
 # Este script:
-# - consulta previsão por coordenada na Open-Meteo;
-# - calcula acumulado previsto para 24h, 48h e 72h;
-# - gera JSON regional para o WordPress;
-# - inclui todos os estados do Nordeste + Tocantins + Pará;
-# - não inventa dados;
-# - não simula chuva;
-# - mantém backup do último JSON válido.
+# - carrega o GeoJSON da região;
+# - gera uma grade uniforme sobre Nordeste + TO + PA;
+# - filtra pontos dentro dos polígonos reais;
+# - seleciona exatamente 200 pontos bem distribuídos;
+# - consulta previsão de precipitação na Open-Meteo;
+# - salva JSON para o WordPress.
+#
+# Não simula chuva.
+# Não inventa valores.
+# Os pontos são coordenadas técnicas de consulta.
 # ============================================================
 
+
+# ------------------------------------------------------------
+# CONFIGURAÇÕES PRINCIPAIS
+# ------------------------------------------------------------
 
 OUT_DIR = Path("public/clima/regional")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -34,141 +43,388 @@ AREA = "Nordeste + Tocantins + Pará"
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 
-TAMANHO_LOTE = 8
+# GeoJSON local no GitHub, se existir
+GEOJSON_LOCAL_PATHS = [
+    Path("public/mapas/matopibapa.geojson"),
+    Path("public/clima/mapas/matopibapa.geojson"),
+    Path("mapas/matopibapa.geojson"),
+]
+
+# GeoJSON do WordPress, caso não exista no GitHub
+GEOJSON_URL = "https://nordesteagro.com/wp-content/uploads/nordeste-agro/mapas/matopibapa.geojson"
+
+UFS_REGIONAIS = ["PA", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "TO"]
+
+TOTAL_PONTOS_DESEJADO = 200
+
+# Quanto maior este número, mais regular fica a seleção final
+MULTIPLICADOR_CANDIDATOS = 6
+
+TAMANHO_LOTE_OPENMETEO = 20
 MAX_TENTATIVAS = 3
 PAUSA_ENTRE_LOTES = 1
 PAUSA_BASE_RETRY = 4
-MINIMO_PONTOS_VALIDOS = 35
+MINIMO_PONTOS_VALIDOS = 150
 
 
-PONTOS = [
-    # PARÁ
-    {"uf": "PA", "nome": "Altamira", "lat": -3.2033, "lon": -52.2064},
-    {"uf": "PA", "nome": "Santarém", "lat": -2.4431, "lon": -54.7083},
-    {"uf": "PA", "nome": "Marabá", "lat": -5.3686, "lon": -49.1178},
-    {"uf": "PA", "nome": "Paragominas", "lat": -2.9958, "lon": -47.3522},
-    {"uf": "PA", "nome": "Redenção", "lat": -8.0253, "lon": -50.0317},
-    {"uf": "PA", "nome": "Conceição do Araguaia", "lat": -8.2578, "lon": -49.2647},
-    {"uf": "PA", "nome": "Castanhal", "lat": -1.2939, "lon": -47.9264},
-    {"uf": "PA", "nome": "Tailândia", "lat": -2.9458, "lon": -48.9489},
-    {"uf": "PA", "nome": "Uruará", "lat": -3.7158, "lon": -53.7397},
-    {"uf": "PA", "nome": "Novo Progresso", "lat": -7.1431, "lon": -55.3786},
-    {"uf": "PA", "nome": "Itaituba", "lat": -4.2761, "lon": -55.9836},
-    {"uf": "PA", "nome": "Tucuruí", "lat": -3.7661, "lon": -49.6725},
-    {"uf": "PA", "nome": "Xinguara", "lat": -7.1003, "lon": -49.9431},
-    {"uf": "PA", "nome": "São Félix do Xingu", "lat": -6.6447, "lon": -51.9950},
-    {"uf": "PA", "nome": "Belém", "lat": -1.4558, "lon": -48.4902},
+# ------------------------------------------------------------
+# FUNÇÕES DE TEXTO E GEOJSON
+# ------------------------------------------------------------
 
-    # MARANHÃO
-    {"uf": "MA", "nome": "Balsas", "lat": -7.5325, "lon": -46.0356},
-    {"uf": "MA", "nome": "Tasso Fragoso", "lat": -8.4724, "lon": -45.7545},
-    {"uf": "MA", "nome": "Alto Parnaíba", "lat": -9.1089, "lon": -45.9300},
-    {"uf": "MA", "nome": "Riachão", "lat": -7.3617, "lon": -46.6172},
-    {"uf": "MA", "nome": "São Raimundo das Mangabeiras", "lat": -7.0219, "lon": -45.4806},
-    {"uf": "MA", "nome": "Imperatriz", "lat": -5.5264, "lon": -47.4917},
-    {"uf": "MA", "nome": "Carolina", "lat": -7.3353, "lon": -47.4692},
-    {"uf": "MA", "nome": "Chapadinha", "lat": -3.7417, "lon": -43.3603},
-    {"uf": "MA", "nome": "Caxias", "lat": -4.8589, "lon": -43.3561},
-    {"uf": "MA", "nome": "São Luís", "lat": -2.5307, "lon": -44.3068},
-    {"uf": "MA", "nome": "Sambaíba", "lat": -7.1344, "lon": -45.3511},
-    {"uf": "MA", "nome": "Benedito Leite", "lat": -7.2100, "lon": -44.5572},
-    {"uf": "MA", "nome": "Fortaleza dos Nogueiras", "lat": -6.9656, "lon": -46.1747},
-    {"uf": "MA", "nome": "Loreto", "lat": -7.0811, "lon": -45.1458},
+def normalizar_texto(valor):
+    texto = str(valor or "").strip().upper()
 
-    # TOCANTINS
-    {"uf": "TO", "nome": "Palmas", "lat": -10.1844, "lon": -48.3336},
-    {"uf": "TO", "nome": "Porto Nacional", "lat": -10.7081, "lon": -48.4172},
-    {"uf": "TO", "nome": "Gurupi", "lat": -11.7292, "lon": -49.0686},
-    {"uf": "TO", "nome": "Pedro Afonso", "lat": -8.9686, "lon": -48.1778},
-    {"uf": "TO", "nome": "Campos Lindos", "lat": -7.9894, "lon": -46.8642},
-    {"uf": "TO", "nome": "Dianópolis", "lat": -11.6244, "lon": -46.8192},
-    {"uf": "TO", "nome": "Formoso do Araguaia", "lat": -11.7975, "lon": -49.5319},
-    {"uf": "TO", "nome": "Lagoa da Confusão", "lat": -10.7906, "lon": -49.6197},
-    {"uf": "TO", "nome": "Natividade", "lat": -11.7075, "lon": -47.7225},
-    {"uf": "TO", "nome": "Araguaína", "lat": -7.1911, "lon": -48.2072},
-    {"uf": "TO", "nome": "Colinas do Tocantins", "lat": -8.0592, "lon": -48.4750},
-    {"uf": "TO", "nome": "Paraíso do Tocantins", "lat": -10.1750, "lon": -48.8828},
+    substituicoes = {
+        "Á": "A",
+        "À": "A",
+        "Â": "A",
+        "Ã": "A",
+        "É": "E",
+        "Ê": "E",
+        "Í": "I",
+        "Ó": "O",
+        "Ô": "O",
+        "Õ": "O",
+        "Ú": "U",
+        "Ç": "C",
+    }
 
-    # PIAUÍ
-    {"uf": "PI", "nome": "Bom Jesus", "lat": -9.0740, "lon": -44.3590},
-    {"uf": "PI", "nome": "Uruçuí", "lat": -7.2294, "lon": -44.5561},
-    {"uf": "PI", "nome": "Baixa Grande do Ribeiro", "lat": -7.8497, "lon": -45.2192},
-    {"uf": "PI", "nome": "Corrente", "lat": -10.4333, "lon": -45.1639},
-    {"uf": "PI", "nome": "Gilbués", "lat": -9.8325, "lon": -45.3431},
-    {"uf": "PI", "nome": "Teresina", "lat": -5.0892, "lon": -42.8019},
-    {"uf": "PI", "nome": "Floriano", "lat": -6.7718, "lon": -43.0241},
-    {"uf": "PI", "nome": "Picos", "lat": -7.0778, "lon": -41.4672},
-    {"uf": "PI", "nome": "Santa Filomena", "lat": -9.1128, "lon": -45.9211},
-    {"uf": "PI", "nome": "Ribeiro Gonçalves", "lat": -7.5583, "lon": -45.2444},
-    {"uf": "PI", "nome": "Sebastião Leal", "lat": -7.5686, "lon": -44.0608},
-    {"uf": "PI", "nome": "Currais", "lat": -9.0111, "lon": -44.4069},
+    for antigo, novo in substituicoes.items():
+        texto = texto.replace(antigo, novo)
 
-    # CEARÁ
-    {"uf": "CE", "nome": "Fortaleza", "lat": -3.7319, "lon": -38.5267},
-    {"uf": "CE", "nome": "Sobral", "lat": -3.6861, "lon": -40.3497},
-    {"uf": "CE", "nome": "Quixadá", "lat": -4.9708, "lon": -39.0153},
-    {"uf": "CE", "nome": "Iguatu", "lat": -6.3594, "lon": -39.2986},
-    {"uf": "CE", "nome": "Crateús", "lat": -5.1783, "lon": -40.6775},
-    {"uf": "CE", "nome": "Juazeiro do Norte", "lat": -7.2128, "lon": -39.3153},
-    {"uf": "CE", "nome": "Limoeiro do Norte", "lat": -5.1456, "lon": -38.0981},
-    {"uf": "CE", "nome": "Tianguá", "lat": -3.7322, "lon": -40.9917},
-
-    # RIO GRANDE DO NORTE
-    {"uf": "RN", "nome": "Natal", "lat": -5.7945, "lon": -35.2110},
-    {"uf": "RN", "nome": "Mossoró", "lat": -5.1875, "lon": -37.3442},
-    {"uf": "RN", "nome": "Caicó", "lat": -6.4591, "lon": -37.0978},
-    {"uf": "RN", "nome": "Pau dos Ferros", "lat": -6.1103, "lon": -38.2067},
-    {"uf": "RN", "nome": "Assu", "lat": -5.5767, "lon": -36.9086},
-    {"uf": "RN", "nome": "Apodi", "lat": -5.6647, "lon": -37.7989},
-
-    # PARAÍBA
-    {"uf": "PB", "nome": "João Pessoa", "lat": -7.1195, "lon": -34.8450},
-    {"uf": "PB", "nome": "Campina Grande", "lat": -7.2306, "lon": -35.8811},
-    {"uf": "PB", "nome": "Patos", "lat": -7.0244, "lon": -37.2800},
-    {"uf": "PB", "nome": "Sousa", "lat": -6.7592, "lon": -38.2281},
-    {"uf": "PB", "nome": "Cajazeiras", "lat": -6.8903, "lon": -38.5553},
-    {"uf": "PB", "nome": "Monteiro", "lat": -7.8894, "lon": -37.1200},
-
-    # PERNAMBUCO
-    {"uf": "PE", "nome": "Recife", "lat": -8.0476, "lon": -34.8770},
-    {"uf": "PE", "nome": "Petrolina", "lat": -9.3891, "lon": -40.5027},
-    {"uf": "PE", "nome": "Caruaru", "lat": -8.2846, "lon": -35.9702},
-    {"uf": "PE", "nome": "Garanhuns", "lat": -8.8903, "lon": -36.4928},
-    {"uf": "PE", "nome": "Serra Talhada", "lat": -7.9919, "lon": -38.2988},
-    {"uf": "PE", "nome": "Araripina", "lat": -7.5767, "lon": -40.4983},
-    {"uf": "PE", "nome": "Salgueiro", "lat": -8.0742, "lon": -39.1192},
-
-    # ALAGOAS
-    {"uf": "AL", "nome": "Maceió", "lat": -9.6498, "lon": -35.7089},
-    {"uf": "AL", "nome": "Arapiraca", "lat": -9.7525, "lon": -36.6611},
-    {"uf": "AL", "nome": "Penedo", "lat": -10.2900, "lon": -36.5864},
-    {"uf": "AL", "nome": "Palmeira dos Índios", "lat": -9.4056, "lon": -36.6328},
-    {"uf": "AL", "nome": "Santana do Ipanema", "lat": -9.3783, "lon": -37.2453},
-
-    # SERGIPE
-    {"uf": "SE", "nome": "Aracaju", "lat": -10.9472, "lon": -37.0731},
-    {"uf": "SE", "nome": "Itabaiana", "lat": -10.6850, "lon": -37.4253},
-    {"uf": "SE", "nome": "Nossa Senhora da Glória", "lat": -10.2158, "lon": -37.4211},
-    {"uf": "SE", "nome": "Lagarto", "lat": -10.9172, "lon": -37.6500},
-    {"uf": "SE", "nome": "Estância", "lat": -11.2683, "lon": -37.4383},
-
-    # BAHIA
-    {"uf": "BA", "nome": "Salvador", "lat": -12.9777, "lon": -38.5016},
-    {"uf": "BA", "nome": "Feira de Santana", "lat": -12.2664, "lon": -38.9663},
-    {"uf": "BA", "nome": "Barreiras", "lat": -12.1528, "lon": -44.9900},
-    {"uf": "BA", "nome": "Luís Eduardo Magalhães", "lat": -12.0956, "lon": -45.7867},
-    {"uf": "BA", "nome": "São Desidério", "lat": -12.3639, "lon": -44.9731},
-    {"uf": "BA", "nome": "Formosa do Rio Preto", "lat": -11.0483, "lon": -45.1931},
-    {"uf": "BA", "nome": "Correntina", "lat": -13.3436, "lon": -44.6367},
-    {"uf": "BA", "nome": "Vitória da Conquista", "lat": -14.8619, "lon": -40.8442},
-    {"uf": "BA", "nome": "Ilhéus", "lat": -14.7930, "lon": -39.0460},
-    {"uf": "BA", "nome": "Juazeiro", "lat": -9.4167, "lon": -40.5033},
-    {"uf": "BA", "nome": "Riachão das Neves", "lat": -11.7461, "lon": -44.9147},
-    {"uf": "BA", "nome": "Cocos", "lat": -14.1817, "lon": -44.5356},
-]
+    return texto
 
 
-def montar_url(pontos_lote):
+def obter_uf_feature(feature):
+    props = feature.get("properties", {}) or {}
+
+    chaves = [
+        "SIGLA_UF",
+        "UF",
+        "uf",
+        "sigla_uf",
+        "SG_UF",
+        "NM_UF",
+        "estado",
+        "nome",
+        "NOME",
+        "name",
+    ]
+
+    nomes = {
+        "PARA": "PA",
+        "MARANHAO": "MA",
+        "PIAUI": "PI",
+        "CEARA": "CE",
+        "RIO GRANDE DO NORTE": "RN",
+        "PARAIBA": "PB",
+        "PERNAMBUCO": "PE",
+        "ALAGOAS": "AL",
+        "SERGIPE": "SE",
+        "BAHIA": "BA",
+        "TOCANTINS": "TO",
+    }
+
+    for chave in chaves:
+        if chave in props and props[chave] not in (None, ""):
+            valor = normalizar_texto(props[chave])
+            return nomes.get(valor, valor)
+
+    return ""
+
+
+def abrir_url_texto(url):
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/json,text/plain,*/*",
+            "User-Agent": "NordesteAgro-Clima/1.0",
+        },
+        method="GET",
+    )
+
+    with urllib.request.urlopen(req, timeout=120) as response:
+        return response.read().decode("utf-8")
+
+
+def carregar_geojson():
+    for caminho in GEOJSON_LOCAL_PATHS:
+        if caminho.exists():
+            print(f"Carregando GeoJSON local: {caminho}")
+            return json.loads(caminho.read_text(encoding="utf-8"))
+
+    print(f"GeoJSON local não encontrado. Baixando do WordPress: {GEOJSON_URL}")
+    texto = abrir_url_texto(GEOJSON_URL)
+    return json.loads(texto)
+
+
+def filtrar_features_regionais(geojson):
+    features = []
+
+    for feature in geojson.get("features", []):
+        uf = obter_uf_feature(feature)
+
+        if uf in UFS_REGIONAIS:
+            features.append(feature)
+
+    if not features:
+        raise RuntimeError("Nenhum estado regional foi encontrado no GeoJSON.")
+
+    return features
+
+
+# ------------------------------------------------------------
+# GEOMETRIA: PONTO DENTRO DE POLÍGONO
+# ------------------------------------------------------------
+
+def iterar_aneis(geometry):
+    if not geometry:
+        return
+
+    tipo = geometry.get("type")
+    coords = geometry.get("coordinates", [])
+
+    if tipo == "Polygon":
+        yield coords
+
+    elif tipo == "MultiPolygon":
+        for poligono in coords:
+            yield poligono
+
+
+def ponto_em_anel(lon, lat, anel):
+    dentro = False
+    n = len(anel)
+
+    if n < 3:
+        return False
+
+    j = n - 1
+
+    for i in range(n):
+        xi, yi = anel[i][0], anel[i][1]
+        xj, yj = anel[j][0], anel[j][1]
+
+        cruza = ((yi > lat) != (yj > lat))
+
+        if cruza:
+            x_intersec = (xj - xi) * (lat - yi) / ((yj - yi) or 1e-12) + xi
+
+            if lon < x_intersec:
+                dentro = not dentro
+
+        j = i
+
+    return dentro
+
+
+def ponto_em_poligono(lon, lat, poligono):
+    if not poligono:
+        return False
+
+    anel_externo = poligono[0]
+
+    if not ponto_em_anel(lon, lat, anel_externo):
+        return False
+
+    # Remove buracos internos, se existirem
+    for buraco in poligono[1:]:
+        if ponto_em_anel(lon, lat, buraco):
+            return False
+
+    return True
+
+
+def ponto_em_feature(lon, lat, feature):
+    geometry = feature.get("geometry", {})
+
+    for poligono in iterar_aneis(geometry):
+        if ponto_em_poligono(lon, lat, poligono):
+            return True
+
+    return False
+
+
+def encontrar_uf_do_ponto(lon, lat, features):
+    for feature in features:
+        if ponto_em_feature(lon, lat, feature):
+            return obter_uf_feature(feature)
+
+    return ""
+
+
+def calcular_bounds(features):
+    min_lon = float("inf")
+    max_lon = float("-inf")
+    min_lat = float("inf")
+    max_lat = float("-inf")
+
+    for feature in features:
+        geometry = feature.get("geometry", {})
+
+        for poligono in iterar_aneis(geometry):
+            for anel in poligono:
+                for coord in anel:
+                    lon = float(coord[0])
+                    lat = float(coord[1])
+
+                    min_lon = min(min_lon, lon)
+                    max_lon = max(max_lon, lon)
+                    min_lat = min(min_lat, lat)
+                    max_lat = max(max_lat, lat)
+
+    if not math.isfinite(min_lon):
+        raise RuntimeError("Não foi possível calcular os limites do GeoJSON.")
+
+    return {
+        "min_lon": min_lon,
+        "max_lon": max_lon,
+        "min_lat": min_lat,
+        "max_lat": max_lat,
+    }
+
+
+# ------------------------------------------------------------
+# MALHA UNIFORME
+# ------------------------------------------------------------
+
+def gerar_candidatos_grade(features, total_desejado):
+    bounds = calcular_bounds(features)
+
+    largura = bounds["max_lon"] - bounds["min_lon"]
+    altura = bounds["max_lat"] - bounds["min_lat"]
+
+    if largura <= 0 or altura <= 0:
+        raise RuntimeError("Bounds inválidos para gerar grade.")
+
+    # Começa com uma grade maior do que 200 para depois selecionar bem distribuído
+    alvo_candidatos = total_desejado * MULTIPLICADOR_CANDIDATOS
+
+    proporcao = largura / altura
+
+    linhas = max(10, int(math.sqrt(alvo_candidatos / proporcao)))
+    colunas = max(10, int(linhas * proporcao))
+
+    candidatos = []
+
+    tentativa = 0
+
+    while len(candidatos) < alvo_candidatos and tentativa < 12:
+        tentativa += 1
+        candidatos = []
+
+        passo_lon = largura / max(1, colunas - 1)
+        passo_lat = altura / max(1, linhas - 1)
+
+        for i in range(linhas):
+            lat = bounds["min_lat"] + i * passo_lat
+
+            for j in range(colunas):
+                lon = bounds["min_lon"] + j * passo_lon
+
+                uf = encontrar_uf_do_ponto(lon, lat, features)
+
+                if uf in UFS_REGIONAIS:
+                    candidatos.append(
+                        {
+                            "uf": uf,
+                            "lat": round(lat, 6),
+                            "lon": round(lon, 6),
+                        }
+                    )
+
+        print(
+            f"Tentativa grade {tentativa}: "
+            f"{colunas} colunas x {linhas} linhas = {len(candidatos)} candidatos válidos"
+        )
+
+        colunas = int(colunas * 1.18) + 1
+        linhas = int(linhas * 1.18) + 1
+
+    if len(candidatos) < total_desejado:
+        raise RuntimeError(
+            f"Não foi possível gerar candidatos suficientes dentro da região. "
+            f"Candidatos: {len(candidatos)}"
+        )
+
+    return candidatos
+
+
+def distancia2(a, b):
+    dx = a["lon"] - b["lon"]
+    dy = a["lat"] - b["lat"]
+    return dx * dx + dy * dy
+
+
+def selecionar_pontos_uniformes(candidatos, total):
+    # Ordena por latitude e longitude para reduzir aleatoriedade
+    candidatos = sorted(candidatos, key=lambda p: (p["lat"], p["lon"]))
+
+    # Primeiro ponto: mais ao noroeste da região
+    primeiro = min(candidatos, key=lambda p: (p["lon"] - p["lat"]))
+    selecionados = [primeiro]
+
+    restantes = [
+        p for p in candidatos
+        if not (p["lat"] == primeiro["lat"] and p["lon"] == primeiro["lon"])
+    ]
+
+    # Farthest point sampling:
+    # seleciona sempre o candidato mais distante dos já selecionados.
+    while len(selecionados) < total and restantes:
+        melhor_indice = 0
+        melhor_distancia = -1
+
+        for idx, ponto in enumerate(restantes):
+            dmin = min(distancia2(ponto, s) for s in selecionados)
+
+            if dmin > melhor_distancia:
+                melhor_distancia = dmin
+                melhor_indice = idx
+
+        selecionados.append(restantes.pop(melhor_indice))
+
+        if len(selecionados) % 25 == 0:
+            print(f"Pontos selecionados: {len(selecionados)}/{total}")
+
+    if len(selecionados) != total:
+        raise RuntimeError(
+            f"Seleção final não gerou {total} pontos. Gerou {len(selecionados)}."
+        )
+
+    selecionados = sorted(selecionados, key=lambda p: (p["uf"], p["lat"], p["lon"]))
+
+    for idx, ponto in enumerate(selecionados, start=1):
+        ponto["id"] = f"P{idx:03d}"
+        ponto["nome"] = f"Ponto {idx:03d}"
+
+    return selecionados
+
+
+def gerar_pontos_grade_uniforme():
+    geojson = carregar_geojson()
+    features = filtrar_features_regionais(geojson)
+
+    candidatos = gerar_candidatos_grade(features, TOTAL_PONTOS_DESEJADO)
+    pontos = selecionar_pontos_uniformes(candidatos, TOTAL_PONTOS_DESEJADO)
+
+    distribuicao = {}
+
+    for p in pontos:
+        distribuicao[p["uf"]] = distribuicao.get(p["uf"], 0) + 1
+
+    print("Distribuição final por UF:")
+    for uf in UFS_REGIONAIS:
+        print(f"{uf}: {distribuicao.get(uf, 0)} pontos")
+
+    return pontos, distribuicao
+
+
+# ------------------------------------------------------------
+# OPEN-METEO
+# ------------------------------------------------------------
+
+def montar_url_openmeteo(pontos_lote):
     latitudes = ",".join(str(p["lat"]) for p in pontos_lote)
     longitudes = ",".join(str(p["lon"]) for p in pontos_lote)
 
@@ -256,11 +512,12 @@ def processar_resposta_lote(pontos_lote, dados):
 
         if len(precipitacao) < 72:
             raise RuntimeError(
-                f"Ponto {ponto['nome']} retornou menos de 72 horas de precipitação."
+                f"{ponto['nome']} retornou menos de 72 horas de precipitação."
             )
 
         resultados.append(
             {
+                "id": ponto["id"],
                 "uf": ponto["uf"],
                 "nome": ponto["nome"],
                 "lat": ponto["lat"],
@@ -277,31 +534,35 @@ def processar_resposta_lote(pontos_lote, dados):
 
 
 def consultar_lote(pontos_lote, numero_lote):
-    url = montar_url(pontos_lote)
+    url = montar_url_openmeteo(pontos_lote)
+
     dados = abrir_json_com_retry(
         url,
         f"Consultando lote {numero_lote} com {len(pontos_lote)} pontos",
     )
+
     return processar_resposta_lote(pontos_lote, dados)
 
 
 def consultar_ponto_individual(ponto):
-    url = montar_url([ponto])
+    url = montar_url_openmeteo([ponto])
+
     dados = abrir_json_com_retry(
         url,
         f"Consultando ponto individual {ponto['nome']} - {ponto['uf']}",
     )
+
     return processar_resposta_lote([ponto], dados)[0]
 
 
-def consultar_openmeteo():
+def consultar_openmeteo(pontos_grade):
     todos_resultados = []
     erros = []
     numero_lote = 0
 
-    for i in range(0, len(PONTOS), TAMANHO_LOTE):
+    for i in range(0, len(pontos_grade), TAMANHO_LOTE_OPENMETEO):
         numero_lote += 1
-        lote = PONTOS[i : i + TAMANHO_LOTE]
+        lote = pontos_grade[i:i + TAMANHO_LOTE_OPENMETEO]
 
         try:
             resultados = consultar_lote(lote, numero_lote)
@@ -318,8 +579,10 @@ def consultar_openmeteo():
 
                 except Exception as erro_ponto:
                     print(f"Erro no ponto {ponto['nome']} - {ponto['uf']}: {erro_ponto}")
+
                     erros.append(
                         {
+                            "id": ponto["id"],
                             "uf": ponto["uf"],
                             "nome": ponto["nome"],
                             "lat": ponto["lat"],
@@ -333,13 +596,22 @@ def consultar_openmeteo():
     return todos_resultados, erros
 
 
+# ------------------------------------------------------------
+# JSON FINAL
+# ------------------------------------------------------------
+
 def gerar_periodos(pontos):
-    periodos = {"24h": [], "48h": [], "72h": []}
+    periodos = {
+        "24h": [],
+        "48h": [],
+        "72h": [],
+    }
 
     for p in pontos:
         for periodo in periodos.keys():
             periodos[periodo].append(
                 {
+                    "id": p["id"],
                     "uf": p["uf"],
                     "nome": p["nome"],
                     "lat": p["lat"],
@@ -355,7 +627,11 @@ def resumo_periodo(pontos):
     valores = [float(p["mm"]) for p in pontos]
 
     if not valores:
-        return {"min": 0, "media": 0, "max": 0}
+        return {
+            "min": 0,
+            "media": 0,
+            "max": 0,
+        }
 
     return {
         "min": round(min(valores), 1),
@@ -391,8 +667,8 @@ def salvar_payload(payload):
     print(f"Backup atualizado: {BACKUP_JSON}")
 
 
-def gerar_payload(pontos, erros):
-    periodos = gerar_periodos(pontos)
+def gerar_payload(pontos_consultados, erros, distribuicao):
+    periodos = gerar_periodos(pontos_consultados)
 
     return {
         "ok": True,
@@ -401,12 +677,22 @@ def gerar_payload(pontos, erros):
         "area": AREA,
         "oficial_inmet": False,
         "simulado": False,
-        "tipo": "previsao_meteorologica_por_coordenada",
-        "metodo": "Consulta Open-Meteo Forecast API por pontos do Nordeste, Tocantins e Pará; cálculo de acumulados 24h, 48h e 72h",
+        "tipo": "previsao_meteorologica_por_grade_uniforme",
+        "metodo": (
+            "Malha uniforme com 200 pontos gerados dentro do GeoJSON regional "
+            "Nordeste + Tocantins + Pará; consulta Open-Meteo Forecast API por coordenada; "
+            "cálculo de acumulados 24h, 48h e 72h."
+        ),
+        "malha": {
+            "tipo": "grade_uniforme",
+            "total_pontos_planejados": TOTAL_PONTOS_DESEJADO,
+            "total_pontos_validos": len(pontos_consultados),
+            "distribuicao_por_uf": distribuicao,
+        },
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(),
-        "total_pontos": len(pontos),
+        "total_pontos": len(pontos_consultados),
         "total_erros": len(erros),
-        "erros": erros[:30],
+        "erros": erros[:50],
         "periodos": {
             "24h": {
                 "label": "Previsão acumulada 24h",
@@ -450,24 +736,29 @@ def aplicar_fallback(motivo):
 
 
 def main():
-    print("Iniciando coleta Open-Meteo: Nordeste + Tocantins + Pará...")
+    print("Iniciando coleta por malha uniforme: Nordeste + Tocantins + Pará...")
 
     try:
-        pontos, erros = consultar_openmeteo()
+        pontos_grade, distribuicao = gerar_pontos_grade_uniforme()
 
-        if len(pontos) < MINIMO_PONTOS_VALIDOS:
+        print(f"Total de pontos planejados: {len(pontos_grade)}")
+        print("Consultando Open-Meteo...")
+
+        pontos_consultados, erros = consultar_openmeteo(pontos_grade)
+
+        if len(pontos_consultados) < MINIMO_PONTOS_VALIDOS:
             motivo = (
-                f"Poucos pontos válidos retornados: {len(pontos)}. "
+                f"Poucos pontos válidos retornados: {len(pontos_consultados)}. "
                 f"Mínimo exigido: {MINIMO_PONTOS_VALIDOS}."
             )
             print(motivo)
             aplicar_fallback(motivo)
             return
 
-        payload = gerar_payload(pontos, erros)
+        payload = gerar_payload(pontos_consultados, erros, distribuicao)
         salvar_payload(payload)
 
-        print(f"Total de pontos válidos: {len(pontos)}")
+        print(f"Total de pontos válidos: {len(pontos_consultados)}")
         print(f"Total de erros: {len(erros)}")
 
         for periodo, dados_periodo in payload["periodos"].items():
