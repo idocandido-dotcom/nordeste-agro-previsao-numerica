@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "fonte": "INMET / VIME",
+  "modelo": "COSMO 7x7km",
+  "produto": "Precipitação Acumulada",
+  "area": "MATOPIBA",
+  "oficial": true,
+  "simulado": false,
+  "gerado_em_utc": "2026-05-04T14:21:06.125105+00:00",
+  "frames": {
+    "24h": {
+      "label": "24h",
+      "url": "https://cdn.jsdelivr.net/gh/idocandido-dotcom/nordeste-agro-previsao-numerica@main/public/clima/matopiba/matopiba_24h.png"
+    },
+    "48h": {
+      "label": "48h",
+      "url": "https://cdn.jsdelivr.net/gh/idocandido-dotcom/nordeste-agro-previsao-numerica@main/public/clima/matopiba/matopiba_48h.png"
+    },
+    "72h": {
+      "label": "72h",
+      "url": "https://cdn.jsdelivr.net/gh/idocandido-dotcom/nordeste-agro-previsao-numerica@main/public/clima/matopiba/matopiba_72h.png"
+    }
+  },
+  "gif": {
+    "label": "GIF animado",
+    "url": "https://cdn.jsdelivr.net/gh/idocandido-dotcom/nordeste-agro-previsao-numerica@main/public/clima/matopiba/matopiba_animado.gif"
+  }
+}
