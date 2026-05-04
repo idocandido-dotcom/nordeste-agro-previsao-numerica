@@ -1,0 +1,41 @@
+name: Atualizar Cotações Oficiais Nordeste Agro
+
+on:
+  schedule:
+    # Roda de segunda a sexta.
+    # GitHub usa UTC: 09:20 UTC = 06:20 no horário de Brasília/Fortaleza.
+    - cron: "20 9 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml pandas openpyxl xlrd python-dateutil
+
+      - name: Executar coletor oficial de cotações
+        run: |
+          python scripts/coletor_cotacoes_oficiais.py
+
+      - name: Salvar JSON atualizado
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Atualiza cotações oficiais Nordeste Agro"
+          file_pattern: |
+            public/cotacoes/cotacoes_oficiais_nordeste_agro.json
+            public/cotacoes/cotacoes_regionais.json
