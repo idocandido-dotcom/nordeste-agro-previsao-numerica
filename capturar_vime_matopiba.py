@@ -12,37 +12,44 @@ from playwright.sync_api import sync_playwright
 # =========================
 
 VIME_URL = "https://vime.inmet.gov.br/CO"
+
 MODELO_DESEJADO = "COSMO 7x7km"
 MAPA_DESEJADO = "Precipitação Acumulada"
 
-# Horas desejadas
+# Horas desejadas.
+# O VIME pode mostrar +024 ou +24, por isso deixamos várias opções.
 HORAS = [
-    {"label": "+024", "slug": "24h"},
-    {"label": "+048", "slug": "48h"},
-    {"label": "+072", "slug": "72h"},
+    {"labels": ["+024", "+24", "024", "24"], "slug": "24h"},
+    {"labels": ["+048", "+48", "048", "48"], "slug": "48h"},
+    {"labels": ["+072", "+72", "072", "72"], "slug": "72h"},
 ]
 
-# Saída
+# Pasta onde as imagens serão salvas no GitHub
 OUT_DIR = Path("public/clima/matopiba")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Tamanho da viewport para o Playwright
+# Tamanho da tela virtual usada pelo navegador automatizado
 VIEWPORT_WIDTH = 1365
 VIEWPORT_HEIGHT = 900
 
-# Recorte bruto do mapa dentro da página inteira
-# Ajustado para o layout do VIME mostrado no seu print.
-# Se um dia o layout do VIME mudar, ajuste estes valores.
+# Recorte bruto do mapa dentro da tela do VIME.
+# Esses valores foram baseados no layout que você mostrou no print.
+# Se o VIME mudar o layout, podemos ajustar depois.
 MAP_CROP = (370, 85, 990, 650)
 
-# Recorte final para focar apenas MATOPIBA (sem Pará)
-# (x1, y1, x2, y2) dentro do recorte do mapa
+# Recorte final para focar MATOPIBA, retirando áreas fora do foco.
+# O objetivo é não usar Pará e focar Maranhão, Tocantins, Piauí e Bahia.
 MATOPIBA_CROP = (95, 35, 610, 520)
 
-REPO_CDN_BASE = "https://cdn.jsdelivr.net/gh/idocandido-dotcom/nordeste-agro-previsao-numerica@main/public/clima/matopiba"
+# URL pública via jsDelivr para o HTML do WordPress carregar os arquivos
+REPO_CDN_BASE = (
+    "https://cdn.jsdelivr.net/gh/"
+    "idocandido-dotcom/nordeste-agro-previsao-numerica@main/"
+    "public/clima/matopiba"
+)
 
 
-def clicar_texto_seguro(page, texto, timeout=5000):
+def clicar_texto_seguro(page, texto, timeout=4000):
     try:
         page.get_by_text(texto, exact=True).click(timeout=timeout)
         return True
@@ -51,11 +58,18 @@ def clicar_texto_seguro(page, texto, timeout=5000):
 
 
 def selecionar_modelo_e_mapa(page):
+    """
+    Tenta selecionar o modelo COSMO 7x7km e o mapa de Precipitação Acumulada
+    nos selects do VIME.
+    """
     selects = page.locator("select")
     qtd = selects.count()
 
+    print(f"Selects encontrados na página: {qtd}")
+
     for i in range(qtd):
         sel = selects.nth(i)
+
         try:
             options = sel.locator("option")
             opt_count = options.count()
@@ -64,57 +78,128 @@ def selecionar_modelo_e_mapa(page):
             for j in range(opt_count):
                 labels.append(options.nth(j).inner_text().strip())
 
-            # Modelo
+            print(f"Select {i} opções:", labels[:20])
+
+            # Selecionar modelo
             if any(MODELO_DESEJADO.lower() in x.lower() for x in labels):
                 try:
                     sel.select_option(label=MODELO_DESEJADO)
-                    time.sleep(1)
+                    print(f"Modelo selecionado: {MODELO_DESEJADO}")
+                    time.sleep(1.5)
                     continue
-                except Exception:
-                    pass
+                except Exception as erro:
+                    print("Não foi possível selecionar modelo por label exato:", erro)
 
-            # Mapa
-            if any("precipitação acumulada" in x.lower() for x in labels):
-                try:
-                    # tenta o texto exato, se não der, tenta por aproximação
-                    try:
-                        sel.select_option(label=MAPA_DESEJADO)
-                    except Exception:
-                        for lab in labels:
-                            if "precipitação acumulada" in lab.lower():
+                    for lab in labels:
+                        if "cosmo" in lab.lower() and "7" in lab.lower():
+                            try:
                                 sel.select_option(label=lab)
+                                print(f"Modelo selecionado por aproximação: {lab}")
+                                time.sleep(1.5)
                                 break
-                    time.sleep(1)
-                    continue
-                except Exception:
-                    pass
+                            except Exception:
+                                pass
+
+            # Selecionar mapa
+            if any("precipitação acumulada" in x.lower() or "precipitacao acumulada" in x.lower() for x in labels):
+                escolhido = None
+
+                for lab in labels:
+                    lab_lower = lab.lower()
+                    if "precipitação acumulada" in lab_lower or "precipitacao acumulada" in lab_lower:
+                        escolhido = lab
+                        break
+
+                if escolhido:
+                    try:
+                        sel.select_option(label=escolhido)
+                        print(f"Mapa selecionado: {escolhido}")
+                        time.sleep(1.5)
+                        continue
+                    except Exception as erro:
+                        print("Não foi possível selecionar mapa:", erro)
+
+        except Exception as erro:
+            print(f"Erro ao ler select {i}:", erro)
+
+
+def clicar_hora(page, labels):
+    """
+    Tenta clicar no botão de previsão por diferentes formas:
+    +024, +24, 024, 24.
+    """
+    print("Tentando clicar horário com labels:", labels)
+
+    # Tentativa 1: texto exato
+    for label in labels:
+        try:
+            page.get_by_text(label, exact=True).click(timeout=3000)
+            return label
         except Exception:
             pass
 
+    # Tentativa 2: botão contendo o texto
+    for label in labels:
+        try:
+            page.locator("button").filter(has_text=label).first.click(timeout=3000)
+            return label
+        except Exception:
+            pass
 
-def capturar_frame(page, hora_label, nome_saida_png):
-    # clica no botão da hora
-    if not clicar_texto_seguro(page, hora_label, timeout=4000):
-        raise RuntimeError(f"Não foi possível clicar no horário {hora_label} no VIME.")
+    # Tentativa 3: qualquer elemento com texto
+    for label in labels:
+        try:
+            page.locator(f"text={label}").first.click(timeout=3000)
+            return label
+        except Exception:
+            pass
+
+    # Diagnóstico: lista textos de botões encontrados
+    try:
+        botoes = page.locator("button")
+        total = botoes.count()
+        textos = []
+
+        for i in range(min(total, 80)):
+            try:
+                txt = botoes.nth(i).inner_text(timeout=1000).strip()
+                if txt:
+                    textos.append(txt)
+            except Exception:
+                pass
+
+        print("Botões encontrados na página:", textos)
+    except Exception as erro:
+        print("Não foi possível listar botões:", erro)
+
+    raise RuntimeError(f"Não foi possível clicar no horário. Tentativas: {labels}")
+
+
+def capturar_frame(page, labels, nome_saida_png):
+    """
+    Clica no horário desejado, faz screenshot da página,
+    recorta a área do mapa e salva a imagem final MATOPIBA.
+    """
+    hora_clicada = clicar_hora(page, labels)
+
+    print(f"Horário selecionado no VIME: {hora_clicada}")
 
     time.sleep(4)
 
-    fullshot = OUT_DIR / f"_full_{hora_label.replace('+', '')}.png"
+    fullshot = OUT_DIR / f"_full_{nome_saida_png}"
     page.screenshot(path=str(fullshot), full_page=True)
 
     img = Image.open(fullshot)
 
-    # recorte bruto do mapa
+    # Recorte bruto do mapa
     mapa = img.crop(MAP_CROP)
 
-    # recorte do MATOPIBA
+    # Recorte final do MATOPIBA
     matopiba = mapa.crop(MATOPIBA_CROP)
 
-    # salva png final
     out_png = OUT_DIR / nome_saida_png
     matopiba.save(out_png)
 
-    # remove full temporário
     try:
         fullshot.unlink()
     except Exception:
@@ -124,7 +209,12 @@ def capturar_frame(page, hora_label, nome_saida_png):
 
 
 def gerar_gif(frames, gif_path):
-    imagens = [Image.open(p).convert("P", palette=Image.ADAPTIVE) for p in frames]
+    imagens = []
+
+    for p in frames:
+        img = Image.open(p).convert("P", palette=Image.ADAPTIVE)
+        imagens.append(img)
+
     if not imagens:
         raise RuntimeError("Nenhum frame disponível para gerar GIF.")
 
@@ -168,7 +258,12 @@ def gerar_manifest(arquivos):
     }
 
     manifest_path = OUT_DIR / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
+    return manifest_path
 
 
 def main():
@@ -176,42 +271,62 @@ def main():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": VIEWPORT_WIDTH, "height": VIEWPORT_HEIGHT})
 
-        page.goto(VIME_URL, wait_until="domcontentloaded", timeout=120000)
-        time.sleep(8)
+        page = browser.new_page(
+            viewport={
+                "width": VIEWPORT_WIDTH,
+                "height": VIEWPORT_HEIGHT
+            }
+        )
 
-        # garante a aba CO, caso necessário
+        print("Abrindo VIME/INMET:", VIME_URL)
+
+        page.goto(
+            VIME_URL,
+            wait_until="domcontentloaded",
+            timeout=120000
+        )
+
+        time.sleep(10)
+
+        # Clica em CO, caso a página precise reforçar a região.
         clicar_texto_seguro(page, "CO", timeout=3000)
-        time.sleep(1)
-
-        selecionar_modelo_e_mapa(page)
         time.sleep(2)
 
-        # captura 24h, 48h, 72h
+        selecionar_modelo_e_mapa(page)
+        time.sleep(3)
+
         for item in HORAS:
             slug = item["slug"]
-            label = item["label"]
+            labels = item["labels"]
             nome = f"matopiba_{slug}.png"
-            print(f"Capturando {label} ...")
-            arquivos[slug] = capturar_frame(page, label, nome)
+
+            print(f"Capturando {slug}...")
+            arquivos[slug] = capturar_frame(page, labels, nome)
 
         browser.close()
 
-    # gera GIF
     gif_path = OUT_DIR / "matopiba_animado.gif"
+
     gerar_gif(
-        [arquivos["24h"], arquivos["48h"], arquivos["72h"]],
+        [
+            arquivos["24h"],
+            arquivos["48h"],
+            arquivos["72h"]
+        ],
         gif_path
     )
+
     arquivos["gif"] = gif_path
 
-    # gera manifest
-    gerar_manifest(arquivos)
+    manifest_path = gerar_manifest(arquivos)
 
     print("Arquivos gerados com sucesso:")
+
     for k, v in arquivos.items():
         print(k, "->", v)
+
+    print("Manifest ->", manifest_path)
 
 
 if __name__ == "__main__":
