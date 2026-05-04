@@ -1,5 +1,6 @@
 import json
 import time
+import shutil
 import urllib.parse
 import urllib.request
 import urllib.error
@@ -16,13 +17,13 @@ from pathlib import Path
 # - calcula precipitação acumulada prevista para 24h, 48h e 72h;
 # - salva JSON para o WordPress gerar o mapa e o slide.
 #
-# Correções desta versão:
-# - reduz tamanho dos lotes;
-# - adiciona retentativas em erro 502/503/504;
-# - adiciona pausa entre chamadas;
-# - se um lote falhar, tenta ponto por ponto;
-# - não simula dados;
-# - registra pontos com erro no JSON.
+# Versão otimizada:
+# - menos tentativas;
+# - menos tempo de espera;
+# - fallback para último JSON válido;
+# - não inventa dados;
+# - não simula valores;
+# - se a API falhar muito, mantém o mapa anterior funcionando.
 # ============================================================
 
 
@@ -30,6 +31,7 @@ OUT_DIR = Path("public/clima/matopiba")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 OUT_JSON = OUT_DIR / "openmeteo_matopiba.json"
+BACKUP_JSON = OUT_DIR / "openmeteo_matopiba_ultimo_valido.json"
 
 FONTE = "Open-Meteo Forecast API"
 MODELO = "Best match / modelos meteorológicos combinados pela Open-Meteo"
@@ -37,10 +39,11 @@ AREA = "Nordeste + Tocantins + Pará"
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 
-TAMANHO_LOTE = 5
-MAX_TENTATIVAS = 5
-PAUSA_ENTRE_LOTES = 2
-PAUSA_BASE_RETRY = 6
+# Ajustes de velocidade e segurança
+TAMANHO_LOTE = 8
+MAX_TENTATIVAS = 3
+PAUSA_ENTRE_LOTES = 1
+PAUSA_BASE_RETRY = 4
 MINIMO_PONTOS_VALIDOS = 35
 
 
@@ -188,7 +191,7 @@ def abrir_json_com_retry(url, descricao):
                 method="GET"
             )
 
-            with urllib.request.urlopen(req, timeout=120) as response:
+            with urllib.request.urlopen(req, timeout=90) as response:
                 texto = response.read().decode("utf-8")
                 return json.loads(texto)
 
@@ -213,10 +216,9 @@ def abrir_json_com_retry(url, descricao):
 
 
 def soma_intervalo(valores, inicio, fim):
-    recorte = valores[inicio:fim]
     total = 0.0
 
-    for v in recorte:
+    for v in valores[inicio:fim]:
         if v is None:
             continue
         total += float(v)
@@ -248,19 +250,15 @@ def processar_resposta_lote(pontos_lote, dados):
                 f"Ponto {ponto['nome']} retornou menos de 72 horas de precipitação."
             )
 
-        acumulado_24 = soma_intervalo(precipitacao, 0, 24)
-        acumulado_48 = soma_intervalo(precipitacao, 24, 48)
-        acumulado_72 = soma_intervalo(precipitacao, 48, 72)
-
         resultados.append({
             "uf": ponto["uf"],
             "nome": ponto["nome"],
             "lat": ponto["lat"],
             "lon": ponto["lon"],
             "precipitacao_mm": {
-                "24h": acumulado_24,
-                "48h": acumulado_48,
-                "72h": acumulado_72
+                "24h": soma_intervalo(precipitacao, 0, 24),
+                "48h": soma_intervalo(precipitacao, 24, 48),
+                "72h": soma_intervalo(precipitacao, 48, 72)
             }
         })
 
@@ -313,12 +311,6 @@ def consultar_openmeteo():
 
         time.sleep(PAUSA_ENTRE_LOTES)
 
-    if len(todos_resultados) < MINIMO_PONTOS_VALIDOS:
-        raise RuntimeError(
-            f"Poucos pontos válidos retornados: {len(todos_resultados)}. "
-            f"Mínimo exigido: {MINIMO_PONTOS_VALIDOS}."
-        )
-
     return todos_resultados, erros
 
 
@@ -359,13 +351,37 @@ def resumo_periodo(pontos):
     }
 
 
-def main():
-    print("Iniciando coleta Open-Meteo: Nordeste + Tocantins + Pará...")
+def carregar_backup_valido():
+    if BACKUP_JSON.exists():
+        print("Carregando último JSON válido como fallback...")
+        return json.loads(BACKUP_JSON.read_text(encoding="utf-8"))
 
-    pontos, erros = consultar_openmeteo()
+    if OUT_JSON.exists():
+        print("Carregando JSON atual como fallback...")
+        return json.loads(OUT_JSON.read_text(encoding="utf-8"))
+
+    return None
+
+
+def salvar_payload(payload):
+    OUT_JSON.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
+    BACKUP_JSON.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
+    print(f"Arquivo gerado: {OUT_JSON}")
+    print(f"Backup atualizado: {BACKUP_JSON}")
+
+
+def gerar_payload(pontos, erros):
     periodos = gerar_periodos(pontos)
 
-    payload = {
+    return {
         "ok": True,
         "fonte": FONTE,
         "modelo": MODELO,
@@ -397,17 +413,57 @@ def main():
         }
     }
 
+
+def aplicar_fallback(motivo):
+    backup = carregar_backup_valido()
+
+    if not backup:
+        raise RuntimeError(
+            "Coleta falhou e não existe JSON anterior válido para fallback."
+        )
+
+    backup["ok"] = True
+    backup["fallback_usado"] = True
+    backup["fallback_motivo"] = motivo
+    backup["fallback_em_utc"] = datetime.now(timezone.utc).isoformat()
+
     OUT_JSON.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
+        json.dumps(backup, ensure_ascii=False, indent=2),
         encoding="utf-8"
     )
 
-    print(f"Arquivo gerado: {OUT_JSON}")
-    print(f"Total de pontos válidos: {len(pontos)}")
-    print(f"Total de erros: {len(erros)}")
+    print("Fallback aplicado com sucesso.")
+    print(f"Motivo: {motivo}")
 
-    for periodo, dados_periodo in payload["periodos"].items():
-        print(periodo, dados_periodo["resumo"])
+
+def main():
+    print("Iniciando coleta Open-Meteo: Nordeste + Tocantins + Pará...")
+
+    try:
+        pontos, erros = consultar_openmeteo()
+
+        if len(pontos) < MINIMO_PONTOS_VALIDOS:
+            motivo = (
+                f"Poucos pontos válidos retornados: {len(pontos)}. "
+                f"Mínimo exigido: {MINIMO_PONTOS_VALIDOS}."
+            )
+            print(motivo)
+            aplicar_fallback(motivo)
+            return
+
+        payload = gerar_payload(pontos, erros)
+        salvar_payload(payload)
+
+        print(f"Total de pontos válidos: {len(pontos)}")
+        print(f"Total de erros: {len(erros)}")
+
+        for periodo, dados_periodo in payload["periodos"].items():
+            print(periodo, dados_periodo["resumo"])
+
+    except Exception as erro:
+        motivo = str(erro)
+        print(f"Erro geral na coleta: {motivo}")
+        aplicar_fallback(motivo)
 
 
 if __name__ == "__main__":
