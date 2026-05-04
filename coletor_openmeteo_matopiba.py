@@ -1,6 +1,5 @@
 import json
 import time
-import shutil
 import urllib.parse
 import urllib.request
 import urllib.error
@@ -9,29 +8,25 @@ from pathlib import Path
 
 
 # ============================================================
-# COLETOR NORDESTE + TOCANTINS + PARÁ — OPEN-METEO
+# COLETOR REGIONAL — NORDESTE + TOCANTINS + PARÁ
+# Fonte: Open-Meteo Forecast API
 # ============================================================
 # Este script:
-# - consulta a Open-Meteo Forecast API;
-# - usa pontos reais por coordenada;
-# - calcula precipitação acumulada prevista para 24h, 48h e 72h;
-# - salva JSON para o WordPress gerar o mapa e o slide.
-#
-# Versão otimizada:
-# - menos tentativas;
-# - menos tempo de espera;
-# - fallback para último JSON válido;
+# - consulta previsão por coordenada na Open-Meteo;
+# - calcula acumulado previsto para 24h, 48h e 72h;
+# - gera JSON regional para o WordPress;
+# - inclui todos os estados do Nordeste + Tocantins + Pará;
 # - não inventa dados;
-# - não simula valores;
-# - se a API falhar muito, mantém o mapa anterior funcionando.
+# - não simula chuva;
+# - mantém backup do último JSON válido.
 # ============================================================
 
 
-OUT_DIR = Path("public/clima/matopiba")
+OUT_DIR = Path("public/clima/regional")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-OUT_JSON = OUT_DIR / "openmeteo_matopiba.json"
-BACKUP_JSON = OUT_DIR / "openmeteo_matopiba_ultimo_valido.json"
+OUT_JSON = OUT_DIR / "openmeteo_regional.json"
+BACKUP_JSON = OUT_DIR / "openmeteo_regional_ultimo_valido.json"
 
 FONTE = "Open-Meteo Forecast API"
 MODELO = "Best match / modelos meteorológicos combinados pela Open-Meteo"
@@ -39,7 +34,6 @@ AREA = "Nordeste + Tocantins + Pará"
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 
-# Ajustes de velocidade e segurança
 TAMANHO_LOTE = 8
 MAX_TENTATIVAS = 3
 PAUSA_ENTRE_LOTES = 1
@@ -59,6 +53,11 @@ PONTOS = [
     {"uf": "PA", "nome": "Tailândia", "lat": -2.9458, "lon": -48.9489},
     {"uf": "PA", "nome": "Uruará", "lat": -3.7158, "lon": -53.7397},
     {"uf": "PA", "nome": "Novo Progresso", "lat": -7.1431, "lon": -55.3786},
+    {"uf": "PA", "nome": "Itaituba", "lat": -4.2761, "lon": -55.9836},
+    {"uf": "PA", "nome": "Tucuruí", "lat": -3.7661, "lon": -49.6725},
+    {"uf": "PA", "nome": "Xinguara", "lat": -7.1003, "lon": -49.9431},
+    {"uf": "PA", "nome": "São Félix do Xingu", "lat": -6.6447, "lon": -51.9950},
+    {"uf": "PA", "nome": "Belém", "lat": -1.4558, "lon": -48.4902},
 
     # MARANHÃO
     {"uf": "MA", "nome": "Balsas", "lat": -7.5325, "lon": -46.0356},
@@ -71,6 +70,10 @@ PONTOS = [
     {"uf": "MA", "nome": "Chapadinha", "lat": -3.7417, "lon": -43.3603},
     {"uf": "MA", "nome": "Caxias", "lat": -4.8589, "lon": -43.3561},
     {"uf": "MA", "nome": "São Luís", "lat": -2.5307, "lon": -44.3068},
+    {"uf": "MA", "nome": "Sambaíba", "lat": -7.1344, "lon": -45.3511},
+    {"uf": "MA", "nome": "Benedito Leite", "lat": -7.2100, "lon": -44.5572},
+    {"uf": "MA", "nome": "Fortaleza dos Nogueiras", "lat": -6.9656, "lon": -46.1747},
+    {"uf": "MA", "nome": "Loreto", "lat": -7.0811, "lon": -45.1458},
 
     # TOCANTINS
     {"uf": "TO", "nome": "Palmas", "lat": -10.1844, "lon": -48.3336},
@@ -83,6 +86,8 @@ PONTOS = [
     {"uf": "TO", "nome": "Lagoa da Confusão", "lat": -10.7906, "lon": -49.6197},
     {"uf": "TO", "nome": "Natividade", "lat": -11.7075, "lon": -47.7225},
     {"uf": "TO", "nome": "Araguaína", "lat": -7.1911, "lon": -48.2072},
+    {"uf": "TO", "nome": "Colinas do Tocantins", "lat": -8.0592, "lon": -48.4750},
+    {"uf": "TO", "nome": "Paraíso do Tocantins", "lat": -10.1750, "lon": -48.8828},
 
     # PIAUÍ
     {"uf": "PI", "nome": "Bom Jesus", "lat": -9.0740, "lon": -44.3590},
@@ -95,6 +100,8 @@ PONTOS = [
     {"uf": "PI", "nome": "Picos", "lat": -7.0778, "lon": -41.4672},
     {"uf": "PI", "nome": "Santa Filomena", "lat": -9.1128, "lon": -45.9211},
     {"uf": "PI", "nome": "Ribeiro Gonçalves", "lat": -7.5583, "lon": -45.2444},
+    {"uf": "PI", "nome": "Sebastião Leal", "lat": -7.5686, "lon": -44.0608},
+    {"uf": "PI", "nome": "Currais", "lat": -9.0111, "lon": -44.4069},
 
     # CEARÁ
     {"uf": "CE", "nome": "Fortaleza", "lat": -3.7319, "lon": -38.5267},
@@ -156,6 +163,8 @@ PONTOS = [
     {"uf": "BA", "nome": "Vitória da Conquista", "lat": -14.8619, "lon": -40.8442},
     {"uf": "BA", "nome": "Ilhéus", "lat": -14.7930, "lon": -39.0460},
     {"uf": "BA", "nome": "Juazeiro", "lat": -9.4167, "lon": -40.5033},
+    {"uf": "BA", "nome": "Riachão das Neves", "lat": -11.7461, "lon": -44.9147},
+    {"uf": "BA", "nome": "Cocos", "lat": -14.1817, "lon": -44.5356},
 ]
 
 
@@ -169,7 +178,7 @@ def montar_url(pontos_lote):
         "hourly": "precipitation",
         "forecast_days": "4",
         "timezone": "America/Bahia",
-        "precipitation_unit": "mm"
+        "precipitation_unit": "mm",
     }
 
     return API_URL + "?" + urllib.parse.urlencode(params)
@@ -186,9 +195,9 @@ def abrir_json_com_retry(url, descricao):
                 url,
                 headers={
                     "Accept": "application/json",
-                    "User-Agent": "NordesteAgro-Clima/1.0"
+                    "User-Agent": "NordesteAgro-Clima/1.0",
                 },
-                method="GET"
+                method="GET",
             )
 
             with urllib.request.urlopen(req, timeout=90) as response:
@@ -200,7 +209,7 @@ def abrir_json_com_retry(url, descricao):
 
             if erro.code in (429, 500, 502, 503, 504):
                 espera = PAUSA_BASE_RETRY * tentativa
-                print(f"Erro HTTP {erro.code}. Aguardando {espera}s e tentando novamente...")
+                print(f"Erro HTTP {erro.code}. Aguardando {espera}s...")
                 time.sleep(espera)
                 continue
 
@@ -209,7 +218,7 @@ def abrir_json_com_retry(url, descricao):
         except Exception as erro:
             ultimo_erro = erro
             espera = PAUSA_BASE_RETRY * tentativa
-            print(f"Erro na consulta: {erro}. Aguardando {espera}s e tentando novamente...")
+            print(f"Erro na consulta: {erro}. Aguardando {espera}s...")
             time.sleep(espera)
 
     raise RuntimeError(f"Falha após {MAX_TENTATIVAS} tentativas em {descricao}: {ultimo_erro}")
@@ -250,42 +259,49 @@ def processar_resposta_lote(pontos_lote, dados):
                 f"Ponto {ponto['nome']} retornou menos de 72 horas de precipitação."
             )
 
-        resultados.append({
-            "uf": ponto["uf"],
-            "nome": ponto["nome"],
-            "lat": ponto["lat"],
-            "lon": ponto["lon"],
-            "precipitacao_mm": {
-                "24h": soma_intervalo(precipitacao, 0, 24),
-                "48h": soma_intervalo(precipitacao, 24, 48),
-                "72h": soma_intervalo(precipitacao, 48, 72)
+        resultados.append(
+            {
+                "uf": ponto["uf"],
+                "nome": ponto["nome"],
+                "lat": ponto["lat"],
+                "lon": ponto["lon"],
+                "precipitacao_mm": {
+                    "24h": soma_intervalo(precipitacao, 0, 24),
+                    "48h": soma_intervalo(precipitacao, 24, 48),
+                    "72h": soma_intervalo(precipitacao, 48, 72),
+                },
             }
-        })
+        )
 
     return resultados
 
 
 def consultar_lote(pontos_lote, numero_lote):
     url = montar_url(pontos_lote)
-    dados = abrir_json_com_retry(url, f"Consultando lote {numero_lote} com {len(pontos_lote)} pontos")
+    dados = abrir_json_com_retry(
+        url,
+        f"Consultando lote {numero_lote} com {len(pontos_lote)} pontos",
+    )
     return processar_resposta_lote(pontos_lote, dados)
 
 
 def consultar_ponto_individual(ponto):
     url = montar_url([ponto])
-    dados = abrir_json_com_retry(url, f"Consultando ponto individual {ponto['nome']} - {ponto['uf']}")
+    dados = abrir_json_com_retry(
+        url,
+        f"Consultando ponto individual {ponto['nome']} - {ponto['uf']}",
+    )
     return processar_resposta_lote([ponto], dados)[0]
 
 
 def consultar_openmeteo():
     todos_resultados = []
     erros = []
-
     numero_lote = 0
 
     for i in range(0, len(PONTOS), TAMANHO_LOTE):
         numero_lote += 1
-        lote = PONTOS[i:i + TAMANHO_LOTE]
+        lote = PONTOS[i : i + TAMANHO_LOTE]
 
         try:
             resultados = consultar_lote(lote, numero_lote)
@@ -293,21 +309,24 @@ def consultar_openmeteo():
 
         except Exception as erro_lote:
             print(f"Erro no lote {numero_lote}: {erro_lote}")
-            print("Tentando recuperar lote ponto por ponto...")
+            print("Tentando recuperar ponto por ponto...")
 
             for ponto in lote:
                 try:
                     resultado = consultar_ponto_individual(ponto)
                     todos_resultados.append(resultado)
+
                 except Exception as erro_ponto:
                     print(f"Erro no ponto {ponto['nome']} - {ponto['uf']}: {erro_ponto}")
-                    erros.append({
-                        "uf": ponto["uf"],
-                        "nome": ponto["nome"],
-                        "lat": ponto["lat"],
-                        "lon": ponto["lon"],
-                        "erro": str(erro_ponto)
-                    })
+                    erros.append(
+                        {
+                            "uf": ponto["uf"],
+                            "nome": ponto["nome"],
+                            "lat": ponto["lat"],
+                            "lon": ponto["lon"],
+                            "erro": str(erro_ponto),
+                        }
+                    )
 
         time.sleep(PAUSA_ENTRE_LOTES)
 
@@ -315,21 +334,19 @@ def consultar_openmeteo():
 
 
 def gerar_periodos(pontos):
-    periodos = {
-        "24h": [],
-        "48h": [],
-        "72h": []
-    }
+    periodos = {"24h": [], "48h": [], "72h": []}
 
     for p in pontos:
         for periodo in periodos.keys():
-            periodos[periodo].append({
-                "uf": p["uf"],
-                "nome": p["nome"],
-                "lat": p["lat"],
-                "lon": p["lon"],
-                "mm": p["precipitacao_mm"][periodo]
-            })
+            periodos[periodo].append(
+                {
+                    "uf": p["uf"],
+                    "nome": p["nome"],
+                    "lat": p["lat"],
+                    "lon": p["lon"],
+                    "mm": p["precipitacao_mm"][periodo],
+                }
+            )
 
     return periodos
 
@@ -338,16 +355,12 @@ def resumo_periodo(pontos):
     valores = [float(p["mm"]) for p in pontos]
 
     if not valores:
-        return {
-            "min": 0,
-            "media": 0,
-            "max": 0
-        }
+        return {"min": 0, "media": 0, "max": 0}
 
     return {
         "min": round(min(valores), 1),
         "media": round(sum(valores) / len(valores), 1),
-        "max": round(max(valores), 1)
+        "max": round(max(valores), 1),
     }
 
 
@@ -366,12 +379,12 @@ def carregar_backup_valido():
 def salvar_payload(payload):
     OUT_JSON.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8"
+        encoding="utf-8",
     )
 
     BACKUP_JSON.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8"
+        encoding="utf-8",
     )
 
     print(f"Arquivo gerado: {OUT_JSON}")
@@ -398,19 +411,19 @@ def gerar_payload(pontos, erros):
             "24h": {
                 "label": "Previsão acumulada 24h",
                 "resumo": resumo_periodo(periodos["24h"]),
-                "pontos": periodos["24h"]
+                "pontos": periodos["24h"],
             },
             "48h": {
                 "label": "Previsão acumulada 48h",
                 "resumo": resumo_periodo(periodos["48h"]),
-                "pontos": periodos["48h"]
+                "pontos": periodos["48h"],
             },
             "72h": {
                 "label": "Previsão acumulada 72h",
                 "resumo": resumo_periodo(periodos["72h"]),
-                "pontos": periodos["72h"]
-            }
-        }
+                "pontos": periodos["72h"],
+            },
+        },
     }
 
 
@@ -429,7 +442,7 @@ def aplicar_fallback(motivo):
 
     OUT_JSON.write_text(
         json.dumps(backup, ensure_ascii=False, indent=2),
-        encoding="utf-8"
+        encoding="utf-8",
     )
 
     print("Fallback aplicado com sucesso.")
