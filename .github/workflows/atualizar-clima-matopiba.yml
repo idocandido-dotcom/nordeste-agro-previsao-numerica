@@ -2,10 +2,11 @@ name: Atualizar Clima Regional Open-Meteo
 
 on:
   schedule:
-    # Roda de hora em hora.
-    # O GitHub usa horário UTC.
-    # Exemplo: 00:35, 01:35, 02:35... UTC
-    - cron: "35 * * * *"
+    # Atualiza de hora em hora.
+    # O GitHub usa UTC.
+    # Roda sempre no minuto 17 de cada hora.
+    - cron: "17 * * * *"
+
   workflow_dispatch:
 
 permissions:
