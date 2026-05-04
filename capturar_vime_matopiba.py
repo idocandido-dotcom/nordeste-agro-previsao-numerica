@@ -19,24 +19,18 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 # - extrai os frames +24, +48 e +72;
 # - recorta o foco MATOPIBA;
 # - gera PNGs finais;
-# - gera GIF animado;
 # - gera manifest.json para o WordPress.
 #
 # Não cria valores numéricos.
 # Não cria grade própria.
+# Não gera simulação.
 # Não publica imagem branca/carregando.
-# Usa apenas imagens baixadas do VIME/INMET.
+# Não gera GIF.
+# O slide será feito pelo HTML do WordPress.
 # ============================================================
 
 
-# Região do VIME.
-# O ZIP enviado veio como NE:
-# web_NE_prec24h_202605040000_+24.png
-#
-# A região NE no VIME inclui o Nordeste e áreas vizinhas suficientes
-# para o foco visual do MATOPIBA. O recorte final remove o excesso.
 REGIAO_VIME = "NE"
-
 VIME_URL = f"https://vime.inmet.gov.br/{REGIAO_VIME}"
 
 MODELO = "COSMO 7x7km"
@@ -55,7 +49,6 @@ REPO_CDN_BASE = (
     "public/clima/matopiba"
 )
 
-# Frames que serão usados no site.
 FRAMES_DESEJADOS = {
     "24h": ["+24", "+024"],
     "48h": ["+48", "+048"],
@@ -63,11 +56,8 @@ FRAMES_DESEJADOS = {
 }
 
 # Recorte proporcional do arquivo oficial do VIME para focar MATOPIBA.
-# O ZIP oficial enviado tem imagem 774x700. Este recorte foi ajustado
-# para manter MA, TO, PI e BA e reduzir áreas fora do foco.
-#
-# Valores em porcentagem da imagem:
-# left, top, right, bottom
+# O ZIP enviado tinha imagem parecida com: web_NE_prec24h_202605040000_+24.png
+# Este recorte mantém MA, TO, PI e BA e reduz excesso fora do foco.
 MATOPIBA_CROP_RATIO = {
     "left": 0.00,
     "top": 0.00,
@@ -75,16 +65,11 @@ MATOPIBA_CROP_RATIO = {
     "bottom": 0.965,
 }
 
-# Coordenada do botão "Download de Todas as Imagens", caso o clique por texto falhe.
 DOWNLOAD_BUTTON_X = 95
 DOWNLOAD_BUTTON_Y = 316
 
 
 def limpar_saida_antiga():
-    """
-    Remove arquivos temporários antigos para evitar confusão.
-    Mantém apenas os novos arquivos após a execução.
-    """
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     padroes = [
@@ -94,7 +79,6 @@ def limpar_saida_antiga():
         "matopiba_24h.png",
         "matopiba_48h.png",
         "matopiba_72h.png",
-        "matopiba_animado.gif",
         "manifest.json",
     ]
 
@@ -127,9 +111,6 @@ def tentar_clicar_texto(page, texto, timeout=5000):
 
 
 def baixar_zip_vime(page):
-    """
-    Baixa o ZIP oficial do VIME usando o botão "Download de Todas as Imagens".
-    """
     print("Preparando download do ZIP oficial do VIME...")
 
     salvar_debug(page, "_debug_antes_download.png")
@@ -138,7 +119,11 @@ def baixar_zip_vime(page):
 
     try:
         with page.expect_download(timeout=180000) as download_info:
-            clicou = tentar_clicar_texto(page, "Download de Todas as Imagens", timeout=7000)
+            clicou = tentar_clicar_texto(
+                page,
+                "Download de Todas as Imagens",
+                timeout=7000
+            )
 
             if not clicou:
                 print(
@@ -176,17 +161,13 @@ def listar_zip(zip_path):
 
     print(f"Arquivos dentro do ZIP: {len(nomes)}")
 
-    for nome in nomes[:10]:
+    for nome in nomes[:15]:
         print(" -", nome)
 
     return nomes
 
 
 def encontrar_imagem_do_frame(nomes, labels):
-    """
-    Encontra no ZIP a imagem correspondente ao frame desejado:
-    +24, +48, +72.
-    """
     candidatos = []
 
     for nome in nomes:
@@ -207,7 +188,6 @@ def encontrar_imagem_do_frame(nomes, labels):
             f"Não encontrei imagem no ZIP para labels {labels}."
         )
 
-    # Se houver mais de um, usa o primeiro em ordem alfabética.
     candidatos = sorted(candidatos)
 
     print(f"Frame {labels} encontrado:", candidatos[0])
@@ -227,10 +207,6 @@ def extrair_imagem(zip_path, nome_interno, destino):
 
 
 def imagem_valida(img):
-    """
-    Valida se a imagem não está branca/carregando.
-    Como o ZIP oficial contém PNG pronto, isso quase sempre passa.
-    """
     img = img.convert("RGB")
     w, h = img.size
 
@@ -270,9 +246,6 @@ def imagem_valida(img):
 
 
 def recortar_matopiba(img):
-    """
-    Recorta a imagem oficial do VIME para foco visual MATOPIBA.
-    """
     img = img.convert("RGB")
     w, h = img.size
 
@@ -287,9 +260,6 @@ def recortar_matopiba(img):
 
 
 def processar_frame(zip_path, nomes_zip, slug, labels):
-    """
-    Extrai, valida, recorta e salva frame final.
-    """
     nome_interno = encontrar_imagem_do_frame(nomes_zip, labels)
 
     raw_path = OUT_DIR / f"_raw_{slug}.png"
@@ -318,29 +288,6 @@ def processar_frame(zip_path, nomes_zip, slug, labels):
     return final_path
 
 
-def gerar_gif(frames, gif_path):
-    imagens = []
-
-    for frame in frames:
-        img = Image.open(frame).convert("P", palette=Image.ADAPTIVE)
-        imagens.append(img)
-
-    if not imagens:
-        raise RuntimeError("Nenhum frame disponível para gerar GIF.")
-
-    imagens[0].save(
-        gif_path,
-        save_all=True,
-        append_images=imagens[1:],
-        duration=1300,
-        loop=0
-    )
-
-    print(f"GIF animado gerado: {gif_path}")
-
-    return gif_path
-
-
 def gerar_manifest(arquivos):
     manifest = {
         "ok": True,
@@ -366,10 +313,6 @@ def gerar_manifest(arquivos):
                 "label": "72h",
                 "url": f"{REPO_CDN_BASE}/{arquivos['72h'].name}"
             },
-        },
-        "gif": {
-            "label": "GIF animado",
-            "url": f"{REPO_CDN_BASE}/{arquivos['gif'].name}"
         }
     }
 
@@ -417,7 +360,6 @@ def main():
             timeout=120000
         )
 
-        # Aguarda o painel lateral montar.
         time.sleep(12)
 
         zip_path = baixar_zip_vime(page)
@@ -445,17 +387,6 @@ def main():
         nomes_zip,
         "72h",
         FRAMES_DESEJADOS["72h"]
-    )
-
-    gif_path = OUT_DIR / "matopiba_animado.gif"
-
-    arquivos["gif"] = gerar_gif(
-        [
-            arquivos["24h"],
-            arquivos["48h"],
-            arquivos["72h"],
-        ],
-        gif_path
     )
 
     gerar_manifest(arquivos)
