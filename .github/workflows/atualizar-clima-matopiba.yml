@@ -29,7 +29,7 @@ jobs:
 
       - name: Executar coletor oficial do VIME / INMET
         run: |
-          python capturar_vime_matopiba.py
+          xvfb-run -a python capturar_vime_matopiba.py
 
       - name: Commitar imagens atualizadas
         run: |
