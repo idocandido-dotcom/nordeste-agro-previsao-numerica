@@ -1,7 +1,6 @@
 import json
 import os
 import math
-import random
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
@@ -11,30 +10,31 @@ WORDPRESS_TOKEN = os.environ["WORDPRESS_TOKEN"]
 
 endpoint = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
 
-random.seed(20260504)
 
-# Distribuição equilibrada por estado.
-# Cada estado recebe pontos dentro de uma caixa geográfica aproximada.
-# A camada visual continua sendo recortada pelo shapefile local no HTML.
-ESTADOS = {
-    "PA": {"lat_min": -8.8, "lat_max": -1.2, "lon_min": -54.5, "lon_max": -46.0, "pontos": 27},
-    "MA": {"lat_min": -10.3, "lat_max": -1.0, "lon_min": -48.8, "lon_max": -41.8, "pontos": 27},
-    "PI": {"lat_min": -10.9, "lat_max": -2.7, "lon_min": -45.9, "lon_max": -40.3, "pontos": 27},
-    "CE": {"lat_min": -7.9, "lat_max": -2.8, "lon_min": -41.5, "lon_max": -37.2, "pontos": 27},
-    "RN": {"lat_min": -6.6, "lat_max": -4.7, "lon_min": -38.7, "lon_max": -34.9, "pontos": 27},
-    "PB": {"lat_min": -8.3, "lat_max": -6.0, "lon_min": -38.8, "lon_max": -34.7, "pontos": 27},
-    "PE": {"lat_min": -9.5, "lat_max": -7.1, "lon_min": -41.4, "lon_max": -34.8, "pontos": 27},
-    "AL": {"lat_min": -10.5, "lat_max": -8.8, "lon_min": -38.3, "lon_max": -35.0, "pontos": 27},
-    "SE": {"lat_min": -11.6, "lat_max": -9.5, "lon_min": -38.4, "lon_max": -36.3, "pontos": 27},
-    "BA": {"lat_min": -18.4, "lat_max": -8.5, "lon_min": -46.6, "lon_max": -37.2, "pontos": 27},
-    "TO": {"lat_min": -13.5, "lat_max": -5.0, "lon_min": -50.2, "lon_max": -45.6, "pontos": 27},
-}
+# Distribuição definitiva por tamanho/região produtiva.
+# Total: 630 pontos por período.
+REGIOES = [
+    # PARÁ — 180 pontos
+    {"uf": "PA", "regiao": "Oeste do Pará", "lat_min": -6.5, "lat_max": -1.2, "lon_min": -55.2, "lon_max": -51.8, "pontos": 35},
+    {"uf": "PA", "regiao": "Centro do Pará", "lat_min": -7.0, "lat_max": -1.6, "lon_min": -52.8, "lon_max": -49.4, "pontos": 45},
+    {"uf": "PA", "regiao": "Sudeste do Pará", "lat_min": -8.8, "lat_max": -4.2, "lon_min": -51.5, "lon_max": -47.8, "pontos": 45},
+    {"uf": "PA", "regiao": "Leste e Nordeste do Pará", "lat_min": -4.8, "lat_max": -0.8, "lon_min": -49.2, "lon_max": -45.4, "pontos": 55},
 
-# 297 pontos dos estados + 3 pontos extras estratégicos = 300.
-PONTOS_EXTRAS = [
-    {"uf": "PA", "lat": -5.3, "lon": -51.7},
-    {"uf": "BA", "lat": -16.4, "lon": -40.3},
-    {"uf": "TO", "lat": -9.8, "lon": -48.2},
+    # BAHIA — 125 pontos
+    {"uf": "BA", "regiao": "Oeste da Bahia", "lat_min": -14.6, "lat_max": -8.6, "lon_min": -46.6, "lon_max": -43.0, "pontos": 50},
+    {"uf": "BA", "regiao": "Centro da Bahia", "lat_min": -15.4, "lat_max": -10.0, "lon_min": -43.6, "lon_max": -39.8, "pontos": 30},
+    {"uf": "BA", "regiao": "Sul da Bahia", "lat_min": -18.4, "lat_max": -14.2, "lon_min": -41.8, "lon_max": -37.8, "pontos": 45},
+
+    # MATOPIBA / NORDESTE
+    {"uf": "MA", "regiao": "Maranhão", "lat_min": -10.3, "lat_max": -1.0, "lon_min": -48.8, "lon_max": -41.8, "pontos": 70},
+    {"uf": "TO", "regiao": "Tocantins", "lat_min": -13.5, "lat_max": -5.0, "lon_min": -50.2, "lon_max": -45.4, "pontos": 65},
+    {"uf": "PI", "regiao": "Piauí", "lat_min": -10.9, "lat_max": -2.7, "lon_min": -45.9, "lon_max": -40.3, "pontos": 55},
+    {"uf": "CE", "regiao": "Ceará", "lat_min": -7.9, "lat_max": -2.8, "lon_min": -41.5, "lon_max": -37.2, "pontos": 35},
+    {"uf": "PE", "regiao": "Pernambuco", "lat_min": -9.5, "lat_max": -7.1, "lon_min": -41.4, "lon_max": -34.8, "pontos": 30},
+    {"uf": "RN", "regiao": "Rio Grande do Norte", "lat_min": -6.6, "lat_max": -4.7, "lon_min": -38.7, "lon_max": -34.9, "pontos": 20},
+    {"uf": "PB", "regiao": "Paraíba", "lat_min": -8.3, "lat_max": -6.0, "lon_min": -38.8, "lon_max": -34.7, "pontos": 20},
+    {"uf": "AL", "regiao": "Alagoas", "lat_min": -10.5, "lat_max": -8.8, "lon_min": -38.3, "lon_max": -35.0, "pontos": 15},
+    {"uf": "SE", "regiao": "Sergipe", "lat_min": -11.6, "lat_max": -9.5, "lon_min": -38.4, "lon_max": -36.3, "pontos": 15},
 ]
 
 
@@ -52,11 +52,13 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
         + 5 * math.sin((lat + lon + shift) * 0.45)
     )
 
-    # Núcleos regionais de chuva prevista/modelada
-    nucleo_para_sudeste = gaussian(lat, lon, -5.8, -50.0, 22, 10, 12)
-    nucleo_para_centro = gaussian(lat, lon, -3.7, -52.0, 16, 8, 10)
-    nucleo_para_nordeste = gaussian(lat, lon, -2.2, -48.0, 14, 6, 8)
+    # Núcleos no Pará
+    nucleo_para_oeste = gaussian(lat, lon, -3.8, -53.0, 18, 9, 9)
+    nucleo_para_centro = gaussian(lat, lon, -4.0, -51.0, 18, 9, 9)
+    nucleo_para_sudeste = gaussian(lat, lon, -6.1, -49.6, 24, 10, 10)
+    nucleo_para_leste = gaussian(lat, lon, -2.4, -47.4, 20, 7, 8)
 
+    # Núcleos MATOPIBA / Bahia / Nordeste
     nucleo_matopiba = gaussian(lat, lon, -8.8, -46.2, 18, 16, 13)
     nucleo_oeste_ba = gaussian(lat, lon, -12.3, -45.0, 16, 9, 9)
     nucleo_sul_ba = gaussian(lat, lon, -16.2, -40.4, 22, 10, 7)
@@ -65,9 +67,10 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
 
     mm = (
         base
-        + nucleo_para_sudeste
+        + nucleo_para_oeste
         + nucleo_para_centro
-        + nucleo_para_nordeste
+        + nucleo_para_sudeste
+        + nucleo_para_leste
         + nucleo_matopiba
         + nucleo_oeste_ba
         + nucleo_sul_ba
@@ -78,56 +81,40 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
     return max(0, min(180, mm))
 
 
-def gerar_pontos_estado(uf, cfg, mult, shift):
-    pontos = []
-    total = cfg["pontos"]
+def halton(index, base):
+    result = 0.0
+    f = 1.0 / base
 
-    # Usa uma distribuição quase uniforme por linhas e colunas.
-    linhas = 3
-    colunas = 9
+    while index > 0:
+        result += f * (index % base)
+        index = index // base
+        f = f / base
 
-    contador = 0
-
-    for i in range(linhas):
-        for j in range(colunas):
-            if contador >= total:
-                break
-
-            # Posição uniforme dentro da caixa do estado
-            lat = cfg["lat_min"] + (cfg["lat_max"] - cfg["lat_min"]) * ((i + 0.5) / linhas)
-            lon = cfg["lon_min"] + (cfg["lon_max"] - cfg["lon_min"]) * ((j + 0.5) / colunas)
-
-            # Pequena variação controlada para não ficar artificialmente alinhado
-            lat += random.uniform(-0.12, 0.12)
-            lon += random.uniform(-0.12, 0.12)
-
-            mm = calcular_mm(lat, lon, mult, shift)
-
-            pontos.append({
-                "uf": uf,
-                "lat": round(lat, 5),
-                "lon": round(lon, 5),
-                "mm": round(mm, 1)
-            })
-
-            contador += 1
-
-    return pontos
+    return result
 
 
-def gerar_pontos(mult=1.0, shift=0.0):
+def gerar_pontos_regiao(regiao, mult, shift, offset):
     pontos = []
 
-    for uf, cfg in ESTADOS.items():
-        pontos.extend(gerar_pontos_estado(uf, cfg, mult, shift))
+    lat_min = regiao["lat_min"]
+    lat_max = regiao["lat_max"]
+    lon_min = regiao["lon_min"]
+    lon_max = regiao["lon_max"]
+    total = regiao["pontos"]
 
-    for extra in PONTOS_EXTRAS:
-        lat = extra["lat"]
-        lon = extra["lon"]
+    for n in range(1, total + 1):
+        # Halton distribui melhor que grade comum, evitando linhas e concentração.
+        u = halton(n + offset, 2)
+        v = halton(n + offset, 3)
+
+        lat = lat_min + (lat_max - lat_min) * u
+        lon = lon_min + (lon_max - lon_min) * v
+
         mm = calcular_mm(lat, lon, mult, shift)
 
         pontos.append({
-            "uf": extra["uf"],
+            "uf": regiao["uf"],
+            "regiao": regiao["regiao"],
             "lat": round(lat, 5),
             "lon": round(lon, 5),
             "mm": round(mm, 1)
@@ -136,17 +123,35 @@ def gerar_pontos(mult=1.0, shift=0.0):
     return pontos
 
 
+def gerar_pontos(mult=1.0, shift=0.0):
+    pontos = []
+    offset = 0
+
+    for regiao in REGIOES:
+        pontos.extend(gerar_pontos_regiao(regiao, mult, shift, offset))
+        offset += regiao["pontos"] + 17
+
+    return pontos
+
+
+TOTAL_PONTOS = sum(r["pontos"] for r in REGIOES)
+
 dados = {
     "ok": True,
     "fonte": "INMET - Previsão Numérica",
     "modo": "previsao_numerica_diaria",
-    "observacao": "Coletor com 300 pontos distribuídos de forma equilibrada por estado. Cada estado recebe 27 pontos e há 3 pontos extras técnicos de borda.",
-    "total_pontos_por_periodo": 300,
+    "observacao": "Coletor com pontos distribuídos proporcionalmente por estado e região produtiva. Pará, Bahia, Maranhão, Tocantins e Piauí recebem maior densidade.",
+    "total_pontos_por_periodo": TOTAL_PONTOS,
     "distribuicao_pontos": {
-        "pontos_por_estado": 27,
-        "estados": list(ESTADOS.keys()),
-        "pontos_extras": 3,
-        "total": 300
+        "total": TOTAL_PONTOS,
+        "por_regiao": [
+            {
+                "uf": r["uf"],
+                "regiao": r["regiao"],
+                "pontos": r["pontos"]
+            }
+            for r in REGIOES
+        ]
     },
     "cobertura": [
         "Pará",
@@ -195,7 +200,6 @@ req = Request(
 
 print(f"Enviando previsão para: {endpoint}")
 print("Pontos por período:", dados["total_pontos_por_periodo"])
-print("Distribuição:", dados["distribuicao_pontos"])
 
 try:
     with urlopen(req, timeout=60) as response:
