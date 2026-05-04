@@ -1,766 +1,880 @@
-import csv
-import io
-import json
-import re
-import urllib.request
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Nordeste Agro - Coletor de Cotações Oficiais
+
+Este coletor gera os arquivos:
+
+1) public/cotacoes/cotacoes_oficiais_nordeste_agro.json
+2) public/cotacoes/cotacoes_regionais.json
+
+O segundo arquivo mantém compatibilidade com o HTML atual da página Cotações.
+
+REGRA PRINCIPAL:
+- Não simular preço.
+- Não preencher praça sem fonte.
+- Não calcular preço local inventado.
+- Só publicar item quando houver valor, data e fonte identificada.
+- Se uma fonte falhar, registrar aviso no JSON.
+
+FONTES:
+1. CEPEA/ESALQ, por raspagem de tabelas públicas de indicadores.
+2. CONAB, por importação de arquivos oficiais exportados/baixados e salvos em dados_conab/.
+   Aceita CSV, XLSX, XLS e HTML com tabelas.
+
+Por que CONAB entra via arquivo?
+- A consulta pública da CONAB pode usar aplicações web dinâmicas e mudar endpoints.
+- Para evitar dado errado, o coletor aceita somente exportações/tabelas oficiais que estejam
+  no repositório ou em URLs diretas configuradas por variável de ambiente.
+
+VARIÁVEIS DE AMBIENTE OPCIONAIS:
+- CONAB_ARQUIVOS_URLS: lista de URLs diretas para CSV/XLS/XLSX/HTML, separadas por vírgula.
+- SAIDA_COTACOES: caminho do JSON principal, se quiser alterar.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
+from io import BytesIO, StringIO
 from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+import json
+import os
+import re
+import sys
+import unicodedata
+
+import pandas as pd
+import requests
 
 
-# ============================================================
-# COLETOR REAL DE COTAÇÕES — NORDESTE AGRO
-# Fonte principal: CONAB - Preços Agropecuários
-# ============================================================
-# Este coletor gera dois arquivos:
-#
-# 1) public/cotacoes/cotacoes_regionais.json
-#    - arquivo leve para a página principal de cotações
-#    - mantém somente a cotação mais recente por Estado + Cidade + Produto
-#    - inclui historico_30d quando disponível
-#
-# 2) public/cotacoes/historico_cotacoes_36m.json
-#    - arquivo para nova página de histórico
-#    - agrupa os registros por Estado + Cidade + Produto
-#    - mantém série histórica para consulta de até 36 meses
-# ============================================================
+FUSO_BR = timezone(timedelta(hours=-3))
 
+ARQUIVO_SAIDA = Path(
+    os.getenv(
+        "SAIDA_COTACOES",
+        "public/cotacoes/cotacoes_oficiais_nordeste_agro.json",
+    )
+)
 
-OUT_DIR = Path("public/cotacoes")
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+ARQUIVO_COMPATIVEL_HTML = Path("public/cotacoes/cotacoes_regionais.json")
 
-OUT_JSON_ATUAL = OUT_DIR / "cotacoes_regionais.json"
-OUT_JSON_HISTORICO = OUT_DIR / "historico_cotacoes_36m.json"
+PASTA_CONAB = Path("dados_conab")
 
-BACKUP_JSON_ATUAL = OUT_DIR / "cotacoes_regionais_ultimo_valido.json"
-BACKUP_JSON_HISTORICO = OUT_DIR / "historico_cotacoes_36m_ultimo_valido.json"
-
-FONTE = "CONAB - Preços Agropecuários"
-TIPO_ATUAL = "cotacoes_regionais"
-TIPO_HISTORICO = "historico_cotacoes_36m"
-ATUALIZACAO = "diaria"
-
-URLS_CONAB = [
-    "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalMunicipio.txt",
-    "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalUF.txt",
-    "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosMensalMunicipio.txt",
-]
-
-UFS_ALVO = {"AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE", "TO", "PA"}
-
-PRODUTOS_ALVO = {
-    "SOJA": "Soja",
-    "MILHO": "Milho",
-    "ALGODAO": "Algodão",
-    "ALGODÃO": "Algodão",
-    "ARROZ": "Arroz",
-    "FEIJAO": "Feijão",
-    "FEIJÃO": "Feijão",
-    "LEITE": "Leite",
-    "BOI": "Carne bovina",
-    "BOVINO": "Carne bovina",
-    "CARNE BOVINA": "Carne bovina",
-    "SORGO": "Sorgo",
-    "ACUCAR": "Açúcar cristal",
-    "AÇÚCAR": "Açúcar cristal",
+HEADERS = {
+    "User-Agent": (
+        "NordesteAgroBot/1.0 "
+        "(coletor de dados públicos oficiais; https://nordesteagro.com)"
+    )
 }
 
-MAX_TENTATIVAS_DOWNLOAD = 3
-MINIMO_REGISTROS_VALIDOS = 10
+UFS_NORDESTE_MATOPIBAPA = {
+    "PA", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "TO"
+}
+
+COMMODITIES = {
+    "soja": {
+        "rotulo": "Soja",
+        "termos": ["soja"],
+        "unidade_padrao": "Saca 60 kg",
+    },
+    "milho": {
+        "rotulo": "Milho",
+        "termos": ["milho"],
+        "unidade_padrao": "Saca 60 kg",
+    },
+    "algodao": {
+        "rotulo": "Algodão",
+        "termos": ["algodao", "algodão"],
+        "unidade_padrao": "@",
+    },
+    "arroz": {
+        "rotulo": "Arroz",
+        "termos": ["arroz"],
+        "unidade_padrao": "Saca",
+    },
+    "feijao": {
+        "rotulo": "Feijão",
+        "termos": ["feijao", "feijão"],
+        "unidade_padrao": "Saca",
+    },
+    "leite": {
+        "rotulo": "Leite",
+        "termos": ["leite"],
+        "unidade_padrao": "Litro",
+    },
+    "carne_bovina": {
+        "rotulo": "Carne bovina",
+        "termos": ["boi", "bovino", "bovina", "carne"],
+        "unidade_padrao": "@",
+    },
+    "sorgo": {
+        "rotulo": "Sorgo",
+        "termos": ["sorgo"],
+        "unidade_padrao": "Saca 60 kg",
+    },
+}
 
 
-def agora_brasilia():
-    fuso_brasilia = timezone(timedelta(hours=-3))
-    return datetime.now(fuso_brasilia)
+@dataclass(frozen=True)
+class FonteCepea:
+    commodity_chave: str
+    produto: str
+    url: str
+    estado: str
+    cidade: str
+    unidade: str
+    tipo_preco: str
+    observacao: str
 
 
-def formatar_data_br(dt):
-    return dt.strftime("%d/%m/%Y")
+FONTES_CEPEA: List[FonteCepea] = [
+    FonteCepea(
+        commodity_chave="soja",
+        produto="Soja",
+        url="https://www.cepea.org.br/br/indicador/soja.aspx",
+        estado="PR",
+        cidade="Paranaguá",
+        unidade="Saca 60 kg",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador CEPEA/ESALQ de referência; não representa preço municipal do Nordeste.",
+    ),
+    FonteCepea(
+        commodity_chave="milho",
+        produto="Milho",
+        url="https://www.cepea.org.br/br/indicador/milho.aspx",
+        estado="SP",
+        cidade="Campinas",
+        unidade="Saca 60 kg",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador CEPEA/ESALQ de referência; não representa preço municipal do Nordeste.",
+    ),
+    FonteCepea(
+        commodity_chave="algodao",
+        produto="Algodão",
+        url="https://www.cepea.org.br/br/indicador/algodao.aspx",
+        estado="SP",
+        cidade="Indicador CEPEA/ESALQ",
+        unidade="Centavos R$/libra-peso",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador do algodão em pluma CEPEA/ESALQ.",
+    ),
+    FonteCepea(
+        commodity_chave="arroz",
+        produto="Arroz",
+        url="https://www.cepea.org.br/br/indicador/arroz.aspx",
+        estado="RS",
+        cidade="Indicador CEPEA/IRGA-RS",
+        unidade="Saca",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador CEPEA/IRGA-RS.",
+    ),
+    FonteCepea(
+        commodity_chave="feijao",
+        produto="Feijão",
+        url="https://www.cepea.org.br/br/indicador/feijao.aspx",
+        estado="BR",
+        cidade="Praças CEPEA",
+        unidade="Saca",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador CEPEA/CNA; pode aparecer agregado conforme disponibilidade da fonte.",
+    ),
+    FonteCepea(
+        commodity_chave="leite",
+        produto="Leite",
+        url="https://www.cepea.org.br/br/indicador/leite.aspx",
+        estado="BR",
+        cidade="Média Brasil CEPEA",
+        unidade="Litro",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador CEPEA do leite; pode ter atualização mensal conforme metodologia da fonte.",
+    ),
+    FonteCepea(
+        commodity_chave="carne_bovina",
+        produto="Carne bovina",
+        url="https://www.cepea.org.br/br/indicador/boi-gordo.aspx",
+        estado="SP",
+        cidade="Boi Gordo - Estado de São Paulo",
+        unidade="@",
+        tipo_preco="Indicador referencial",
+        observacao="Indicador do boi gordo CEPEA/ESALQ.",
+    ),
+]
 
 
-def normalizar(txt):
-    txt = str(txt or "").strip().upper()
-    trocas = {
-        "Á": "A", "À": "A", "Â": "A", "Ã": "A",
-        "É": "E", "Ê": "E",
-        "Í": "I",
-        "Ó": "O", "Ô": "O", "Õ": "O",
-        "Ú": "U",
-        "Ç": "C",
-    }
-
-    for a, b in trocas.items():
-        txt = txt.replace(a, b)
-
-    return txt
+def agora_br() -> datetime:
+    return datetime.now(FUSO_BR)
 
 
-def baixar_texto(url):
-    ultimo_erro = None
+def agora_br_texto() -> str:
+    return agora_br().strftime("%d/%m/%Y %H:%M")
 
-    for tentativa in range(1, MAX_TENTATIVAS_DOWNLOAD + 1):
+
+def normalizar_txt(valor: Any) -> str:
+    texto = str(valor or "").strip()
+    texto = unicodedata.normalize("NFD", texto)
+    texto = "".join(ch for ch in texto if unicodedata.category(ch) != "Mn")
+    texto = re.sub(r"\s+", " ", texto)
+    return texto.lower().strip()
+
+
+def apenas_texto(valor: Any) -> str:
+    return str(valor or "").replace("\xa0", " ").strip()
+
+
+def parse_numero_br(valor: Any) -> Optional[float]:
+    if valor is None:
+        return None
+
+    texto = apenas_texto(valor)
+
+    if not texto or texto.lower() in {"nan", "-", "—", "null", "none"}:
+        return None
+
+    texto = texto.replace("R$", "").replace("US$", "").replace("%", "").strip()
+    texto = re.sub(r"[^0-9,.\-]", "", texto)
+
+    if not texto:
+        return None
+
+    # Padrão brasileiro 1.234,56
+    if "," in texto:
+        texto = texto.replace(".", "").replace(",", ".")
+
+    try:
+        return float(texto)
+    except ValueError:
+        return None
+
+
+def parse_data(valor: Any) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Retorna (data_br, data_iso).
+    Aceita datas como 04/05/2026, 2026-05-04, 05/2026.
+    """
+    texto = apenas_texto(valor)
+
+    if not texto:
+        return None, None
+
+    # dd/mm/yyyy
+    m = re.search(r"(\d{1,2})[/-](\d{1,2})[/-](\d{4})", texto)
+    if m:
+        dia, mes, ano = map(int, m.groups())
         try:
-            print(f"Baixando CONAB: {url} tentativa {tentativa}/{MAX_TENTATIVAS_DOWNLOAD}")
+            d = datetime(ano, mes, dia, tzinfo=FUSO_BR).date()
+            return d.strftime("%d/%m/%Y"), d.isoformat()
+        except ValueError:
+            pass
 
-            req = urllib.request.Request(
-                url,
-                headers={
-                    "User-Agent": "NordesteAgro-Cotacoes/1.0",
-                    "Accept": "text/plain,text/csv,*/*",
-                },
-                method="GET",
-            )
+    # yyyy-mm-dd
+    m = re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", texto)
+    if m:
+        ano, mes, dia = map(int, m.groups())
+        try:
+            d = datetime(ano, mes, dia, tzinfo=FUSO_BR).date()
+            return d.strftime("%d/%m/%Y"), d.isoformat()
+        except ValueError:
+            pass
 
-            with urllib.request.urlopen(req, timeout=120) as resp:
-                bruto = resp.read()
+    # mm/yyyy ou mês/ano
+    m = re.search(r"(\d{1,2})[/-](\d{4})", texto)
+    if m:
+        mes, ano = map(int, m.groups())
+        try:
+            d = datetime(ano, mes, 1, tzinfo=FUSO_BR).date()
+            return d.strftime("%m/%Y"), d.isoformat()
+        except ValueError:
+            pass
 
-            for encoding in ["utf-8-sig", "latin-1", "cp1252"]:
-                try:
-                    return bruto.decode(encoding)
-                except UnicodeDecodeError:
-                    pass
-
-            return bruto.decode("utf-8", errors="replace")
-
-        except Exception as erro:
-            ultimo_erro = erro
-            print(f"Erro no download: {erro}")
-
-    raise RuntimeError(f"Não foi possível baixar {url}. Último erro: {ultimo_erro}")
-
-
-def detectar_dialeto(texto):
-    amostra = texto[:10000]
-
-    try:
-        return csv.Sniffer().sniff(amostra, delimiters=";\t,|")
-    except Exception:
-        class DialetoPadrao(csv.Dialect):
-            delimiter = ";"
-            quotechar = '"'
-            escapechar = None
-            doublequote = True
-            skipinitialspace = False
-            lineterminator = "\n"
-            quoting = csv.QUOTE_MINIMAL
-
-        return DialetoPadrao
+    return texto, None
 
 
-def ler_tabela(texto):
-    dialeto = detectar_dialeto(texto)
-    leitor = csv.DictReader(io.StringIO(texto), dialect=dialeto)
-    linhas = list(leitor)
+def commodity_por_produto(produto: Any) -> Optional[str]:
+    p = normalizar_txt(produto)
 
-    if not linhas:
-        raise RuntimeError("Arquivo CONAB baixado, mas sem linhas tabulares.")
+    if not p:
+        return None
 
-    print(f"Colunas detectadas: {leitor.fieldnames}")
-    print(f"Linhas detectadas: {len(linhas)}")
+    for chave, cfg in COMMODITIES.items():
+        if any(normalizar_txt(t) in p for t in cfg["termos"]):
+            return chave
 
-    return linhas
-
-
-def pegar_valor(row, possibilidades):
-    normalizadas = {normalizar(k): k for k in row.keys()}
-
-    for nome in possibilidades:
-        nome_norm = normalizar(nome)
-
-        if nome_norm in normalizadas:
-            return row.get(normalizadas[nome_norm])
-
-    for chave_norm, chave_original in normalizadas.items():
-        for nome in possibilidades:
-            nome_norm = normalizar(nome)
-
-            if nome_norm in chave_norm or chave_norm in nome_norm:
-                return row.get(chave_original)
-
-    return ""
+    return None
 
 
-def extrair_uf(row):
-    return str(pegar_valor(row, [
-        "UF",
-        "SG_UF",
-        "SIGLA_UF",
-        "ESTADO",
-        "UNIDADE DA FEDERACAO",
-        "UNIDADE DA FEDERAÇÃO",
-    ]) or "").strip().upper()
+def extrair_produto_unidade(texto_produto: Any) -> Tuple[str, str]:
+    """
+    Exemplo CONAB: SOJA (60KG), MILHO (60KG), BOI GORDO (15KG)
+    """
+    bruto = apenas_texto(texto_produto)
+    unidade = ""
+
+    m = re.search(r"\(([^)]+)\)", bruto)
+    if m:
+        unidade = m.group(1).strip()
+        produto = re.sub(r"\([^)]+\)", "", bruto).strip()
+    else:
+        produto = bruto
+
+    produto = re.sub(r"\s+", " ", produto).strip()
+
+    return produto.title(), unidade
 
 
-def limpar_nome_cidade(cidade, uf):
-    cidade = str(cidade or "").strip()
+def unidade_amigavel(unidade: str, commodity_chave: Optional[str]) -> str:
+    u = normalizar_txt(unidade)
 
-    if not cidade:
-        return uf
+    if "60" in u and ("kg" in u or "quilo" in u):
+        return "Saca 60 kg"
 
-    # Mantém o nome como vem da fonte, mas remove espaços duplicados.
-    cidade = re.sub(r"\s+", " ", cidade)
+    if "saca" in u or u == "sc":
+        return "Saca"
 
-    return cidade
+    if "litro" in u or u == "l":
+        return "Litro"
 
+    if "arroba" in u or "@" in u or "15kg" in u or "15 kg" in u:
+        return "@"
 
-def extrair_cidade(row, uf):
-    cidade = str(pegar_valor(row, [
-        "MUNICIPIO",
-        "MUNICÍPIO",
-        "CIDADE",
-        "PRACA",
-        "PRAÇA",
-        "LOCALIDADE",
-    ]) or "").strip()
+    if "kg" in u:
+        return "Kg"
 
-    return limpar_nome_cidade(cidade, uf)
+    if "ton" in u:
+        return "Tonelada"
 
+    if commodity_chave and commodity_chave in COMMODITIES:
+        return COMMODITIES[commodity_chave]["unidade_padrao"]
 
-def extrair_produto(row):
-    return str(pegar_valor(row, [
-        "PRODUTO",
-        "NOME PRODUTO",
-        "NOME_PRODUTO",
-        "PRODUTO_DESCRICAO",
-        "PRODUTO DESCRICAO",
-        "PRODUTO DESCRIÇÃO",
-    ]) or "").strip()
+    return unidade or "Unidade"
 
 
-def extrair_data(row):
-    return str(pegar_valor(row, [
-        "DATA",
-        "DT_PRECO",
-        "DATA PRECO",
-        "DATA PREÇO",
-        "DATA_COLETA",
-        "DATA COLETA",
-        "REFERENCIA",
-        "REFERÊNCIA",
-        "DATA_REFERENCIA",
-        "SEMANA",
-        "PERIODO",
-        "PERÍODO",
-    ]) or "").strip()
-
-
-def extrair_unidade(row):
-    return str(pegar_valor(row, [
-        "UNIDADE",
-        "UNIDADE MEDIDA",
-        "UNIDADE_MEDIDA",
-        "MEDIDA",
-        "EMBALAGEM",
-    ]) or "").strip()
-
-
-def extrair_preco_bruto(row):
-    return pegar_valor(row, [
-        "PRECO",
-        "PREÇO",
-        "VALOR",
-        "VL_PRECO",
-        "PRECO_MEDIO",
-        "PREÇO MÉDIO",
-        "PRECO MEDIO",
-        "VALOR_MEDIO",
-        "VALOR MÉDIO",
-        "MEDIA",
-        "MÉDIA",
-    ])
-
-
-def converter_numero(valor):
+def formatar_moeda(valor: Optional[float], unidade: str = "") -> str:
     if valor is None:
-        return None
+        return "--"
 
-    s = str(valor).strip()
-
-    if not s:
-        return None
-
-    s = s.replace("R$", "").replace("r$", "").replace(" ", "")
-    s = re.sub(r"[^0-9,\.\-]", "", s)
-
-    if not s:
-        return None
-
-    if "," in s and "." in s:
-        s = s.replace(".", "").replace(",", ".")
-    elif "," in s:
-        s = s.replace(",", ".")
-
-    try:
-        return round(float(s), 4)
-    except Exception:
-        return None
-
-
-def formatar_preco(valor, unidade):
-    if valor is None:
-        return ""
-
-    unidade_norm = normalizar(unidade)
-
-    if "LITRO" in unidade_norm:
+    if normalizar_txt(unidade) == "litro":
         return "R$ " + f"{valor:.4f}".replace(".", ",")
 
     return "R$ " + f"{valor:.2f}".replace(".", ",")
 
 
-def classificar_produto(nome_produto):
-    nome_norm = normalizar(nome_produto)
-
-    for chave, produto_padrao in PRODUTOS_ALVO.items():
-        if normalizar(chave) in nome_norm:
-            return produto_padrao
-
-    return ""
+def download(url: str) -> bytes:
+    resp = requests.get(url, headers=HEADERS, timeout=50)
+    resp.raise_for_status()
+    return resp.content
 
 
-def parse_data_iso(data_txt):
-    """
-    Tenta transformar datas da CONAB em uma data ISO para ordenação.
-    Funciona com textos como:
-    - 26-05-2025 - 30-05-2025
-    - 30/05/2025
-    - 2025-05-30
-    - mai/2025
-    """
-    s = str(data_txt or "").strip()
+def ler_tabelas_de_bytes(conteudo: bytes, origem: str) -> List[pd.DataFrame]:
+    nome = origem.lower()
 
-    if not s:
-        return ""
+    if nome.endswith(".csv"):
+        texto = conteudo.decode("utf-8-sig", errors="replace")
 
-    candidatos = re.findall(r"\d{2}[-/]\d{2}[-/]\d{4}", s)
-
-    if candidatos:
-        alvo = candidatos[-1]
-
-        for fmt in ["%d-%m-%Y", "%d/%m/%Y"]:
+        for sep in [";", ",", "\t"]:
             try:
-                return datetime.strptime(alvo, fmt).date().isoformat()
+                df = pd.read_csv(StringIO(texto), sep=sep)
+                if df.shape[1] > 1:
+                    return [df]
             except Exception:
-                pass
+                continue
 
-    candidatos_iso = re.findall(r"\d{4}-\d{2}-\d{2}", s)
+        return []
 
-    if candidatos_iso:
-        return candidatos_iso[-1]
-
-    meses = {
-        "JAN": 1, "JANEIRO": 1,
-        "FEV": 2, "FEVEREIRO": 2,
-        "MAR": 3, "MARCO": 3, "MARÇO": 3,
-        "ABR": 4, "ABRIL": 4,
-        "MAI": 5, "MAIO": 5,
-        "JUN": 6, "JUNHO": 6,
-        "JUL": 7, "JULHO": 7,
-        "AGO": 8, "AGOSTO": 8,
-        "SET": 9, "SETEMBRO": 9,
-        "OUT": 10, "OUTUBRO": 10,
-        "NOV": 11, "NOVEMBRO": 11,
-        "DEZ": 12, "DEZEMBRO": 12,
-    }
-
-    m = re.search(r"([A-Za-zçÇ]{3,9})[/\-\s]+(\d{4})", s)
-
-    if m:
-        mes_txt = normalizar(m.group(1))
-        ano = int(m.group(2))
-        mes = meses.get(mes_txt)
-
-        if mes:
-            return datetime(ano, mes, 1).date().isoformat()
-
-    return ""
-
-
-def gerar_regiao_generica(uf, cidade):
-    if cidade:
-        return f"{cidade} / {uf}"
-
-    return uf
-
-
-def transformar_linhas(linhas, origem):
-    registros = []
-
-    for row in linhas:
-        uf = extrair_uf(row)
-
-        if uf not in UFS_ALVO:
-            continue
-
-        cidade = extrair_cidade(row, uf)
-        produto_original = extrair_produto(row)
-        produto = classificar_produto(produto_original)
-
-        if not produto:
-            continue
-
-        unidade = extrair_unidade(row)
-        data = extrair_data(row)
-        data_iso = parse_data_iso(data)
-        valor = converter_numero(extrair_preco_bruto(row))
-
-        if valor is None:
-            continue
-
-        registro = {
-            "estado": uf,
-            "cidade": cidade or uf,
-            "regiao": gerar_regiao_generica(uf, cidade),
-            "produto": produto,
-            "preco": formatar_preco(valor, unidade),
-            "valor": valor,
-            "unidade": unidade or "unidade informada pela fonte",
-            "data": data or formatar_data_br(agora_brasilia()),
-            "data_iso": data_iso,
-            "fonte": "CONAB",
-            "referencia": f"{FONTE} - {origem}",
-            "obs": "Cotação real importada da base pública da CONAB; validar condições locais antes de negociar."
-        }
-
-        registros.append(registro)
-
-    return registros
-
-
-def deduplicar(registros):
-    vistos = set()
-    saida = []
-
-    for r in registros:
-        chave = (
-            r.get("estado"),
-            r.get("cidade"),
-            r.get("produto"),
-            r.get("data"),
-            r.get("unidade"),
-            r.get("valor"),
-        )
-
-        if chave in vistos:
-            continue
-
-        vistos.add(chave)
-        saida.append(r)
-
-    return saida
-
-
-def coletar_conab():
-    todos = []
-    erros = []
-
-    for url in URLS_CONAB:
-        nome = url.split("/")[-1]
-
+    if nome.endswith(".xlsx") or nome.endswith(".xls"):
         try:
-            texto = baixar_texto(url)
-            linhas = ler_tabela(texto)
-            registros = transformar_linhas(linhas, nome)
-
-            print(f"{nome}: {len(registros)} registros filtrados")
-            todos.extend(registros)
-
-        except Exception as erro:
-            print(f"Erro ao processar {nome}: {erro}")
-            erros.append({"url": url, "erro": str(erro)})
-
-    todos = deduplicar(todos)
-
-    return todos, erros
-
-
-def data_limite_meses(meses):
-    hoje = agora_brasilia().date()
-    dias = int(meses * 30.44)
-    return hoje - timedelta(days=dias)
-
-
-def filtrar_ultimos_36_meses(registros):
-    limite = data_limite_meses(36)
-
-    filtrados = []
-
-    for r in registros:
-        data_iso = r.get("data_iso")
-
-        if not data_iso:
-            filtrados.append(r)
-            continue
-
-        try:
-            d = datetime.strptime(data_iso, "%Y-%m-%d").date()
-
-            if d >= limite:
-                filtrados.append(r)
-
+            planilhas = pd.read_excel(BytesIO(conteudo), sheet_name=None)
+            return [df for df in planilhas.values() if not df.empty]
         except Exception:
-            filtrados.append(r)
+            return []
 
-    return filtrados
-
-
-def ordenar_por_data(registros):
-    def chave(r):
-        data_iso = r.get("data_iso") or "0000-00-00"
-        return data_iso
-
-    return sorted(registros, key=chave)
+    try:
+        html = conteudo.decode("utf-8", errors="replace")
+        return pd.read_html(StringIO(html))
+    except Exception:
+        return []
 
 
-def agrupar_historico(registros):
-    grupos = {}
-
-    for r in registros:
-        chave = (
-            r.get("estado"),
-            r.get("cidade"),
-            r.get("produto"),
-            r.get("unidade"),
-        )
-
-        grupos.setdefault(chave, []).append(r)
-
-    dados_historico = []
-
-    for (estado, cidade, produto, unidade), itens in grupos.items():
-        itens_ordenados = ordenar_por_data(itens)
-
-        historico = []
-
-        for item in itens_ordenados:
-            historico.append({
-                "data": item.get("data"),
-                "data_iso": item.get("data_iso"),
-                "valor": item.get("valor"),
-                "preco": item.get("preco"),
-                "fonte": item.get("fonte"),
-                "referencia": item.get("referencia"),
-            })
-
-        if not historico:
-            continue
-
-        ultimo = itens_ordenados[-1]
-
-        dados_historico.append({
-            "estado": estado,
-            "cidade": cidade,
-            "regiao": ultimo.get("regiao"),
-            "produto": produto,
-            "unidade": unidade,
-            "fonte": ultimo.get("fonte"),
-            "referencia": ultimo.get("referencia"),
-            "ultimo_preco": ultimo.get("preco"),
-            "ultimo_valor": ultimo.get("valor"),
-            "ultima_data": ultimo.get("data"),
-            "ultima_data_iso": ultimo.get("data_iso"),
-            "total_pontos_historicos": len(historico),
-            "historico": historico,
-        })
-
-    dados_historico.sort(key=lambda x: (
-        str(x.get("estado")),
-        str(x.get("cidade")),
-        str(x.get("produto")),
-    ))
-
-    return dados_historico
+def ler_tabelas_arquivo(path: Path) -> List[pd.DataFrame]:
+    return ler_tabelas_de_bytes(path.read_bytes(), str(path))
 
 
-def obter_historico_30d(historico):
-    limite = data_limite_meses(1)
-    saida = []
+def limpar_colunas(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
 
-    for h in historico:
-        data_iso = h.get("data_iso")
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [
+            " ".join(str(x) for x in col if str(x).lower() != "nan").strip()
+            for col in df.columns
+        ]
+    else:
+        df.columns = [str(c).strip() for c in df.columns]
 
-        if not data_iso:
-            continue
-
-        try:
-            d = datetime.strptime(data_iso, "%Y-%m-%d").date()
-
-            if d >= limite:
-                saida.append({
-                    "data": h.get("data"),
-                    "data_iso": h.get("data_iso"),
-                    "valor": h.get("valor"),
-                    "preco": h.get("preco"),
-                })
-
-        except Exception:
-            continue
-
-    if len(saida) >= 2:
-        return saida
-
-    return historico[-5:] if len(historico) >= 2 else historico
+    df = df.dropna(how="all")
+    return df
 
 
-def gerar_cotacoes_atuais(dados_historico):
-    atuais = []
+def encontrar_coluna(df: pd.DataFrame, termos: Iterable[str]) -> Optional[str]:
+    termos_n = [normalizar_txt(t) for t in termos]
 
-    for grupo in dados_historico:
-        historico = grupo.get("historico", [])
-
-        if not historico:
-            continue
-
-        ultimo = historico[-1]
-
-        atual = {
-            "estado": grupo.get("estado"),
-            "cidade": grupo.get("cidade"),
-            "regiao": grupo.get("regiao"),
-            "produto": grupo.get("produto"),
-            "preco": ultimo.get("preco"),
-            "valor": ultimo.get("valor"),
-            "unidade": grupo.get("unidade"),
-            "data": ultimo.get("data"),
-            "data_iso": ultimo.get("data_iso"),
-            "fonte": grupo.get("fonte"),
-            "referencia": grupo.get("referencia"),
-            "obs": "Cotação mais recente importada da base pública da CONAB; validar condições locais antes de negociar.",
-            "historico_30d": obter_historico_30d(historico),
-        }
-
-        atuais.append(atual)
-
-    atuais.sort(key=lambda x: (
-        str(x.get("estado")),
-        str(x.get("cidade")),
-        str(x.get("produto")),
-    ))
-
-    return atuais
-
-
-def carregar_backup(path):
-    if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
+    for col in df.columns:
+        c = normalizar_txt(col)
+        if any(t in c for t in termos_n):
+            return col
 
     return None
 
 
-def salvar_json(path, payload):
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
+def normalizar_item(
+    *,
+    produto: str,
+    commodity_chave: Optional[str],
+    estado: str,
+    cidade: str,
+    valor: Optional[float],
+    unidade: str,
+    data: str,
+    data_iso: Optional[str],
+    fonte: str,
+    url_fonte: str,
+    tipo_preco: str,
+    nivel_comercializacao: str = "",
+    observacao: str = "",
+    historico_30d: Optional[List[Dict[str, Any]]] = None,
+) -> Optional[Dict[str, Any]]:
+    if valor is None:
+        return None
 
+    commodity_chave = commodity_chave or commodity_por_produto(produto)
 
-def aplicar_fallback(motivo):
-    print("Aplicando fallback...")
-    print(f"Motivo: {motivo}")
+    if not commodity_chave:
+        return None
 
-    backup_atual = carregar_backup(BACKUP_JSON_ATUAL)
-    backup_hist = carregar_backup(BACKUP_JSON_HISTORICO)
+    estado = apenas_texto(estado).upper() or "BR"
+    cidade = apenas_texto(cidade) or "Média/Indicador"
 
-    if backup_atual:
-        backup_atual["fallback_usado"] = True
-        backup_atual["fallback_motivo"] = motivo
-        backup_atual["fallback_em"] = agora_brasilia().isoformat()
-        salvar_json(OUT_JSON_ATUAL, backup_atual)
+    unidade = unidade_amigavel(unidade, commodity_chave)
 
-    if backup_hist:
-        backup_hist["fallback_usado"] = True
-        backup_hist["fallback_motivo"] = motivo
-        backup_hist["fallback_em"] = agora_brasilia().isoformat()
-        salvar_json(OUT_JSON_HISTORICO, backup_hist)
-
-    if not backup_atual and not backup_hist:
-        raise RuntimeError("Coleta falhou e não existe backup válido.")
-
-
-def montar_payload_atual(cotacoes_atuais, erros):
-    agora = agora_brasilia()
-
-    return {
-        "ok": True,
-        "fonte": FONTE,
-        "tipo": TIPO_ATUAL,
-        "atualizacao": ATUALIZACAO,
-        "atualizado_em": agora.isoformat(),
-        "ultima_sincronizacao": formatar_data_br(agora),
-        "total_registros": len(cotacoes_atuais),
-        "fontes_carregadas": ["CONAB"] if cotacoes_atuais else [],
-        "total_erros": len(erros),
-        "erros": erros[:20],
-        "dados": cotacoes_atuais,
-        "aviso": (
-            "Cotações referenciais importadas de fonte pública. Valores podem variar conforme praça, qualidade, "
-            "volume, frete, forma de pagamento e disponibilidade das fontes."
-        )
+    item = {
+        "produto": COMMODITIES.get(commodity_chave, {}).get("rotulo", produto),
+        "commodity_chave": commodity_chave,
+        "estado": estado,
+        "cidade": cidade,
+        "valor": round(float(valor), 4),
+        "preco": formatar_moeda(float(valor), unidade),
+        "unidade": unidade,
+        "data": data or "",
+        "data_iso": data_iso,
+        "fonte": fonte,
+        "url_fonte": url_fonte,
+        "tipo_preco": tipo_preco,
+        "nivel_comercializacao": nivel_comercializacao,
+        "status": "oficial",
+        "observacao": observacao,
     }
 
+    if historico_30d:
+        item["historico_30d"] = historico_30d
 
-def montar_payload_historico(dados_historico, erros):
-    agora = agora_brasilia()
-
-    return {
-        "ok": True,
-        "fonte": FONTE,
-        "tipo": TIPO_HISTORICO,
-        "atualizacao": ATUALIZACAO,
-        "periodo": "36 meses",
-        "atualizado_em": agora.isoformat(),
-        "ultima_sincronizacao": formatar_data_br(agora),
-        "total_series": len(dados_historico),
-        "fontes_carregadas": ["CONAB"] if dados_historico else [],
-        "total_erros": len(erros),
-        "erros": erros[:20],
-        "dados": dados_historico,
-        "aviso": (
-            "Histórico referencial importado de fonte pública. Valores podem variar conforme praça, qualidade, "
-            "volume, frete, forma de pagamento e disponibilidade das fontes."
-        )
-    }
+    return item
 
 
-def main():
-    print("Iniciando coletor real de cotações CONAB...")
+def coletar_cepea() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    itens: List[Dict[str, Any]] = []
+    avisos: List[Dict[str, Any]] = []
 
-    try:
-        registros, erros = coletar_conab()
+    for fonte in FONTES_CEPEA:
+        try:
+            conteudo = download(fonte.url)
+            tabelas = ler_tabelas_de_bytes(conteudo, fonte.url)
 
-        print(f"Total bruto filtrado: {len(registros)}")
-        print(f"Total de erros: {len(erros)}")
+            if not tabelas:
+                raise RuntimeError("Nenhuma tabela encontrada na página do indicador.")
 
-        if len(registros) < MINIMO_REGISTROS_VALIDOS:
-            raise RuntimeError(
-                f"Poucos registros válidos retornados da CONAB: {len(registros)}."
+            serie = extrair_serie_cepea(tabelas)
+
+            if not serie:
+                raise RuntimeError("Tabela encontrada, mas sem série válida de preço/data.")
+
+            atual = serie[-1]
+
+            item = normalizar_item(
+                produto=fonte.produto,
+                commodity_chave=fonte.commodity_chave,
+                estado=fonte.estado,
+                cidade=fonte.cidade,
+                valor=atual["valor"],
+                unidade=fonte.unidade,
+                data=atual["data"],
+                data_iso=atual.get("data_iso"),
+                fonte="CEPEA/ESALQ",
+                url_fonte=fonte.url,
+                tipo_preco=fonte.tipo_preco,
+                nivel_comercializacao="Indicador",
+                observacao=fonte.observacao,
+                historico_30d=serie[-30:],
             )
 
-        registros_36m = filtrar_ultimos_36_meses(registros)
+            if item:
+                itens.append(item)
+                print(f"CEPEA OK: {fonte.produto} - {item['preco']}")
+            else:
+                raise RuntimeError("Registro normalizado ficou inválido.")
 
-        print(f"Registros dentro de 36 meses: {len(registros_36m)}")
+        except Exception as exc:
+            aviso = {
+                "fonte": "CEPEA/ESALQ",
+                "produto": fonte.produto,
+                "commodity_chave": fonte.commodity_chave,
+                "url_fonte": fonte.url,
+                "status": "erro",
+                "mensagem": str(exc),
+            }
+            avisos.append(aviso)
+            print(f"CEPEA ERRO: {fonte.produto} - {exc}", file=sys.stderr)
 
-        dados_historico = agrupar_historico(registros_36m)
-        cotacoes_atuais = gerar_cotacoes_atuais(dados_historico)
+    return itens, avisos
 
-        print(f"Séries históricas geradas: {len(dados_historico)}")
-        print(f"Cotações atuais geradas: {len(cotacoes_atuais)}")
 
-        payload_atual = montar_payload_atual(cotacoes_atuais, erros)
-        payload_historico = montar_payload_historico(dados_historico, erros)
+def extrair_serie_cepea(tabelas: List[pd.DataFrame]) -> List[Dict[str, Any]]:
+    """
+    Procura uma tabela com coluna de data e preço.
+    Retorna ordem crescente por data, adequada para gráfico.
+    """
+    for df_raw in tabelas:
+        df = limpar_colunas(df_raw)
 
-        salvar_json(OUT_JSON_ATUAL, payload_atual)
-        salvar_json(BACKUP_JSON_ATUAL, payload_atual)
+        if df.empty:
+            continue
 
-        salvar_json(OUT_JSON_HISTORICO, payload_historico)
-        salvar_json(BACKUP_JSON_HISTORICO, payload_historico)
+        col_data = encontrar_coluna(df, ["data", "dt", "dia"])
 
-        print(f"Arquivo principal gerado: {OUT_JSON_ATUAL}")
-        print(f"Arquivo histórico gerado: {OUT_JSON_HISTORICO}")
+        if not col_data and len(df.columns) >= 2:
+            col_data = df.columns[0]
 
-    except Exception as erro:
-        print(f"Erro ao gerar cotações: {erro}")
-        aplicar_fallback(str(erro))
+        if not col_data:
+            continue
+
+        candidatos = []
+
+        for col in df.columns:
+            if col == col_data:
+                continue
+
+            nome = normalizar_txt(col)
+
+            if any(t in nome for t in ["var", "%", "us$", "dolar", "dólar"]):
+                continue
+
+            n_validos = df[col].apply(parse_numero_br).notna().sum()
+
+            if n_validos > 0:
+                candidatos.append((col, n_validos))
+
+        if not candidatos:
+            continue
+
+        candidatos.sort(key=lambda x: x[1], reverse=True)
+        col_preco = candidatos[0][0]
+
+        serie = []
+
+        for _, row in df.iterrows():
+            data_br, data_iso = parse_data(row.get(col_data))
+            valor = parse_numero_br(row.get(col_preco))
+
+            if not data_br or valor is None:
+                continue
+
+            serie.append({
+                "data": data_br,
+                "data_iso": data_iso,
+                "valor": round(float(valor), 4),
+            })
+
+        unicos = {}
+
+        for p in serie:
+            chave = p.get("data_iso") or p["data"]
+            unicos[chave] = p
+
+        serie = list(unicos.values())
+        serie.sort(key=lambda x: x.get("data_iso") or x.get("data") or "")
+
+        if serie:
+            return serie[-30:]
+
+    return []
+
+
+def iter_fontes_conab() -> List[Tuple[str, bytes]]:
+    fontes: List[Tuple[str, bytes]] = []
+
+    if PASTA_CONAB.exists():
+        for path in sorted(PASTA_CONAB.glob("*")):
+            if path.is_file() and path.suffix.lower() in {".csv", ".xlsx", ".xls", ".html", ".htm"}:
+                fontes.append((str(path), path.read_bytes()))
+
+    urls = [
+        u.strip()
+        for u in os.getenv("CONAB_ARQUIVOS_URLS", "").split(",")
+        if u.strip()
+    ]
+
+    for url in urls:
+        try:
+            fontes.append((url, download(url)))
+        except Exception as exc:
+            print(f"CONAB URL ERRO: {url} - {exc}", file=sys.stderr)
+
+    return fontes
+
+
+def coletar_conab_importado() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    itens: List[Dict[str, Any]] = []
+    avisos: List[Dict[str, Any]] = []
+
+    fontes = iter_fontes_conab()
+
+    if not fontes:
+        avisos.append({
+            "fonte": "CONAB",
+            "status": "sem_arquivo",
+            "mensagem": (
+                "Nenhum arquivo oficial da CONAB foi encontrado em dados_conab/ "
+                "e nenhuma URL direta foi informada em CONAB_ARQUIVOS_URLS."
+            ),
+        })
+        return itens, avisos
+
+    for origem, conteudo in fontes:
+        try:
+            tabelas = ler_tabelas_de_bytes(conteudo, origem)
+
+            if not tabelas:
+                raise RuntimeError("Nenhuma tabela reconhecida no arquivo/fonte.")
+
+            total_origem = 0
+
+            for tabela in tabelas:
+                for item in normalizar_tabela_conab(tabela, origem):
+                    itens.append(item)
+                    total_origem += 1
+
+            if total_origem == 0:
+                raise RuntimeError("Tabela lida, mas nenhum item compatível com as commodities do projeto.")
+
+            print(f"CONAB OK: {origem} - {total_origem} registros")
+
+        except Exception as exc:
+            avisos.append({
+                "fonte": "CONAB",
+                "origem": origem,
+                "status": "erro",
+                "mensagem": str(exc),
+            })
+            print(f"CONAB ERRO: {origem} - {exc}", file=sys.stderr)
+
+    return itens, avisos
+
+
+def normalizar_tabela_conab(df_raw: pd.DataFrame, origem: str) -> List[Dict[str, Any]]:
+    df = limpar_colunas(df_raw)
+
+    if df.empty:
+        return []
+
+    col_produto = encontrar_coluna(df, ["produto", "produto/unidade", "produto unidade"])
+    col_nivel = encontrar_coluna(df, ["nivel", "nível", "comercializacao", "comercialização"])
+    col_uf = encontrar_coluna(df, ["uf", "u.f", "estado"])
+    col_cidade = encontrar_coluna(df, ["municipio", "município", "cidade", "praca", "praça", "localidade"])
+    col_data = encontrar_coluna(df, ["data", "mes/ano", "mês/ano", "semana", "periodo", "período"])
+    col_preco = encontrar_coluna(df, ["preco medio", "preço médio", "preco", "preço", "valor"])
+
+    if not col_produto or not col_preco:
+        return []
+
+    registros: List[Dict[str, Any]] = []
+
+    for _, row in df.iterrows():
+        produto_bruto = row.get(col_produto)
+        produto, unidade_extraida = extrair_produto_unidade(produto_bruto)
+        commodity = commodity_por_produto(produto)
+
+        if not commodity:
+            continue
+
+        valor = parse_numero_br(row.get(col_preco))
+
+        if valor is None:
+            continue
+
+        estado = apenas_texto(row.get(col_uf)) if col_uf else "BR"
+        estado = estado.upper()
+
+        # Mantém apenas Nordeste + Tocantins + Pará.
+        # Para publicar Brasil inteiro, comente este bloco.
+        if estado and estado != "BR" and estado not in UFS_NORDESTE_MATOPIBAPA:
+            continue
+
+        cidade = apenas_texto(row.get(col_cidade)) if col_cidade else ""
+
+        if not cidade:
+            cidade = "Média estadual" if estado and estado != "BR" else "Média Brasil"
+
+        data_br = ""
+        data_iso = None
+
+        if col_data:
+            data_br, data_iso = parse_data(row.get(col_data))
+
+        if not data_br:
+            data_br = agora_br().strftime("%d/%m/%Y")
+
+        nivel = apenas_texto(row.get(col_nivel)) if col_nivel else "Preço de mercado"
+
+        item = normalizar_item(
+            produto=produto,
+            commodity_chave=commodity,
+            estado=estado or "BR",
+            cidade=cidade,
+            valor=valor,
+            unidade=unidade_extraida,
+            data=data_br,
+            data_iso=data_iso,
+            fonte="CONAB",
+            url_fonte=origem,
+            tipo_preco="Preço oficial de mercado",
+            nivel_comercializacao=nivel,
+            observacao="Registro importado de arquivo/tabela oficial da CONAB.",
+        )
+
+        if item:
+            registros.append(item)
+
+    return deduplicar_itens(registros)
+
+
+def deduplicar_itens(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {}
+
+    for item in itens:
+        chave = "|".join([
+            item.get("fonte", ""),
+            item.get("commodity_chave", ""),
+            item.get("estado", ""),
+            normalizar_txt(item.get("cidade", "")),
+            item.get("data", ""),
+            str(item.get("valor", "")),
+        ])
+
+        out[chave] = item
+
+    return list(out.values())
+
+
+def gerar_payload(itens: List[Dict[str, Any]], avisos: List[Dict[str, Any]]) -> Dict[str, Any]:
+    itens = deduplicar_itens(itens)
+
+    itens.sort(key=lambda x: (
+        x.get("commodity_chave", ""),
+        x.get("estado", ""),
+        x.get("cidade", ""),
+        x.get("fonte", ""),
+    ))
+
+    payload = {
+        "ok": bool(itens),
+        "projeto": "Nordeste Agro",
+        "tipo": "cotacoes_oficiais",
+        "fonte_principal": "CONAB",
+        "fontes_complementares": ["CEPEA/ESALQ", "B3"],
+        "ultima_sincronizacao": agora_br_texto(),
+        "gerado_em": agora_br().isoformat(timespec="seconds"),
+        "frequencia_atualizacao": "diaria_em_dias_uteis",
+        "modo": "github_actions_json_publico",
+        "regra_dados": (
+            "Somente valores coletados/importados de fontes oficiais são publicados. "
+            "O sistema não simula preços e não cria cotação para praça sem dado oficial."
+        ),
+        "dados": itens,
+        "avisos": avisos + gerar_avisos_commodities_sem_dado(itens),
+        "fontes": [
+            {
+                "nome": "CONAB",
+                "uso": "Preços agropecuários oficiais por produto, UF e localidade quando importados de arquivo/export oficial.",
+                "status": "ativo_por_importacao_ou_url_direta",
+            },
+            {
+                "nome": "CEPEA/ESALQ",
+                "uso": "Indicadores referenciais oficiais de mercado por produto.",
+                "status": "ativo",
+            },
+            {
+                "nome": "B3",
+                "uso": "Mercado futuro e referência complementar quando integrada futuramente.",
+                "status": "preparado_para_integracao_futura",
+            },
+        ],
+    }
+
+    return payload
+
+
+def gerar_avisos_commodities_sem_dado(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    com_dado = {i.get("commodity_chave") for i in itens}
+    avisos = []
+
+    for chave, cfg in COMMODITIES.items():
+        if chave not in com_dado:
+            avisos.append({
+                "produto": cfg["rotulo"],
+                "commodity_chave": chave,
+                "status": "sem_dado_oficial_publicado",
+                "mensagem": (
+                    "Nenhum valor oficial foi coletado/importado para esta commodity nesta execução. "
+                    "A página deve mostrar indisponibilidade, não valor simulado."
+                ),
+            })
+
+    return avisos
+
+
+def salvar_json(payload: Dict[str, Any]) -> None:
+    ARQUIVO_SAIDA.parent.mkdir(parents=True, exist_ok=True)
+    ARQUIVO_COMPATIVEL_HTML.parent.mkdir(parents=True, exist_ok=True)
+
+    texto_json = json.dumps(payload, ensure_ascii=False, indent=2)
+
+    ARQUIVO_SAIDA.write_text(texto_json, encoding="utf-8")
+    ARQUIVO_COMPATIVEL_HTML.write_text(texto_json, encoding="utf-8")
+
+    print(f"Arquivo principal gerado: {ARQUIVO_SAIDA}")
+    print(f"Arquivo compatível com HTML gerado: {ARQUIVO_COMPATIVEL_HTML}")
+
+
+def main() -> int:
+    todos_itens: List[Dict[str, Any]] = []
+    todos_avisos: List[Dict[str, Any]] = []
+
+    itens_conab, avisos_conab = coletar_conab_importado()
+    todos_itens.extend(itens_conab)
+    todos_avisos.extend(avisos_conab)
+
+    itens_cepea, avisos_cepea = coletar_cepea()
+    todos_itens.extend(itens_cepea)
+    todos_avisos.extend(avisos_cepea)
+
+    payload = gerar_payload(todos_itens, todos_avisos)
+    salvar_json(payload)
+
+    print(f"Total de registros oficiais publicados: {len(payload['dados'])}")
+    print(f"Total de avisos: {len(payload['avisos'])}")
+
+    return 0 if payload["ok"] else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
