@@ -1,5 +1,4 @@
 import json
-import math
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -7,11 +6,11 @@ from pathlib import Path
 
 
 # ============================================================
-# COLETOR MATOPIBA — OPEN-METEO
+# COLETOR NORDESTE + TOCANTINS + PARÁ — OPEN-METEO
 # ============================================================
 # Este script:
 # - consulta a Open-Meteo Forecast API;
-# - usa pontos reais por coordenada no MATOPIBA;
+# - usa pontos reais por coordenada;
 # - calcula precipitação acumulada prevista para 24h, 48h e 72h;
 # - salva JSON para o WordPress gerar o mapa e o slide.
 #
@@ -28,24 +27,35 @@ OUT_JSON = OUT_DIR / "openmeteo_matopiba.json"
 
 FONTE = "Open-Meteo Forecast API"
 MODELO = "Best match / modelos meteorológicos combinados pela Open-Meteo"
-AREA = "MATOPIBA"
+AREA = "Nordeste + Tocantins + Pará"
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 
-# Pontos distribuídos no MATOPIBA.
-# Inclui cidades produtoras e pontos adicionais para melhorar interpolação.
+
 PONTOS = [
+    # PARÁ
+    {"uf": "PA", "nome": "Altamira", "lat": -3.2033, "lon": -52.2064},
+    {"uf": "PA", "nome": "Santarém", "lat": -2.4431, "lon": -54.7083},
+    {"uf": "PA", "nome": "Marabá", "lat": -5.3686, "lon": -49.1178},
+    {"uf": "PA", "nome": "Paragominas", "lat": -2.9958, "lon": -47.3522},
+    {"uf": "PA", "nome": "Redenção", "lat": -8.0253, "lon": -50.0317},
+    {"uf": "PA", "nome": "Conceição do Araguaia", "lat": -8.2578, "lon": -49.2647},
+    {"uf": "PA", "nome": "Castanhal", "lat": -1.2939, "lon": -47.9264},
+    {"uf": "PA", "nome": "Tailândia", "lat": -2.9458, "lon": -48.9489},
+    {"uf": "PA", "nome": "Uruará", "lat": -3.7158, "lon": -53.7397},
+    {"uf": "PA", "nome": "Novo Progresso", "lat": -7.1431, "lon": -55.3786},
+
     # MARANHÃO
     {"uf": "MA", "nome": "Balsas", "lat": -7.5325, "lon": -46.0356},
     {"uf": "MA", "nome": "Tasso Fragoso", "lat": -8.4724, "lon": -45.7545},
     {"uf": "MA", "nome": "Alto Parnaíba", "lat": -9.1089, "lon": -45.9300},
     {"uf": "MA", "nome": "Riachão", "lat": -7.3617, "lon": -46.6172},
     {"uf": "MA", "nome": "São Raimundo das Mangabeiras", "lat": -7.0219, "lon": -45.4806},
-    {"uf": "MA", "nome": "Sambaíba", "lat": -7.1344, "lon": -45.3511},
+    {"uf": "MA", "nome": "Imperatriz", "lat": -5.5264, "lon": -47.4917},
     {"uf": "MA", "nome": "Carolina", "lat": -7.3353, "lon": -47.4692},
-    {"uf": "MA", "nome": "Benedito Leite", "lat": -7.2100, "lon": -44.5572},
-    {"uf": "MA", "nome": "Fortaleza dos Nogueiras", "lat": -6.9656, "lon": -46.1747},
-    {"uf": "MA", "nome": "Loreto", "lat": -7.0811, "lon": -45.1458},
+    {"uf": "MA", "nome": "Chapadinha", "lat": -3.7417, "lon": -43.3603},
+    {"uf": "MA", "nome": "Caxias", "lat": -4.8589, "lon": -43.3561},
+    {"uf": "MA", "nome": "São Luís", "lat": -2.5307, "lon": -44.3068},
 
     # TOCANTINS
     {"uf": "TO", "nome": "Palmas", "lat": -10.1844, "lon": -48.3336},
@@ -65,37 +75,72 @@ PONTOS = [
     {"uf": "PI", "nome": "Baixa Grande do Ribeiro", "lat": -7.8497, "lon": -45.2192},
     {"uf": "PI", "nome": "Corrente", "lat": -10.4333, "lon": -45.1639},
     {"uf": "PI", "nome": "Gilbués", "lat": -9.8325, "lon": -45.3431},
+    {"uf": "PI", "nome": "Teresina", "lat": -5.0892, "lon": -42.8019},
+    {"uf": "PI", "nome": "Floriano", "lat": -6.7718, "lon": -43.0241},
+    {"uf": "PI", "nome": "Picos", "lat": -7.0778, "lon": -41.4672},
     {"uf": "PI", "nome": "Santa Filomena", "lat": -9.1128, "lon": -45.9211},
-    {"uf": "PI", "nome": "Currais", "lat": -9.0111, "lon": -44.4069},
-    {"uf": "PI", "nome": "Monte Alegre do Piauí", "lat": -9.7533, "lon": -45.3031},
     {"uf": "PI", "nome": "Ribeiro Gonçalves", "lat": -7.5583, "lon": -45.2444},
-    {"uf": "PI", "nome": "Sebastião Leal", "lat": -7.5686, "lon": -44.0608},
+
+    # CEARÁ
+    {"uf": "CE", "nome": "Fortaleza", "lat": -3.7319, "lon": -38.5267},
+    {"uf": "CE", "nome": "Sobral", "lat": -3.6861, "lon": -40.3497},
+    {"uf": "CE", "nome": "Quixadá", "lat": -4.9708, "lon": -39.0153},
+    {"uf": "CE", "nome": "Iguatu", "lat": -6.3594, "lon": -39.2986},
+    {"uf": "CE", "nome": "Crateús", "lat": -5.1783, "lon": -40.6775},
+    {"uf": "CE", "nome": "Juazeiro do Norte", "lat": -7.2128, "lon": -39.3153},
+    {"uf": "CE", "nome": "Limoeiro do Norte", "lat": -5.1456, "lon": -38.0981},
+    {"uf": "CE", "nome": "Tianguá", "lat": -3.7322, "lon": -40.9917},
+
+    # RIO GRANDE DO NORTE
+    {"uf": "RN", "nome": "Natal", "lat": -5.7945, "lon": -35.2110},
+    {"uf": "RN", "nome": "Mossoró", "lat": -5.1875, "lon": -37.3442},
+    {"uf": "RN", "nome": "Caicó", "lat": -6.4591, "lon": -37.0978},
+    {"uf": "RN", "nome": "Pau dos Ferros", "lat": -6.1103, "lon": -38.2067},
+    {"uf": "RN", "nome": "Assu", "lat": -5.5767, "lon": -36.9086},
+    {"uf": "RN", "nome": "Apodi", "lat": -5.6647, "lon": -37.7989},
+
+    # PARAÍBA
+    {"uf": "PB", "nome": "João Pessoa", "lat": -7.1195, "lon": -34.8450},
+    {"uf": "PB", "nome": "Campina Grande", "lat": -7.2306, "lon": -35.8811},
+    {"uf": "PB", "nome": "Patos", "lat": -7.0244, "lon": -37.2800},
+    {"uf": "PB", "nome": "Sousa", "lat": -6.7592, "lon": -38.2281},
+    {"uf": "PB", "nome": "Cajazeiras", "lat": -6.8903, "lon": -38.5553},
+    {"uf": "PB", "nome": "Monteiro", "lat": -7.8894, "lon": -37.1200},
+
+    # PERNAMBUCO
+    {"uf": "PE", "nome": "Recife", "lat": -8.0476, "lon": -34.8770},
+    {"uf": "PE", "nome": "Petrolina", "lat": -9.3891, "lon": -40.5027},
+    {"uf": "PE", "nome": "Caruaru", "lat": -8.2846, "lon": -35.9702},
+    {"uf": "PE", "nome": "Garanhuns", "lat": -8.8903, "lon": -36.4928},
+    {"uf": "PE", "nome": "Serra Talhada", "lat": -7.9919, "lon": -38.2988},
+    {"uf": "PE", "nome": "Araripina", "lat": -7.5767, "lon": -40.4983},
+    {"uf": "PE", "nome": "Salgueiro", "lat": -8.0742, "lon": -39.1192},
+
+    # ALAGOAS
+    {"uf": "AL", "nome": "Maceió", "lat": -9.6498, "lon": -35.7089},
+    {"uf": "AL", "nome": "Arapiraca", "lat": -9.7525, "lon": -36.6611},
+    {"uf": "AL", "nome": "Penedo", "lat": -10.2900, "lon": -36.5864},
+    {"uf": "AL", "nome": "Palmeira dos Índios", "lat": -9.4056, "lon": -36.6328},
+    {"uf": "AL", "nome": "Santana do Ipanema", "lat": -9.3783, "lon": -37.2453},
+
+    # SERGIPE
+    {"uf": "SE", "nome": "Aracaju", "lat": -10.9472, "lon": -37.0731},
+    {"uf": "SE", "nome": "Itabaiana", "lat": -10.6850, "lon": -37.4253},
+    {"uf": "SE", "nome": "Nossa Senhora da Glória", "lat": -10.2158, "lon": -37.4211},
+    {"uf": "SE", "nome": "Lagarto", "lat": -10.9172, "lon": -37.6500},
+    {"uf": "SE", "nome": "Estância", "lat": -11.2683, "lon": -37.4383},
 
     # BAHIA
+    {"uf": "BA", "nome": "Salvador", "lat": -12.9777, "lon": -38.5016},
+    {"uf": "BA", "nome": "Feira de Santana", "lat": -12.2664, "lon": -38.9663},
     {"uf": "BA", "nome": "Barreiras", "lat": -12.1528, "lon": -44.9900},
     {"uf": "BA", "nome": "Luís Eduardo Magalhães", "lat": -12.0956, "lon": -45.7867},
     {"uf": "BA", "nome": "São Desidério", "lat": -12.3639, "lon": -44.9731},
     {"uf": "BA", "nome": "Formosa do Rio Preto", "lat": -11.0483, "lon": -45.1931},
     {"uf": "BA", "nome": "Correntina", "lat": -13.3436, "lon": -44.6367},
-    {"uf": "BA", "nome": "Riachão das Neves", "lat": -11.7461, "lon": -44.9147},
-    {"uf": "BA", "nome": "Jaborandi", "lat": -13.6214, "lon": -44.4619},
-    {"uf": "BA", "nome": "Cocos", "lat": -14.1817, "lon": -44.5356},
-    {"uf": "BA", "nome": "Baianópolis", "lat": -12.3019, "lon": -44.5389},
-    {"uf": "BA", "nome": "Wanderley", "lat": -12.1169, "lon": -43.8956},
-
-    # PONTOS DE REFORÇO PARA INTERPOLAÇÃO REGIONAL
-    {"uf": "MA", "nome": "Ponto MA Norte", "lat": -5.90, "lon": -45.50},
-    {"uf": "MA", "nome": "Ponto MA Oeste", "lat": -6.80, "lon": -47.30},
-    {"uf": "MA", "nome": "Ponto MA Leste", "lat": -6.90, "lon": -44.20},
-    {"uf": "TO", "nome": "Ponto TO Norte", "lat": -8.30, "lon": -48.50},
-    {"uf": "TO", "nome": "Ponto TO Centro", "lat": -10.30, "lon": -48.60},
-    {"uf": "TO", "nome": "Ponto TO Sudeste", "lat": -12.50, "lon": -46.80},
-    {"uf": "PI", "nome": "Ponto PI Oeste", "lat": -8.40, "lon": -45.60},
-    {"uf": "PI", "nome": "Ponto PI Centro", "lat": -8.80, "lon": -44.40},
-    {"uf": "PI", "nome": "Ponto PI Sul", "lat": -10.30, "lon": -44.80},
-    {"uf": "BA", "nome": "Ponto BA Norte", "lat": -11.40, "lon": -45.30},
-    {"uf": "BA", "nome": "Ponto BA Oeste", "lat": -12.70, "lon": -46.00},
-    {"uf": "BA", "nome": "Ponto BA Sul", "lat": -14.10, "lon": -44.70},
+    {"uf": "BA", "nome": "Vitória da Conquista", "lat": -14.8619, "lon": -40.8442},
+    {"uf": "BA", "nome": "Ilhéus", "lat": -14.7930, "lon": -39.0460},
+    {"uf": "BA", "nome": "Juazeiro", "lat": -9.4167, "lon": -40.5033},
 ]
 
 
@@ -187,7 +232,6 @@ def processar_resposta_lote(pontos_lote, dados):
 
 def consultar_openmeteo():
     todos_resultados = []
-
     tamanho_lote = 10
 
     for i in range(0, len(PONTOS), tamanho_lote):
@@ -241,7 +285,7 @@ def resumo_periodo(pontos):
 
 
 def main():
-    print("Iniciando coleta Open-Meteo MATOPIBA...")
+    print("Iniciando coleta Open-Meteo: Nordeste + Tocantins + Pará...")
 
     pontos = consultar_openmeteo()
     periodos = gerar_periodos(pontos)
@@ -254,7 +298,7 @@ def main():
         "oficial_inmet": False,
         "simulado": False,
         "tipo": "previsao_meteorologica_por_coordenada",
-        "metodo": "Consulta Open-Meteo Forecast API por pontos do MATOPIBA e cálculo de acumulados 24h, 48h e 72h",
+        "metodo": "Consulta Open-Meteo Forecast API por pontos do Nordeste, Tocantins e Pará; cálculo de acumulados 24h, 48h e 72h",
         "gerado_em_utc": datetime.now(timezone.utc).isoformat(),
         "total_pontos": len(pontos),
         "periodos": {
