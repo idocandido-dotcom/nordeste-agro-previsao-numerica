@@ -3,7 +3,6 @@ import io
 import json
 import re
 import urllib.request
-import urllib.error
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -12,24 +11,32 @@ from pathlib import Path
 # COLETOR REAL DE COTAÇÕES — NORDESTE AGRO
 # Fonte principal: CONAB - Preços Agropecuários
 # ============================================================
-# Este coletor:
-# - baixa arquivo oficial de preços agropecuários da CONAB;
-# - tenta ler automaticamente separador e colunas;
-# - filtra Nordeste + Tocantins + Pará;
-# - seleciona produtos agrícolas de interesse do Nordeste Agro;
-# - gera JSON para o WordPress;
-# - mantém backup do último JSON válido.
+# Este coletor gera dois arquivos:
+#
+# 1) public/cotacoes/cotacoes_regionais.json
+#    - arquivo leve para a página principal de cotações
+#    - mantém somente a cotação mais recente por Estado + Cidade + Produto
+#    - inclui historico_30d quando disponível
+#
+# 2) public/cotacoes/historico_cotacoes_36m.json
+#    - arquivo para nova página de histórico
+#    - agrupa os registros por Estado + Cidade + Produto
+#    - mantém série histórica para consulta de até 36 meses
 # ============================================================
 
 
 OUT_DIR = Path("public/cotacoes")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-OUT_JSON = OUT_DIR / "cotacoes_regionais.json"
-BACKUP_JSON = OUT_DIR / "cotacoes_regionais_ultimo_valido.json"
+OUT_JSON_ATUAL = OUT_DIR / "cotacoes_regionais.json"
+OUT_JSON_HISTORICO = OUT_DIR / "historico_cotacoes_36m.json"
+
+BACKUP_JSON_ATUAL = OUT_DIR / "cotacoes_regionais_ultimo_valido.json"
+BACKUP_JSON_HISTORICO = OUT_DIR / "historico_cotacoes_36m_ultimo_valido.json"
 
 FONTE = "CONAB - Preços Agropecuários"
-TIPO = "cotacoes_regionais"
+TIPO_ATUAL = "cotacoes_regionais"
+TIPO_HISTORICO = "historico_cotacoes_36m"
 ATUALIZACAO = "diaria"
 
 URLS_CONAB = [
@@ -80,8 +87,10 @@ def normalizar(txt):
         "Ú": "U",
         "Ç": "C",
     }
+
     for a, b in trocas.items():
         txt = txt.replace(a, b)
+
     return txt
 
 
@@ -148,7 +157,7 @@ def ler_tabela(texto):
     print(f"Colunas detectadas: {leitor.fieldnames}")
     print(f"Linhas detectadas: {len(linhas)}")
 
-    return linhas, leitor.fieldnames or []
+    return linhas
 
 
 def pegar_valor(row, possibilidades):
@@ -156,13 +165,14 @@ def pegar_valor(row, possibilidades):
 
     for nome in possibilidades:
         nome_norm = normalizar(nome)
+
         if nome_norm in normalizadas:
             return row.get(normalizadas[nome_norm])
 
-    # busca parcial
     for chave_norm, chave_original in normalizadas.items():
         for nome in possibilidades:
             nome_norm = normalizar(nome)
+
             if nome_norm in chave_norm or chave_norm in nome_norm:
                 return row.get(chave_original)
 
@@ -180,8 +190,20 @@ def extrair_uf(row):
     ]) or "").strip().upper()
 
 
-def extrair_cidade(row):
-    return str(pegar_valor(row, [
+def limpar_nome_cidade(cidade, uf):
+    cidade = str(cidade or "").strip()
+
+    if not cidade:
+        return uf
+
+    # Mantém o nome como vem da fonte, mas remove espaços duplicados.
+    cidade = re.sub(r"\s+", " ", cidade)
+
+    return cidade
+
+
+def extrair_cidade(row, uf):
+    cidade = str(pegar_valor(row, [
         "MUNICIPIO",
         "MUNICÍPIO",
         "CIDADE",
@@ -189,6 +211,8 @@ def extrair_cidade(row):
         "PRAÇA",
         "LOCALIDADE",
     ]) or "").strip()
+
+    return limpar_nome_cidade(cidade, uf)
 
 
 def extrair_produto(row):
@@ -213,6 +237,9 @@ def extrair_data(row):
         "REFERENCIA",
         "REFERÊNCIA",
         "DATA_REFERENCIA",
+        "SEMANA",
+        "PERIODO",
+        "PERÍODO",
     ]) or "").strip()
 
 
@@ -222,6 +249,7 @@ def extrair_unidade(row):
         "UNIDADE MEDIDA",
         "UNIDADE_MEDIDA",
         "MEDIDA",
+        "EMBALAGEM",
     ]) or "").strip()
 
 
@@ -251,14 +279,11 @@ def converter_numero(valor):
         return None
 
     s = s.replace("R$", "").replace("r$", "").replace(" ", "")
-
-    # Mantém apenas número, vírgula, ponto e sinal
     s = re.sub(r"[^0-9,\.\-]", "", s)
 
     if not s:
         return None
 
-    # Caso brasileiro: 1.234,56
     if "," in s and "." in s:
         s = s.replace(".", "").replace(",", ".")
     elif "," in s:
@@ -292,9 +317,68 @@ def classificar_produto(nome_produto):
     return ""
 
 
+def parse_data_iso(data_txt):
+    """
+    Tenta transformar datas da CONAB em uma data ISO para ordenação.
+    Funciona com textos como:
+    - 26-05-2025 - 30-05-2025
+    - 30/05/2025
+    - 2025-05-30
+    - mai/2025
+    """
+    s = str(data_txt or "").strip()
+
+    if not s:
+        return ""
+
+    candidatos = re.findall(r"\d{2}[-/]\d{2}[-/]\d{4}", s)
+
+    if candidatos:
+        alvo = candidatos[-1]
+
+        for fmt in ["%d-%m-%Y", "%d/%m/%Y"]:
+            try:
+                return datetime.strptime(alvo, fmt).date().isoformat()
+            except Exception:
+                pass
+
+    candidatos_iso = re.findall(r"\d{4}-\d{2}-\d{2}", s)
+
+    if candidatos_iso:
+        return candidatos_iso[-1]
+
+    meses = {
+        "JAN": 1, "JANEIRO": 1,
+        "FEV": 2, "FEVEREIRO": 2,
+        "MAR": 3, "MARCO": 3, "MARÇO": 3,
+        "ABR": 4, "ABRIL": 4,
+        "MAI": 5, "MAIO": 5,
+        "JUN": 6, "JUNHO": 6,
+        "JUL": 7, "JULHO": 7,
+        "AGO": 8, "AGOSTO": 8,
+        "SET": 9, "SETEMBRO": 9,
+        "OUT": 10, "OUTUBRO": 10,
+        "NOV": 11, "NOVEMBRO": 11,
+        "DEZ": 12, "DEZEMBRO": 12,
+    }
+
+    m = re.search(r"([A-Za-zçÇ]{3,9})[/\-\s]+(\d{4})", s)
+
+    if m:
+        mes_txt = normalizar(m.group(1))
+        ano = int(m.group(2))
+        mes = meses.get(mes_txt)
+
+        if mes:
+            return datetime(ano, mes, 1).date().isoformat()
+
+    return ""
+
+
 def gerar_regiao_generica(uf, cidade):
     if cidade:
         return f"{cidade} / {uf}"
+
     return uf
 
 
@@ -307,7 +391,7 @@ def transformar_linhas(linhas, origem):
         if uf not in UFS_ALVO:
             continue
 
-        cidade = extrair_cidade(row)
+        cidade = extrair_cidade(row, uf)
         produto_original = extrair_produto(row)
         produto = classificar_produto(produto_original)
 
@@ -316,6 +400,7 @@ def transformar_linhas(linhas, origem):
 
         unidade = extrair_unidade(row)
         data = extrair_data(row)
+        data_iso = parse_data_iso(data)
         valor = converter_numero(extrair_preco_bruto(row))
 
         if valor is None:
@@ -330,6 +415,7 @@ def transformar_linhas(linhas, origem):
             "valor": valor,
             "unidade": unidade or "unidade informada pela fonte",
             "data": data or formatar_data_br(agora_brasilia()),
+            "data_iso": data_iso,
             "fonte": "CONAB",
             "referencia": f"{FONTE} - {origem}",
             "obs": "Cotação real importada da base pública da CONAB; validar condições locais antes de negociar."
@@ -363,25 +449,6 @@ def deduplicar(registros):
     return saida
 
 
-def carregar_json_existente():
-    if OUT_JSON.exists():
-        try:
-            return json.loads(OUT_JSON.read_text(encoding="utf-8"))
-        except Exception:
-            return None
-    return None
-
-
-def carregar_backup():
-    if BACKUP_JSON.exists():
-        return json.loads(BACKUP_JSON.read_text(encoding="utf-8"))
-
-    if OUT_JSON.exists():
-        return json.loads(OUT_JSON.read_text(encoding="utf-8"))
-
-    return None
-
-
 def coletar_conab():
     todos = []
     erros = []
@@ -391,7 +458,7 @@ def coletar_conab():
 
         try:
             texto = baixar_texto(url)
-            linhas, _ = ler_tabela(texto)
+            linhas = ler_tabela(texto)
             registros = transformar_linhas(linhas, nome)
 
             print(f"{nome}: {len(registros)} registros filtrados")
@@ -406,23 +473,224 @@ def coletar_conab():
     return todos, erros
 
 
-def montar_payload(registros, erros):
-    agora = agora_brasilia()
+def data_limite_meses(meses):
+    hoje = agora_brasilia().date()
+    dias = int(meses * 30.44)
+    return hoje - timedelta(days=dias)
 
-    fontes = sorted(set(r.get("fonte", "") for r in registros if r.get("fonte")))
+
+def filtrar_ultimos_36_meses(registros):
+    limite = data_limite_meses(36)
+
+    filtrados = []
+
+    for r in registros:
+        data_iso = r.get("data_iso")
+
+        if not data_iso:
+            filtrados.append(r)
+            continue
+
+        try:
+            d = datetime.strptime(data_iso, "%Y-%m-%d").date()
+
+            if d >= limite:
+                filtrados.append(r)
+
+        except Exception:
+            filtrados.append(r)
+
+    return filtrados
+
+
+def ordenar_por_data(registros):
+    def chave(r):
+        data_iso = r.get("data_iso") or "0000-00-00"
+        return data_iso
+
+    return sorted(registros, key=chave)
+
+
+def agrupar_historico(registros):
+    grupos = {}
+
+    for r in registros:
+        chave = (
+            r.get("estado"),
+            r.get("cidade"),
+            r.get("produto"),
+            r.get("unidade"),
+        )
+
+        grupos.setdefault(chave, []).append(r)
+
+    dados_historico = []
+
+    for (estado, cidade, produto, unidade), itens in grupos.items():
+        itens_ordenados = ordenar_por_data(itens)
+
+        historico = []
+
+        for item in itens_ordenados:
+            historico.append({
+                "data": item.get("data"),
+                "data_iso": item.get("data_iso"),
+                "valor": item.get("valor"),
+                "preco": item.get("preco"),
+                "fonte": item.get("fonte"),
+                "referencia": item.get("referencia"),
+            })
+
+        if not historico:
+            continue
+
+        ultimo = itens_ordenados[-1]
+
+        dados_historico.append({
+            "estado": estado,
+            "cidade": cidade,
+            "regiao": ultimo.get("regiao"),
+            "produto": produto,
+            "unidade": unidade,
+            "fonte": ultimo.get("fonte"),
+            "referencia": ultimo.get("referencia"),
+            "ultimo_preco": ultimo.get("preco"),
+            "ultimo_valor": ultimo.get("valor"),
+            "ultima_data": ultimo.get("data"),
+            "ultima_data_iso": ultimo.get("data_iso"),
+            "total_pontos_historicos": len(historico),
+            "historico": historico,
+        })
+
+    dados_historico.sort(key=lambda x: (
+        str(x.get("estado")),
+        str(x.get("cidade")),
+        str(x.get("produto")),
+    ))
+
+    return dados_historico
+
+
+def obter_historico_30d(historico):
+    limite = data_limite_meses(1)
+    saida = []
+
+    for h in historico:
+        data_iso = h.get("data_iso")
+
+        if not data_iso:
+            continue
+
+        try:
+            d = datetime.strptime(data_iso, "%Y-%m-%d").date()
+
+            if d >= limite:
+                saida.append({
+                    "data": h.get("data"),
+                    "data_iso": h.get("data_iso"),
+                    "valor": h.get("valor"),
+                    "preco": h.get("preco"),
+                })
+
+        except Exception:
+            continue
+
+    if len(saida) >= 2:
+        return saida
+
+    return historico[-5:] if len(historico) >= 2 else historico
+
+
+def gerar_cotacoes_atuais(dados_historico):
+    atuais = []
+
+    for grupo in dados_historico:
+        historico = grupo.get("historico", [])
+
+        if not historico:
+            continue
+
+        ultimo = historico[-1]
+
+        atual = {
+            "estado": grupo.get("estado"),
+            "cidade": grupo.get("cidade"),
+            "regiao": grupo.get("regiao"),
+            "produto": grupo.get("produto"),
+            "preco": ultimo.get("preco"),
+            "valor": ultimo.get("valor"),
+            "unidade": grupo.get("unidade"),
+            "data": ultimo.get("data"),
+            "data_iso": ultimo.get("data_iso"),
+            "fonte": grupo.get("fonte"),
+            "referencia": grupo.get("referencia"),
+            "obs": "Cotação mais recente importada da base pública da CONAB; validar condições locais antes de negociar.",
+            "historico_30d": obter_historico_30d(historico),
+        }
+
+        atuais.append(atual)
+
+    atuais.sort(key=lambda x: (
+        str(x.get("estado")),
+        str(x.get("cidade")),
+        str(x.get("produto")),
+    ))
+
+    return atuais
+
+
+def carregar_backup(path):
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    return None
+
+
+def salvar_json(path, payload):
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
+
+def aplicar_fallback(motivo):
+    print("Aplicando fallback...")
+    print(f"Motivo: {motivo}")
+
+    backup_atual = carregar_backup(BACKUP_JSON_ATUAL)
+    backup_hist = carregar_backup(BACKUP_JSON_HISTORICO)
+
+    if backup_atual:
+        backup_atual["fallback_usado"] = True
+        backup_atual["fallback_motivo"] = motivo
+        backup_atual["fallback_em"] = agora_brasilia().isoformat()
+        salvar_json(OUT_JSON_ATUAL, backup_atual)
+
+    if backup_hist:
+        backup_hist["fallback_usado"] = True
+        backup_hist["fallback_motivo"] = motivo
+        backup_hist["fallback_em"] = agora_brasilia().isoformat()
+        salvar_json(OUT_JSON_HISTORICO, backup_hist)
+
+    if not backup_atual and not backup_hist:
+        raise RuntimeError("Coleta falhou e não existe backup válido.")
+
+
+def montar_payload_atual(cotacoes_atuais, erros):
+    agora = agora_brasilia()
 
     return {
         "ok": True,
         "fonte": FONTE,
-        "tipo": TIPO,
+        "tipo": TIPO_ATUAL,
         "atualizacao": ATUALIZACAO,
         "atualizado_em": agora.isoformat(),
         "ultima_sincronizacao": formatar_data_br(agora),
-        "total_registros": len(registros),
-        "fontes_carregadas": fontes,
+        "total_registros": len(cotacoes_atuais),
+        "fontes_carregadas": ["CONAB"] if cotacoes_atuais else [],
         "total_erros": len(erros),
         "erros": erros[:20],
-        "dados": registros,
+        "dados": cotacoes_atuais,
         "aviso": (
             "Cotações referenciais importadas de fonte pública. Valores podem variar conforme praça, qualidade, "
             "volume, frete, forma de pagamento e disponibilidade das fontes."
@@ -430,39 +698,27 @@ def montar_payload(registros, erros):
     }
 
 
-def salvar_payload(payload):
-    OUT_JSON.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
+def montar_payload_historico(dados_historico, erros):
+    agora = agora_brasilia()
 
-    BACKUP_JSON.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
-
-    print(f"Arquivo gerado: {OUT_JSON}")
-    print(f"Backup gerado: {BACKUP_JSON}")
-
-
-def aplicar_fallback(motivo):
-    backup = carregar_backup()
-
-    if not backup:
-        raise RuntimeError("Coleta falhou e não existe JSON anterior válido para fallback.")
-
-    backup["ok"] = True
-    backup["fallback_usado"] = True
-    backup["fallback_motivo"] = motivo
-    backup["fallback_em"] = agora_brasilia().isoformat()
-
-    OUT_JSON.write_text(
-        json.dumps(backup, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
-
-    print("Fallback aplicado com sucesso.")
-    print(f"Motivo: {motivo}")
+    return {
+        "ok": True,
+        "fonte": FONTE,
+        "tipo": TIPO_HISTORICO,
+        "atualizacao": ATUALIZACAO,
+        "periodo": "36 meses",
+        "atualizado_em": agora.isoformat(),
+        "ultima_sincronizacao": formatar_data_br(agora),
+        "total_series": len(dados_historico),
+        "fontes_carregadas": ["CONAB"] if dados_historico else [],
+        "total_erros": len(erros),
+        "erros": erros[:20],
+        "dados": dados_historico,
+        "aviso": (
+            "Histórico referencial importado de fonte pública. Valores podem variar conforme praça, qualidade, "
+            "volume, frete, forma de pagamento e disponibilidade das fontes."
+        )
+    }
 
 
 def main():
@@ -471,29 +727,38 @@ def main():
     try:
         registros, erros = coletar_conab()
 
-        print(f"Total de registros reais filtrados: {len(registros)}")
+        print(f"Total bruto filtrado: {len(registros)}")
         print(f"Total de erros: {len(erros)}")
 
         if len(registros) < MINIMO_REGISTROS_VALIDOS:
-            existente = carregar_json_existente()
+            raise RuntimeError(
+                f"Poucos registros válidos retornados da CONAB: {len(registros)}."
+            )
 
-            if existente and isinstance(existente.get("dados"), list) and existente.get("dados"):
-                print("Poucos registros reais retornados. Mantendo dados existentes e atualizando data.")
-                registros = existente["dados"]
-            else:
-                raise RuntimeError(
-                    f"Poucos registros válidos retornados da CONAB: {len(registros)}."
-                )
+        registros_36m = filtrar_ultimos_36_meses(registros)
 
-        payload = montar_payload(registros, erros)
-        salvar_payload(payload)
+        print(f"Registros dentro de 36 meses: {len(registros_36m)}")
 
-        print("JSON real de cotações gerado com sucesso.")
-        print(f"Registros: {payload['total_registros']}")
-        print(f"Última sincronização: {payload['ultima_sincronizacao']}")
+        dados_historico = agrupar_historico(registros_36m)
+        cotacoes_atuais = gerar_cotacoes_atuais(dados_historico)
+
+        print(f"Séries históricas geradas: {len(dados_historico)}")
+        print(f"Cotações atuais geradas: {len(cotacoes_atuais)}")
+
+        payload_atual = montar_payload_atual(cotacoes_atuais, erros)
+        payload_historico = montar_payload_historico(dados_historico, erros)
+
+        salvar_json(OUT_JSON_ATUAL, payload_atual)
+        salvar_json(BACKUP_JSON_ATUAL, payload_atual)
+
+        salvar_json(OUT_JSON_HISTORICO, payload_historico)
+        salvar_json(BACKUP_JSON_HISTORICO, payload_historico)
+
+        print(f"Arquivo principal gerado: {OUT_JSON_ATUAL}")
+        print(f"Arquivo histórico gerado: {OUT_JSON_HISTORICO}")
 
     except Exception as erro:
-        print(f"Erro ao gerar cotações reais: {erro}")
+        print(f"Erro ao gerar cotações: {erro}")
         aplicar_fallback(str(erro))
 
 
