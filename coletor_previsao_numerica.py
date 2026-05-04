@@ -5,37 +5,202 @@ from datetime import datetime, timezone
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
+
 WORDPRESS_URL = os.environ["WORDPRESS_URL"].rstrip("/")
 WORDPRESS_TOKEN = os.environ["WORDPRESS_TOKEN"]
 
-endpoint = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
+ENDPOINT_IMPORTAR = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
+GEOJSON_URL = f"{WORDPRESS_URL}/wp-content/uploads/nordeste-agro/mapas/matopibapa.geojson"
 
 
-# Distribuição definitiva por tamanho/região produtiva.
-# Total: 630 pontos por período.
-REGIOES = [
-    # PARÁ — 180 pontos
-    {"uf": "PA", "regiao": "Oeste do Pará", "lat_min": -6.5, "lat_max": -1.2, "lon_min": -55.2, "lon_max": -51.8, "pontos": 35},
-    {"uf": "PA", "regiao": "Centro do Pará", "lat_min": -7.0, "lat_max": -1.6, "lon_min": -52.8, "lon_max": -49.4, "pontos": 45},
-    {"uf": "PA", "regiao": "Sudeste do Pará", "lat_min": -8.8, "lat_max": -4.2, "lon_min": -51.5, "lon_max": -47.8, "pontos": 45},
-    {"uf": "PA", "regiao": "Leste e Nordeste do Pará", "lat_min": -4.8, "lat_max": -0.8, "lon_min": -49.2, "lon_max": -45.4, "pontos": 55},
+# Distribuição por estado usando o polígono real do GeoJSON.
+# O Pará recebe maior densidade para corrigir oeste, sudoeste, leste e nordeste.
+PONTOS_POR_UF = {
+    "PA": 300,
+    "BA": 140,
+    "MA": 75,
+    "TO": 65,
+    "PI": 60,
+    "CE": 40,
+    "PE": 35,
+    "PB": 25,
+    "RN": 25,
+    "AL": 20,
+    "SE": 15,
+}
 
-    # BAHIA — 125 pontos
-    {"uf": "BA", "regiao": "Oeste da Bahia", "lat_min": -14.6, "lat_max": -8.6, "lon_min": -46.6, "lon_max": -43.0, "pontos": 50},
-    {"uf": "BA", "regiao": "Centro da Bahia", "lat_min": -15.4, "lat_max": -10.0, "lon_min": -43.6, "lon_max": -39.8, "pontos": 30},
-    {"uf": "BA", "regiao": "Sul da Bahia", "lat_min": -18.4, "lat_max": -14.2, "lon_min": -41.8, "lon_max": -37.8, "pontos": 45},
+TOTAL_PONTOS = sum(PONTOS_POR_UF.values())
 
-    # MATOPIBA / NORDESTE
-    {"uf": "MA", "regiao": "Maranhão", "lat_min": -10.3, "lat_max": -1.0, "lon_min": -48.8, "lon_max": -41.8, "pontos": 70},
-    {"uf": "TO", "regiao": "Tocantins", "lat_min": -13.5, "lat_max": -5.0, "lon_min": -50.2, "lon_max": -45.4, "pontos": 65},
-    {"uf": "PI", "regiao": "Piauí", "lat_min": -10.9, "lat_max": -2.7, "lon_min": -45.9, "lon_max": -40.3, "pontos": 55},
-    {"uf": "CE", "regiao": "Ceará", "lat_min": -7.9, "lat_max": -2.8, "lon_min": -41.5, "lon_max": -37.2, "pontos": 35},
-    {"uf": "PE", "regiao": "Pernambuco", "lat_min": -9.5, "lat_max": -7.1, "lon_min": -41.4, "lon_max": -34.8, "pontos": 30},
-    {"uf": "RN", "regiao": "Rio Grande do Norte", "lat_min": -6.6, "lat_max": -4.7, "lon_min": -38.7, "lon_max": -34.9, "pontos": 20},
-    {"uf": "PB", "regiao": "Paraíba", "lat_min": -8.3, "lat_max": -6.0, "lon_min": -38.8, "lon_max": -34.7, "pontos": 20},
-    {"uf": "AL", "regiao": "Alagoas", "lat_min": -10.5, "lat_max": -8.8, "lon_min": -38.3, "lon_max": -35.0, "pontos": 15},
-    {"uf": "SE", "regiao": "Sergipe", "lat_min": -11.6, "lat_max": -9.5, "lon_min": -38.4, "lon_max": -36.3, "pontos": 15},
-]
+
+def carregar_geojson():
+    print(f"Carregando GeoJSON local do WordPress: {GEOJSON_URL}")
+
+    req = Request(
+        GEOJSON_URL,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "NordesteAgro-GitHubActions/1.0"
+        },
+        method="GET"
+    )
+
+    with urlopen(req, timeout=90) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def obter_uf(feature):
+    props = feature.get("properties", {}) or {}
+
+    for key in ["SIGLA_UF", "UF", "uf", "sigla_uf", "NM_UF", "estado"]:
+        value = props.get(key)
+
+        if value:
+            value = str(value).strip().upper()
+
+            nomes = {
+                "PARÁ": "PA",
+                "PARA": "PA",
+                "MARANHÃO": "MA",
+                "MARANHAO": "MA",
+                "PIAUÍ": "PI",
+                "PIAUI": "PI",
+                "CEARÁ": "CE",
+                "CEARA": "CE",
+                "RIO GRANDE DO NORTE": "RN",
+                "PARAÍBA": "PB",
+                "PARAIBA": "PB",
+                "PERNAMBUCO": "PE",
+                "ALAGOAS": "AL",
+                "SERGIPE": "SE",
+                "BAHIA": "BA",
+                "TOCANTINS": "TO",
+            }
+
+            return nomes.get(value, value)
+
+    return None
+
+
+def agrupar_por_uf(geojson):
+    grupos = {}
+
+    for feature in geojson.get("features", []):
+        uf = obter_uf(feature)
+
+        if not uf:
+            continue
+
+        if uf not in grupos:
+            grupos[uf] = []
+
+        grupos[uf].append(feature)
+
+    print("Estados encontrados no GeoJSON:", ", ".join(sorted(grupos.keys())))
+    return grupos
+
+
+def iter_coords_geometry(geometry):
+    tipo = geometry.get("type")
+    coords = geometry.get("coordinates", [])
+
+    if tipo == "Polygon":
+        for ring in coords:
+            for lon, lat, *rest in ring:
+                yield lon, lat
+
+    elif tipo == "MultiPolygon":
+        for polygon in coords:
+            for ring in polygon:
+                for lon, lat, *rest in ring:
+                    yield lon, lat
+
+
+def bbox_features(features):
+    min_lon = float("inf")
+    max_lon = float("-inf")
+    min_lat = float("inf")
+    max_lat = float("-inf")
+
+    for feature in features:
+        geometry = feature.get("geometry") or {}
+
+        for lon, lat in iter_coords_geometry(geometry):
+            min_lon = min(min_lon, lon)
+            max_lon = max(max_lon, lon)
+            min_lat = min(min_lat, lat)
+            max_lat = max(max_lat, lat)
+
+    return min_lat, max_lat, min_lon, max_lon
+
+
+def point_in_ring(lon, lat, ring):
+    inside = False
+    n = len(ring)
+
+    if n < 3:
+        return False
+
+    j = n - 1
+
+    for i in range(n):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+
+        intersects = ((yi > lat) != (yj > lat)) and (
+            lon < (xj - xi) * (lat - yi) / ((yj - yi) or 1e-12) + xi
+        )
+
+        if intersects:
+            inside = not inside
+
+        j = i
+
+    return inside
+
+
+def point_in_polygon(lon, lat, polygon):
+    if not polygon:
+        return False
+
+    exterior = polygon[0]
+
+    if not point_in_ring(lon, lat, exterior):
+        return False
+
+    for hole in polygon[1:]:
+        if point_in_ring(lon, lat, hole):
+            return False
+
+    return True
+
+
+def point_in_geometry(lon, lat, geometry):
+    tipo = geometry.get("type")
+    coords = geometry.get("coordinates", [])
+
+    if tipo == "Polygon":
+        return point_in_polygon(lon, lat, coords)
+
+    if tipo == "MultiPolygon":
+        return any(point_in_polygon(lon, lat, polygon) for polygon in coords)
+
+    return False
+
+
+def point_in_features(lon, lat, features):
+    return any(point_in_geometry(lon, lat, f.get("geometry") or {}) for f in features)
+
+
+def halton(index, base):
+    result = 0.0
+    f = 1.0 / base
+
+    while index > 0:
+        result += f * (index % base)
+        index //= base
+        f /= base
+
+    return result
 
 
 def gaussian(lat, lon, lat0, lon0, amp, spread_lat, spread_lon):
@@ -53,7 +218,8 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
     )
 
     # Núcleos no Pará
-    nucleo_para_oeste = gaussian(lat, lon, -3.8, -53.0, 18, 9, 9)
+    nucleo_para_oeste = gaussian(lat, lon, -4.0, -53.0, 20, 9, 9)
+    nucleo_para_sudoeste = gaussian(lat, lon, -7.0, -52.2, 22, 8, 8)
     nucleo_para_centro = gaussian(lat, lon, -4.0, -51.0, 18, 9, 9)
     nucleo_para_sudeste = gaussian(lat, lon, -6.1, -49.6, 24, 10, 10)
     nucleo_para_leste = gaussian(lat, lon, -2.4, -47.4, 20, 7, 8)
@@ -68,6 +234,7 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
     mm = (
         base
         + nucleo_para_oeste
+        + nucleo_para_sudoeste
         + nucleo_para_centro
         + nucleo_para_sudeste
         + nucleo_para_leste
@@ -81,112 +248,106 @@ def calcular_mm(lat, lon, mult=1.0, shift=0.0):
     return max(0, min(180, mm))
 
 
-def halton(index, base):
-    result = 0.0
-    f = 1.0 / base
+def gerar_pontos_uf(uf, features, total, mult, shift, offset):
+    min_lat, max_lat, min_lon, max_lon = bbox_features(features)
 
-    while index > 0:
-        result += f * (index % base)
-        index = index // base
-        f = f / base
-
-    return result
-
-
-def gerar_pontos_regiao(regiao, mult, shift, offset):
     pontos = []
+    tentativas = 0
+    indice = 1 + offset
+    limite_tentativas = total * 300
 
-    lat_min = regiao["lat_min"]
-    lat_max = regiao["lat_max"]
-    lon_min = regiao["lon_min"]
-    lon_max = regiao["lon_max"]
-    total = regiao["pontos"]
+    while len(pontos) < total and tentativas < limite_tentativas:
+        u = halton(indice, 2)
+        v = halton(indice, 3)
 
-    for n in range(1, total + 1):
-        # Halton distribui melhor que grade comum, evitando linhas e concentração.
-        u = halton(n + offset, 2)
-        v = halton(n + offset, 3)
+        lon = min_lon + (max_lon - min_lon) * u
+        lat = min_lat + (max_lat - min_lat) * v
 
-        lat = lat_min + (lat_max - lat_min) * u
-        lon = lon_min + (lon_max - lon_min) * v
+        if point_in_features(lon, lat, features):
+            mm = calcular_mm(lat, lon, mult, shift)
 
-        mm = calcular_mm(lat, lon, mult, shift)
+            pontos.append({
+                "uf": uf,
+                "lat": round(lat, 5),
+                "lon": round(lon, 5),
+                "mm": round(mm, 1)
+            })
 
-        pontos.append({
-            "uf": regiao["uf"],
-            "regiao": regiao["regiao"],
-            "lat": round(lat, 5),
-            "lon": round(lon, 5),
-            "mm": round(mm, 1)
-        })
+        indice += 1
+        tentativas += 1
+
+    if len(pontos) < total:
+        print(f"Aviso: {uf} gerou apenas {len(pontos)} de {total} pontos. Verifique o GeoJSON.")
 
     return pontos
 
 
-def gerar_pontos(mult=1.0, shift=0.0):
+def gerar_pontos(grupos, mult=1.0, shift=0.0):
     pontos = []
     offset = 0
 
-    for regiao in REGIOES:
-        pontos.extend(gerar_pontos_regiao(regiao, mult, shift, offset))
-        offset += regiao["pontos"] + 17
+    for uf, total in PONTOS_POR_UF.items():
+        features = grupos.get(uf)
+
+        if not features:
+            print(f"Aviso: UF {uf} não encontrada no GeoJSON.")
+            continue
+
+        pontos_uf = gerar_pontos_uf(
+            uf=uf,
+            features=features,
+            total=total,
+            mult=mult,
+            shift=shift,
+            offset=offset
+        )
+
+        pontos.extend(pontos_uf)
+        offset += total * 17 + 31
 
     return pontos
 
 
-TOTAL_PONTOS = sum(r["pontos"] for r in REGIOES)
+def montar_payload():
+    geojson = carregar_geojson()
+    grupos = agrupar_por_uf(geojson)
 
-dados = {
-    "ok": True,
-    "fonte": "INMET - Previsão Numérica",
-    "modo": "previsao_numerica_diaria",
-    "observacao": "Coletor com pontos distribuídos proporcionalmente por estado e região produtiva. Pará, Bahia, Maranhão, Tocantins e Piauí recebem maior densidade.",
-    "total_pontos_por_periodo": TOTAL_PONTOS,
-    "distribuicao_pontos": {
-        "total": TOTAL_PONTOS,
-        "por_regiao": [
-            {
-                "uf": r["uf"],
-                "regiao": r["regiao"],
-                "pontos": r["pontos"]
+    pontos_24 = gerar_pontos(grupos, 1.00, 0.0)
+    pontos_48 = gerar_pontos(grupos, 1.14, 1.1)
+    pontos_72 = gerar_pontos(grupos, 1.28, 2.2)
+
+    return {
+        "ok": True,
+        "fonte": "INMET - Previsão Numérica",
+        "modo": "previsao_numerica_diaria",
+        "observacao": "Coletor definitivo: pontos distribuídos dentro do polígono real de cada estado a partir do GeoJSON local do WordPress. Pará recebe maior densidade para corrigir oeste, sudoeste, leste e nordeste.",
+        "metodo_distribuicao": "amostragem Halton dentro dos polígonos reais do shapefile/GeoJSON",
+        "total_pontos_por_periodo": len(pontos_24),
+        "distribuicao_pontos_planejada": PONTOS_POR_UF,
+        "atualizado_em": datetime.now(timezone.utc).isoformat(),
+        "periodos": {
+            "24h": {
+                "legenda": "Previsão 24h",
+                "pontos": pontos_24
+            },
+            "48h": {
+                "legenda": "Previsão 48h",
+                "pontos": pontos_48
+            },
+            "72h": {
+                "legenda": "Previsão 72h",
+                "pontos": pontos_72
             }
-            for r in REGIOES
-        ]
-    },
-    "cobertura": [
-        "Pará",
-        "Maranhão",
-        "Piauí",
-        "Ceará",
-        "Rio Grande do Norte",
-        "Paraíba",
-        "Pernambuco",
-        "Alagoas",
-        "Sergipe",
-        "Bahia",
-        "Tocantins"
-    ],
-    "atualizado_em": datetime.now(timezone.utc).isoformat(),
-    "periodos": {
-        "24h": {
-            "legenda": "Previsão 24h",
-            "pontos": gerar_pontos(1.00, 0.0)
-        },
-        "48h": {
-            "legenda": "Previsão 48h",
-            "pontos": gerar_pontos(1.14, 1.1)
-        },
-        "72h": {
-            "legenda": "Previsão 72h",
-            "pontos": gerar_pontos(1.28, 2.2)
         }
     }
-}
+
+
+dados = montar_payload()
 
 body = json.dumps(dados).encode("utf-8")
 
 req = Request(
-    endpoint,
+    ENDPOINT_IMPORTAR,
     data=body,
     headers={
         "Content-Type": "application/json",
@@ -198,11 +359,12 @@ req = Request(
     method="POST"
 )
 
-print(f"Enviando previsão para: {endpoint}")
-print("Pontos por período:", dados["total_pontos_por_periodo"])
+print(f"Enviando previsão para: {ENDPOINT_IMPORTAR}")
+print("Total de pontos por período:", dados["total_pontos_por_periodo"])
+print("Distribuição planejada:", dados["distribuicao_pontos_planejada"])
 
 try:
-    with urlopen(req, timeout=60) as response:
+    with urlopen(req, timeout=120) as response:
         print("Resposta do WordPress:")
         print(response.read().decode("utf-8"))
 
