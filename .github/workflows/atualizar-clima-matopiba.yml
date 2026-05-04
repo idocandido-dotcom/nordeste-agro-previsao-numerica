@@ -2,6 +2,8 @@ name: Atualizar Clima MATOPIBA INMET
 
 on:
   schedule:
+    # Roda todos os dias às 06:35 no horário de Brasília
+    # 09:35 UTC = 06:35 BRT
     - cron: "35 9 * * *"
   workflow_dispatch:
 
@@ -27,7 +29,7 @@ jobs:
           pip install playwright pillow
           python -m playwright install --with-deps chromium
 
-      - name: Baixar ZIP oficial do VIME e gerar imagens MATOPIBA
+      - name: Baixar imagens oficiais do VIME / INMET
         run: |
           xvfb-run -a python capturar_vime_matopiba.py
 
@@ -43,5 +45,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Atualiza clima MATOPIBA INMET"
+          git commit -m "Atualiza imagens oficiais clima MATOPIBA INMET"
           git push
