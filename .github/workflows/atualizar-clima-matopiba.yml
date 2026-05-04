@@ -27,7 +27,7 @@ jobs:
           pip install playwright pillow
           python -m playwright install --with-deps chromium
 
-      - name: Executar coletor oficial do VIME / INMET
+      - name: Baixar ZIP oficial do VIME e gerar imagens MATOPIBA
         run: |
           xvfb-run -a python capturar_vime_matopiba.py
 
