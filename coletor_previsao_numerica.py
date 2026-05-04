@@ -2,9 +2,12 @@ import json
 import os
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 WORDPRESS_URL = os.environ["WORDPRESS_URL"].rstrip("/")
 WORDPRESS_TOKEN = os.environ["WORDPRESS_TOKEN"]
+
+endpoint = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
 
 dados = {
     "ok": True,
@@ -42,8 +45,6 @@ dados = {
     }
 }
 
-endpoint = f"{WORDPRESS_URL}/wp-json/nordeste-agro/v1/importar-previsao-numerica"
-
 body = json.dumps(dados).encode("utf-8")
 
 req = Request(
@@ -51,10 +52,24 @@ req = Request(
     data=body,
     headers={
         "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "NordesteAgro-GitHubActions/1.0",
         "Authorization": f"Bearer {WORDPRESS_TOKEN}"
     },
     method="POST"
 )
 
-with urlopen(req, timeout=60) as response:
-    print(response.read().decode("utf-8"))
+print(f"Enviando previsão para: {endpoint}")
+
+try:
+    with urlopen(req, timeout=60) as response:
+        resposta = response.read().decode("utf-8")
+        print("Resposta do WordPress:")
+        print(resposta)
+except HTTPError as e:
+    print(f"Erro HTTP: {e.code}")
+    print(e.read().decode("utf-8", errors="ignore"))
+    raise
+except URLError as e:
+    print(f"Erro de conexão: {e}")
+    raise
