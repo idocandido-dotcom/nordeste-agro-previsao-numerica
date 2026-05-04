@@ -1,1 +1,12 @@
 
+{
+  "ok": true,
+  "fonte": "CEPEA / CONAB / B3 / IBGE-MAPA",
+  "tipo": "cotacoes_regionais",
+  "atualizacao": "diaria",
+  "atualizado_em": "2026-05-04T00:00:00-03:00",
+  "ultima_sincronizacao": "04/05/2026",
+  "total_registros": 0,
+  "dados": [],
+  "aviso": "Arquivo inicial. Os dados serão alimentados pelo coletor automático."
+}
