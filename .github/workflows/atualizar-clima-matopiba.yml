@@ -4,11 +4,10 @@ on:
   schedule:
     # Roda de hora em hora no minuto 23.
     # O GitHub Actions usa horário UTC.
-    # Exemplo: 00:23, 01:23, 02:23...
     - cron: "23 * * * *"
 
-  # Permite disparar manualmente pelo botão "Run workflow"
-  # e também pelo cron-job.org usando o endpoint workflow_dispatch.
+  # Permite rodar manualmente pelo botão "Run workflow"
+  # e também pelo cron-job.org usando workflow_dispatch.
   workflow_dispatch:
 
 permissions:
@@ -38,7 +37,7 @@ jobs:
 
       - name: Rodar coletor Open-Meteo Regional
         run: |
-          python coletor_openmeteo_regional.py
+          python coletor_openmeteo_matopiba.py
 
       - name: Verificar arquivo gerado
         run: |
