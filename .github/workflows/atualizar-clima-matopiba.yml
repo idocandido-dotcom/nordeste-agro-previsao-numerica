@@ -2,10 +2,13 @@ name: Atualizar Clima Regional Open-Meteo
 
 on:
   schedule:
-    # Roda de hora em hora.
-    # O GitHub usa horário UTC.
-    # Exemplo: 00:35, 01:35, 02:35... UTC
-    - cron: "35 * * * *"
+    # Roda de hora em hora no minuto 23.
+    # O GitHub Actions usa horário UTC.
+    # Exemplo: 00:23, 01:23, 02:23...
+    - cron: "23 * * * *"
+
+  # Permite disparar manualmente pelo botão "Run workflow"
+  # e também pelo cron-job.org usando o endpoint workflow_dispatch.
   workflow_dispatch:
 
 permissions:
@@ -18,8 +21,6 @@ jobs:
     steps:
       - name: Baixar repositório
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -31,57 +32,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Verificar arquivos antes da coleta
+      - name: Criar pastas necessárias
         run: |
-          echo "Arquivos na raiz do repositório:"
-          ls -la
-
-          echo ""
-          echo "Arquivos em public/clima/regional:"
           mkdir -p public/clima/regional
-          ls -la public/clima/regional || true
 
-      - name: Gerar dados reais de previsão Open-Meteo
+      - name: Rodar coletor Open-Meteo Regional
         run: |
-          python coletor_openmeteo_matopiba.py
+          python coletor_openmeteo_regional.py
 
-      - name: Conferir JSON gerado
+      - name: Verificar arquivo gerado
         run: |
-          echo "Conferindo arquivo gerado..."
+          echo "Verificando arquivo gerado..."
+          ls -lah public/clima/regional/
+          test -f public/clima/regional/openmeteo_regional.json
 
-          if [ ! -f public/clima/regional/openmeteo_regional.json ]; then
-            echo "ERRO: arquivo public/clima/regional/openmeteo_regional.json não foi gerado."
-            exit 1
-          fi
-
-          echo "Arquivo encontrado:"
-          ls -lh public/clima/regional/openmeteo_regional.json
-
-          echo ""
-          echo "Primeiras linhas do JSON:"
-          head -n 40 public/clima/regional/openmeteo_regional.json
-
-      - name: Commitar dados atualizados
+      - name: Commit e push dos dados atualizados
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          BRANCH="${GITHUB_REF_NAME:-main}"
-
-          echo "Sincronizando com a branch remota antes do commit..."
-          git pull --rebase --autostash origin "$BRANCH"
-
-          echo "Verificando alterações geradas..."
-          git status --short
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add public/clima/regional/openmeteo_regional.json
 
           if git diff --cached --quiet; then
-            echo "Nenhuma alteração para commitar."
-            exit 0
+            echo "Nenhuma alteração nos dados climáticos."
+          else
+            git commit -m "Atualizar clima regional Open-Meteo"
+            git push
           fi
-
-          git commit -m "Atualiza previsão regional Open-Meteo"
-
-          echo "Enviando atualização para a branch $BRANCH..."
-          git push origin "HEAD:$BRANCH"
