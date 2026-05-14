@@ -39,3 +39,6 @@ jobs:
           file_pattern: |
             public/cotacoes/cotacoes_oficiais_nordeste_agro.json
             public/cotacoes/cotacoes_regionais.json
+            public/cotacoes/cotacoes_oficiais_nordeste_agro_ultimo_valido.json
+            public/cotacoes/cotacoes_regionais_ultimo_valido.json
+            public/cotacoes/status_ultima_execucao.json
