@@ -1,12 +1,12 @@
-name: Atualizar Cotações Nordeste Agro
+name: Atualizar Cotações Oficiais Nordeste Agro
 
 on:
   push:
     branches:
       - main
     paths:
-      - ".github/workflows/atualizar-cotacoes.yml"
-      - "cotacoes/scripts/coletor_cotacoes_nordeste.py"
+      - ".github/workflows/atualizar-cotacoes-oficiais.yml"
+      - "scripts/coletor_cotacoes_oficiais.py"
 
   schedule:
     # Roda todos os dias às 09:30 UTC.
@@ -42,10 +42,13 @@ jobs:
       - name: Localizar coletor de cotações
         shell: bash
         run: |
-          if [ -f "cotacoes/scripts/coletor_cotacoes_nordeste.py" ]; then
-            echo "COLETOR=cotacoes/scripts/coletor_cotacoes_nordeste.py" >> "$GITHUB_ENV"
+          if [ -f "scripts/coletor_cotacoes_oficiais.py" ]; then
+            echo "COLETOR=scripts/coletor_cotacoes_oficiais.py" >> "$GITHUB_ENV"
+            echo "Coletor encontrado em scripts/coletor_cotacoes_oficiais.py"
           else
-            echo "ERRO: coletor principal não foi encontrado."
+            echo "ERRO: coletor de cotações não foi encontrado."
+            echo "Caminho esperado: scripts/coletor_cotacoes_oficiais.py"
+            echo "Arquivos Python encontrados:"
             find . -maxdepth 5 -name "*.py" -print
             exit 1
           fi
@@ -57,29 +60,33 @@ jobs:
 
       - name: Rodar coletor de cotações
         run: |
+          echo "Iniciando coletor de cotações oficiais Nordeste Agro..."
           python "$COLETOR"
 
       - name: Verificar arquivos gerados
         run: |
-          test -f cotacoes/public/cotacoes_nordeste.json
-          test -f cotacoes/public/cotacoes_regionais.json
-          test -f cotacoes/public/cotacoes_nordeste.csv
-          test -f cotacoes/logs/status_ultima_execucao.json
+          echo "Verificando arquivos de saída..."
 
-          python -m json.tool cotacoes/public/cotacoes_nordeste.json > /tmp/cotacoes_nordeste_validado.json
-          python -m json.tool cotacoes/public/cotacoes_regionais.json > /tmp/cotacoes_regionais_validado.json
-          python -m json.tool cotacoes/logs/status_ultima_execucao.json > /tmp/status_ultima_execucao_validado.json
+          test -f public/cotacoes_nordeste.json
+          test -f public/cotacoes_regionais.json
+          test -f public/cotacoes_nordeste.csv
+          test -f logs/status_ultima_execucao.json
+
+          python -m json.tool public/cotacoes_nordeste.json > /tmp/cotacoes_nordeste_validado.json
+          python -m json.tool public/cotacoes_regionais.json > /tmp/cotacoes_regionais_validado.json
+          python -m json.tool logs/status_ultima_execucao.json > /tmp/status_ultima_execucao_validado.json
 
           python - <<'PY'
           import json
           from pathlib import Path
 
-          caminho = Path("cotacoes/public/cotacoes_nordeste.json")
+          caminho = Path("public/cotacoes_nordeste.json")
           dados = json.loads(caminho.read_text(encoding="utf-8"))
+
           lista = dados.get("dados", [])
 
           if not isinstance(lista, list) or len(lista) == 0:
-              raise SystemExit("ERRO: cotacoes_nordeste.json foi gerado sem itens em dados.")
+              raise SystemExit("ERRO: public/cotacoes_nordeste.json foi gerado sem itens em dados.")
 
           print(f"JSON principal válido com {len(lista)} itens.")
           PY
@@ -90,32 +97,76 @@ jobs:
           import json
           from pathlib import Path
 
-          status = json.loads(Path("cotacoes/logs/status_ultima_execucao.json").read_text(encoding="utf-8"))
+          status_path = Path("logs/status_ultima_execucao.json")
+
+          if not status_path.exists():
+              raise SystemExit("ERRO: logs/status_ultima_execucao.json não encontrado.")
+
+          status = json.loads(status_path.read_text(encoding="utf-8"))
           resumo = status.get("resumo", {})
 
           print("Versão:", status.get("versao"))
           print("Última sincronização:", status.get("ultima_sincronizacao"))
           print("Total tabela:", status.get("total_cotacoes_tabela"))
           print("Total HTML:", status.get("total_dados_html"))
+
           print("Sorgo CONAB tabela:", resumo.get("total_sorgo_conab_tabela"))
           print("Arroz:", resumo.get("total_arroz_extraido"))
           print("Feijão:", resumo.get("total_feijao_extraido"))
           print("Boi Gordo:", resumo.get("total_boi_gordo_extraido"))
           print("Leite:", resumo.get("total_leite_extraido"))
           print("Itens com variação última semana:", resumo.get("total_itens_com_variacao_ultima_semana"))
-          dados_json = json.loads(Path("cotacoes/public/cotacoes_nordeste.json").read_text(encoding="utf-8")).get("dados", [])
-          print("Milho/Soja/Algodão com histórico 360:", sum(1 for x in dados_json if x.get("produto_base") in ["Soja", "Milho", "Algodão"] and len(x.get("historico_30d", [])) >= 2))
-          print("Sorgo com histórico:", sum(1 for x in dados_json if x.get("produto_base") == "Sorgo" and len(x.get("historico_30d", [])) >= 2))
-          print("AIBA/regionais com histórico:", sum(1 for x in dados_json if ("AIBA" in str(x.get("fonte", "")) or x.get("nivel_comercializacao") == "Regional") and len(x.get("historico_30d", [])) >= 2))
-          hist_aiba = Path("cotacoes/logs/historico_aiba.json")
+
+          dados_path = Path("public/cotacoes_nordeste.json")
+          dados_json = json.loads(dados_path.read_text(encoding="utf-8")).get("dados", [])
+
+          print(
+              "Milho/Soja/Algodão com histórico 360:",
+              sum(
+                  1 for x in dados_json
+                  if x.get("produto_base") in ["Soja", "Milho", "Algodão"]
+                  and len(x.get("historico_30d", [])) >= 2
+              )
+          )
+
+          print(
+              "Sorgo com histórico:",
+              sum(
+                  1 for x in dados_json
+                  if x.get("produto_base") == "Sorgo"
+                  and len(x.get("historico_30d", [])) >= 2
+              )
+          )
+
+          print(
+              "AIBA/regionais com histórico:",
+              sum(
+                  1 for x in dados_json
+                  if (
+                      "AIBA" in str(x.get("fonte", ""))
+                      or x.get("nivel_comercializacao") == "Regional"
+                  )
+                  and len(x.get("historico_30d", [])) >= 2
+              )
+          )
+
+          hist_aiba = Path("logs/historico_aiba.json")
           print("Histórico AIBA persistente:", "sim" if hist_aiba.exists() else "não")
-          dup_aiba = Path("cotacoes/logs/debug_aiba_duplicados.json")
+
+          dup_aiba = Path("logs/debug_aiba_duplicados.json")
           if dup_aiba.exists():
               dups = json.loads(dup_aiba.read_text(encoding="utf-8"))
               print("Duplicados AIBA removidos:", dups.get("total_grupos_duplicados"))
 
           for fonte in status.get("fontes", []):
-              print("-", fonte.get("fonte"), "|", fonte.get("status"), "|", fonte.get("total_registros"))
+              print(
+                  "-",
+                  fonte.get("fonte"),
+                  "|",
+                  fonte.get("status"),
+                  "|",
+                  fonte.get("total_registros")
+              )
           PY
 
       - name: Commit automático dos arquivos atualizados
@@ -129,21 +180,21 @@ jobs:
           git fetch origin main
           git pull --rebase --autostash origin main
 
-          git add cotacoes/scripts/coletor_cotacoes_nordeste.py
-          git add cotacoes/public/cotacoes_nordeste.json
-          git add cotacoes/public/cotacoes_regionais.json
-          git add cotacoes/public/cotacoes_nordeste.csv
-          git add cotacoes/logs/status_ultima_execucao.json
-          git add cotacoes/logs/debug_conab_produtos_360.json || true
-          git add cotacoes/logs/debug_sorgo_conab.json || true
-          git add cotacoes/logs/debug_prioridade_siagro.json || true
-          git add cotacoes/logs/historico_aiba.json || true
-          git add cotacoes/logs/debug_aiba_duplicados.json || true
+          git add scripts/coletor_cotacoes_oficiais.py
+          git add public/cotacoes_nordeste.json || true
+          git add public/cotacoes_regionais.json || true
+          git add public/cotacoes_nordeste.csv || true
+          git add logs/status_ultima_execucao.json || true
+          git add logs/debug_conab_produtos_360.json || true
+          git add logs/debug_sorgo_conab.json || true
+          git add logs/debug_prioridade_siagro.json || true
+          git add logs/historico_aiba.json || true
+          git add logs/debug_aiba_duplicados.json || true
 
           if git diff --cached --quiet; then
             echo "Nenhuma alteração para commitar."
             exit 0
           fi
 
-          git commit -m "Atualizar cotações Nordeste Agro"
+          git commit -m "Atualizar cotações oficiais Nordeste Agro"
           git push origin HEAD:main
