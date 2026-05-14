@@ -37,7 +37,7 @@ jobs:
 
       - name: Rodar coletor Open-Meteo Regional
         run: |
-          python coletor_openmeteo_matopiba.py
+         python scripts/coletor_openmeteo_matopiba.py
 
       - name: Verificar arquivo gerado
         run: |
