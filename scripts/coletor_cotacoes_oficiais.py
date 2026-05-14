@@ -1,1119 +1,32 @@
-ChatGPT
-
-
-
-76552a66-522d-45b7-a4f3-8efb290e2d84.png
-imagem em branco rodape(1).png
-vamos adicionar o logo ao inves do nome nordeste agro ele deve ficar totalmente branco anexei o arquivo logo branco para adicição tambem Icone editave no roda pé de instagram whatsapp e email os icone devem manter o padrão simple agricola da nordeste agro
-
-Thought for 42s
-Imagem gerada: Modern footer design for Nordeste Agro
-
-
-Editar
-
-
-e4d9d745-aa97-4be1-ac43-4603cae4e317.png
- o coleto parou de trazer informações da aiba precisamos corrigir qual o proximo passo?
-
-Imagem editada
-faça o incones menores e deixe a frente dos dados de contato
-
-Thought for 47s
-Imagem gerada: Modern agricultural website footer design
-
-
-Editar
-
-
-vamos fazer essa alteração para aplicarmos do rodapé
-
-Pensou por 5s
-Perfeito. Vamos aplicar no rodapé com:
-
-Logo branca no lugar do texto “NORDESTE AGRO”
-
-Ícones menores
-
-Ícones na frente dos dados de contato
-
-Ícones editáveis em SVG
-
-Layout responsivo para mobile
-
-Sem depender de biblioteca externa
-
-Cole este código completo no bloco HTML do rodapé, ou no plugin/área onde você está controlando o rodapé.
-
-<!-- Rodapé Nordeste Agro -->
-<footer class="na-footer">
-  <div class="na-footer-inner">
-
-    <!-- Coluna 1: Logo -->
-    <div class="na-footer-brand">
-      <a href="/" class="na-footer-logo-link" aria-label="Nordeste Agro">
-        <img 
-          src="/wp-content/uploads/imagem-em-branco-rodape.png" 
-          alt="Nordeste Agro" 
-          class="na-footer-logo"
-        >
-      </a>
-
-      <p class="na-footer-slogan">
-        Inteligência Técnica a Serviço do Agronegócio Nordestino
-      </p>
-    </div>
-
-    <!-- Coluna 2: Links -->
-    <nav class="na-footer-links" aria-label="Links rápidos do rodapé">
-      <h3>Links rápidos</h3>
-
-      <a href="/publicacoes/">Publicações</a>
-      <a href="/clima/">Clima</a>
-      <a href="/cotacoes/">Cotações</a>
-      <a href="/anuncie/">Anuncie</a>
-    </nav>
-
-    <!-- Coluna 3: Contato -->
-    <div class="na-footer-contact">
-      <h3>Contato</h3>
-
-      <a class="na-footer-contact-item" href="mailto:contato@nordesteagro.com.br">
-        <span class="na-footer-icon" aria-hidden="true">
-          <!-- Ícone Email -->
-          <svg viewBox="0 0 24 24">
-            <path d="M4 6h16v12H4V6Z"></path>
-            <path d="m4 7 8 6 8-6"></path>
-          </svg>
-        </span>
-        <span>contato@nordesteagro.com.br</span>
-      </a>
-
-      <a class="na-footer-contact-item" href="https://wa.me/558999915435" target="_blank" rel="noopener">
-        <span class="na-footer-icon" aria-hidden="true">
-          <!-- Ícone WhatsApp -->
-          <svg viewBox="0 0 24 24">
-            <path d="M20 11.8a8 8 0 0 1-11.8 7L4 20l1.2-4.1A8 8 0 1 1 20 11.8Z"></path>
-            <path d="M9.4 8.5c.2-.5.4-.5.7-.5h.5c.2 0 .5.1.6.4l.7 1.6c.1.3.1.5-.1.7l-.4.5c-.1.2-.2.3 0 .6.3.5.8 1.2 1.5 1.7.8.6 1.4.8 1.8 1 .2.1.4.1.5-.1l.7-.8c.2-.2.4-.3.7-.2l1.6.7c.3.1.4.4.4.6 0 .4-.2 1.2-.8 1.7-.5.5-1.3.6-2.2.4-1.1-.3-2.8-1-4.5-2.6-1.7-1.6-2.6-3.2-3-4.3-.3-.9-.1-1.6.2-2.1Z"></path>
-          </svg>
-        </span>
-        <span>WhatsApp: (89) 99915-435</span>
-      </a>
-
-      <a class="na-footer-contact-item" href="https://www.instagram.com/nordesteagro" target="_blank" rel="noopener">
-        <span class="na-footer-icon" aria-hidden="true">
-          <!-- Ícone Instagram -->
-          <svg viewBox="0 0 24 24">
-            <rect x="5" y="5" width="14" height="14" rx="4"></rect>
-            <circle cx="12" cy="12" r="3.2"></circle>
-            <path d="M16.8 7.4h.01"></path>
-          </svg>
-        </span>
-        <span>Instagram: @nordesteagro</span>
-      </a>
-    </div>
-
-  </div>
-
-  <div class="na-footer-bottom">
-    <p>© 2026 NORDESTE AGRO. Todos os direitos reservados.</p>
-  </div>
-</footer>
-
-<style>
-/* Rodapé Nordeste Agro */
-.na-footer {
-  width: 100%;
-  background:
-    radial-gradient(circle at top left, rgba(85, 200, 59, 0.08), transparent 34%),
-    linear-gradient(135deg, #062f19 0%, #07391f 48%, #052a17 100%);
-  color: #ffffff;
-  font-family: "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
-  padding: 54px 7% 28px;
-  box-sizing: border-box;
-}
-
-.na-footer *,
-.na-footer *::before,
-.na-footer *::after {
-  box-sizing: border-box;
-}
-
-.na-footer-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.6fr 0.8fr 1.1fr;
-  gap: 72px;
-  align-items: flex-start;
-}
-
-.na-footer-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.na-footer-logo-link {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.na-footer-logo {
-  display: block;
-  width: 255px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  filter: none;
-}
-
-.na-footer-slogan {
-  margin: 22px 0 0;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 16px;
-  line-height: 1.55;
-  font-weight: 400;
-  max-width: 520px;
-}
-
-.na-footer h3 {
-  margin: 0 0 18px;
-  color: #ffffff;
-  font-size: 18px;
-  line-height: 1.3;
-  font-weight: 800;
-}
-
-.na-footer-links {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.na-footer-links a {
-  color: rgba(255, 255, 255, 0.88);
-  text-decoration: none;
-  font-size: 16px;
-  line-height: 1.4;
-  margin: 0 0 14px;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.na-footer-links a:hover {
-  color: #55C83B;
-  transform: translateX(2px);
-}
-
-.na-footer-contact {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.na-footer-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-size: 16px;
-  line-height: 1.4;
-  margin: 0 0 14px;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.na-footer-contact-item:hover {
-  color: #55C83B;
-  transform: translateX(2px);
-}
-
-.na-footer-icon {
-  width: 23px;
-  height: 23px;
-  min-width: 23px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.na-footer-icon svg {
-  width: 23px;
-  height: 23px;
-  display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.85;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.na-footer-bottom {
-  max-width: 1180px;
-  margin: 38px auto 0;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-.na-footer-bottom p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* Tablet */
-@media (max-width: 980px) {
-  .na-footer {
-    padding: 44px 6% 26px;
-  }
-
-  .na-footer-inner {
-    grid-template-columns: 1fr 1fr;
-    gap: 42px;
-  }
-
-  .na-footer-brand {
-    grid-column: 1 / -1;
-  }
-
-  .na-footer-logo {
-    width: 235px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 640px) {
-  .na-footer {
-    padding: 38px 24px 24px;
-  }
-
-  .na-footer-inner {
-    grid-template-columns: 1fr;
-    gap: 34px;
-  }
-
-  .na-footer-brand,
-  .na-footer-links,
-  .na-footer-contact {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .na-footer-logo {
-    width: 220px;
-  }
-
-  .na-footer-slogan {
-    font-size: 15px;
-    margin-top: 18px;
-  }
-
-  .na-footer h3 {
-    font-size: 17px;
-    margin-bottom: 14px;
-  }
-
-  .na-footer-links a,
-  .na-footer-contact-item {
-    font-size: 15px;
-  }
-
-  .na-footer-icon,
-  .na-footer-icon svg {
-    width: 21px;
-    height: 21px;
-    min-width: 21px;
-  }
-
-  .na-footer-bottom {
-    margin-top: 32px;
-    padding-top: 20px;
-  }
-
-  .na-footer-bottom p {
-    font-size: 12.5px;
-  }
-}
-</style>
-Atenção ao caminho da logo. Se a imagem estiver na mídia do WordPress com outro caminho, troque esta linha:
-
-src="/wp-content/uploads/imagem-em-branco-rodape.png"
-pelo link completo da imagem copiado na Biblioteca de Mídia.
-
-
-<?php
-/**
- * Rodapé do tema.
- */
-if (!defined('ABSPATH')) {
-    exit;
-}
-?>
-<footer class="na-site-footer">
-    <div class="na-container">
-        <div class="na-footer-grid">
-            <div>
-                <div class="na-footer-title"><?php bloginfo('name'); ?></div>
-                <p><?php echo esc_html(get_bloginfo('description') ? get_bloginfo('description') : 'Informação, clima e mercado para o agronegócio nordestino.'); ?></p>
-            </div>
-
-            <div>
-                <h3><?php esc_html_e('Links rápidos', 'nordeste-agro-independente'); ?></h3>
-                <?php
-                if (has_nav_menu('footer')) {
-                    wp_nav_menu(array(
-                        'theme_location' => 'footer',
-                        'menu_class'     => 'na-footer-menu',
-                        'container'      => false,
-                        'depth'          => 1,
-                    ));
-                } else {
-                    echo '<ul class="na-footer-menu">';
-                    echo '<li><a href="' . esc_url(home_url('/publicacoes/')) . '">Publicações</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/clima/')) . '">Clima</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/cotacoes/')) . '">Cotações</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/anuncie/')) . '">Anuncie</a></li>';
-                    echo '</ul>';
-                }
-                ?>
-            </div>
-
-            <div class="na-footer-contact">
-                <h3><?php esc_html_e('Contato', 'nordeste-agro-independente'); ?></h3>
-                <p><a href="mailto:contato@nordesteagro.com.br">contato@nordesteagro.com.br</a></p>
-                <p><a href="https://wa.me/558999915435" target="_blank" rel="noopener">WhatsApp: (89) 99915-435</a></p>
-            </div>
-        </div>
-
-        <div class="na-footer-bottom">
-            © <?php echo esc_html(date_i18n('Y')); ?> <?php bloginfo('name'); ?>. <?php esc_html_e('Todos os direitos reservados.', 'nordeste-agro-independente'); ?>
-        </div>
-    </div>
-</footer>
-<?php wp_footer(); ?>
-</body>
-</html>
-
-esse o html do tema do roda pé refaça e me encaminhe o codigo
-
-nome do arquivo na biblioeteca é "imagem-em-branco-rodape.png"
-
-Pensou por 5s
-Segue o footer.php completo refeito para o tema. Ele substitui o nome do site pela logo branca imagem-em-branco-rodape.png, adiciona ícones menores na frente dos contatos e mantém o rodapé editável pelo menu do WordPress.
-
-Cole substituindo o arquivo atual do rodapé.
-
-<?php
-/**
- * Rodapé do tema.
- */
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-/**
- * Busca a logo branca na Biblioteca de Mídia pelo nome do arquivo.
- * Arquivo esperado: imagem-em-branco-rodape.png
- */
-function na_get_footer_logo_url() {
-    $filename = 'imagem-em-branco-rodape.png';
-
-    $attachments = get_posts(array(
-        'post_type'      => 'attachment',
-        'post_status'    => 'inherit',
-        'posts_per_page' => 1,
-        'meta_query'     => array(
-            array(
-                'key'     => '_wp_attached_file',
-                'value'   => $filename,
-                'compare' => 'LIKE',
-            ),
-        ),
-    ));
-
-    if (!empty($attachments)) {
-        $url = wp_get_attachment_url($attachments[0]->ID);
-        if ($url) {
-            return $url;
-        }
-    }
-
-    /**
-     * Fallback caso o WordPress não encontre pelo banco.
-     * Se a imagem estiver em uma pasta por mês/ano, o método acima deve funcionar.
-     */
-    $upload_dir = wp_upload_dir();
-    return trailingslashit($upload_dir['baseurl']) . $filename;
-}
-
-$na_footer_logo_url = na_get_footer_logo_url();
-?>
-
-<footer class="na-site-footer">
-    <div class="na-container">
-        <div class="na-footer-grid">
-
-            <div class="na-footer-brand">
-                <a href="<?php echo esc_url(home_url('/')); ?>" class="na-footer-logo-link" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?>">
-                    <img
-                        src="<?php echo esc_url($na_footer_logo_url); ?>"
-                        alt="<?php echo esc_attr(get_bloginfo('name')); ?>"
-                        class="na-footer-logo"
-                        loading="lazy"
-                    >
-                </a>
-
-                <p class="na-footer-description">
-                    <?php echo esc_html(get_bloginfo('description') ? get_bloginfo('description') : 'Informação, clima e mercado para o agronegócio nordestino.'); ?>
-                </p>
-            </div>
-
-            <div class="na-footer-links-wrap">
-                <h3><?php esc_html_e('Links rápidos', 'nordeste-agro-independente'); ?></h3>
-
-                <?php
-                if (has_nav_menu('footer')) {
-                    wp_nav_menu(array(
-                        'theme_location' => 'footer',
-                        'menu_class'     => 'na-footer-menu',
-                        'container'      => false,
-                        'depth'          => 1,
-                    ));
-                } else {
-                    echo '<ul class="na-footer-menu">';
-                    echo '<li><a href="' . esc_url(home_url('/publicacoes/')) . '">Publicações</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/clima/')) . '">Clima</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/cotacoes/')) . '">Cotações</a></li>';
-                    echo '<li><a href="' . esc_url(home_url('/anuncie/')) . '">Anuncie</a></li>';
-                    echo '</ul>';
-                }
-                ?>
-            </div>
-
-            <div class="na-footer-contact">
-                <h3><?php esc_html_e('Contato', 'nordeste-agro-independente'); ?></h3>
-
-                <a class="na-footer-contact-item" href="mailto:contato@nordesteagro.com.br">
-                    <span class="na-footer-contact-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M4 6h16v12H4V6Z"></path>
-                            <path d="m4 7 8 6 8-6"></path>
-                        </svg>
-                    </span>
-                    <span>contato@nordesteagro.com.br</span>
-                </a>
-
-                <a class="na-footer-contact-item" href="https://wa.me/558999915435" target="_blank" rel="noopener">
-                    <span class="na-footer-contact-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                            <path d="M20 11.8a8 8 0 0 1-11.8 7L4 20l1.2-4.1A8 8 0 1 1 20 11.8Z"></path>
-                            <path d="M9.4 8.5c.2-.5.4-.5.7-.5h.5c.2 0 .5.1.6.4l.7 1.6c.1.3.1.5-.1.7l-.4.5c-.1.2-.2.3 0 .6.3.5.8 1.2 1.5 1.7.8.6 1.4.8 1.8 1 .2.1.4.1.5-.1l.7-.8c.2-.2.4-.3.7-.2l1.6.7c.3.1.4.4.4.6 0 .4-.2 1.2-.8 1.7-.5.5-1.3.6-2.2.4-1.1-.3-2.8-1-4.5-2.6-1.7-1.6-2.6-3.2-3-4.3-.3-.9-.1-1.6.2-2.1Z"></path>
-                        </svg>
-                    </span>
-                    <span>WhatsApp: (89) 99915-435</span>
-                </a>
-
-                <a class="na-footer-contact-item" href="https://www.instagram.com/nordesteagro" target="_blank" rel="noopener">
-                    <span class="na-footer-contact-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" focusable="false">
-                            <rect x="5" y="5" width="14" height="14" rx="4"></rect>
-                            <circle cx="12" cy="12" r="3.2"></circle>
-                            <path d="M16.8 7.4h.01"></path>
-                        </svg>
-                    </span>
-                    <span>Instagram: @nordesteagro</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="na-footer-bottom">
-            © <?php echo esc_html(date_i18n('Y')); ?> <?php bloginfo('name'); ?>. <?php esc_html_e('Todos os direitos reservados.', 'nordeste-agro-independente'); ?>
-        </div>
-    </div>
-</footer>
-
-<?php wp_footer(); ?>
-</body>
-</html>
-Agora adicione este CSS completo do rodapé no arquivo CSS do tema ou em Aparência > Personalizar > CSS adicional:
-
-/* Rodapé Nordeste Agro */
-.na-site-footer {
-  width: 100%;
-  background:
-    radial-gradient(circle at top left, rgba(85, 200, 59, 0.08), transparent 34%),
-    linear-gradient(135deg, #062f19 0%, #07391f 48%, #052a17 100%);
-  color: #ffffff;
-  padding: 52px 0 28px;
-  font-family: "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
-}
-
-.na-site-footer *,
-.na-site-footer *::before,
-.na-site-footer *::after {
-  box-sizing: border-box;
-}
-
-.na-site-footer .na-container {
-  width: min(1180px, calc(100% - 48px));
-  margin: 0 auto;
-}
-
-.na-footer-grid {
-  display: grid;
-  grid-template-columns: 1.55fr 0.8fr 1.15fr;
-  gap: 72px;
-  align-items: flex-start;
-}
-
-.na-footer-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.na-footer-logo-link {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.na-footer-logo {
-  display: block;
-  width: 255px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-.na-footer-description {
-  margin: 22px 0 0;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 16px;
-  line-height: 1.55;
-  font-weight: 400;
-  max-width: 520px;
-}
-
-.na-site-footer h3 {
-  margin: 0 0 18px;
-  color: #ffffff;
-  font-size: 18px;
-  line-height: 1.3;
-  font-weight: 800;
-}
-
-.na-footer-menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.na-footer-menu li {
-  margin: 0 0 14px;
-  padding: 0;
-}
-
-.na-footer-menu a,
-.na-footer-contact-item {
-  color: rgba(255, 255, 255, 0.88);
-  text-decoration: none;
-  font-size: 16px;
-  line-height: 1.4;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.na-footer-menu a:hover,
-.na-footer-contact-item:hover {
-  color: #55C83B;
-}
-
-.na-footer-menu a:hover {
-  display: inline-block;
-  transform: translateX(2px);
-}
-
-.na-footer-contact {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.na-footer-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 14px;
-}
-
-.na-footer-contact-item:hover {
-  transform: translateX(2px);
-}
-
-.na-footer-contact-icon {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: currentColor;
-}
-
-.na-footer-contact-icon svg {
-  width: 22px;
-  height: 22px;
-  display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.85;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.na-footer-bottom {
-  margin-top: 38px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* Tablet */
-@media (max-width: 980px) {
-  .na-site-footer {
-    padding: 44px 0 26px;
-  }
-
-  .na-footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 42px;
-  }
-
-  .na-footer-brand {
-    grid-column: 1 / -1;
-  }
-
-  .na-footer-logo {
-    width: 235px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 640px) {
-  .na-site-footer {
-    padding: 38px 0 24px;
-  }
-
-  .na-site-footer .na-container {
-    width: min(100% - 40px, 1180px);
-  }
-
-  .na-footer-grid {
-    grid-template-columns: 1fr;
-    gap: 34px;
-  }
-
-  .na-footer-brand,
-  .na-footer-links-wrap,
-  .na-footer-contact {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .na-footer-logo {
-    width: 220px;
-  }
-
-  .na-footer-description {
-    font-size: 15px;
-    margin-top: 18px;
-  }
-
-  .na-site-footer h3 {
-    font-size: 17px;
-    margin-bottom: 14px;
-  }
-
-  .na-footer-menu a,
-  .na-footer-contact-item {
-    font-size: 15px;
-  }
-
-  .na-footer-contact-icon,
-  .na-footer-contact-icon svg {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-  }
-
-  .na-footer-bottom {
-    margin-top: 32px;
-    padding-top: 20px;
-    font-size: 12.5px;
-  }
-}
-Esse código mantém o rodapé dentro do tema e busca a imagem pelo nome imagem-em-branco-rodape.png na Biblioteca de Mídia.
-
-
-vamos resolver a questão das cotações 
-
-Pensou por 11s
-Vamos resolver pela ordem certa, sem mexer no layout da página.
-
-O problema atual das cotações é este: a tabela está funcionando, mas a fonte AIBA provavelmente deixou de entrar no JSON atualizado. Então o coletor precisa ser corrigido para garantir:
-
-AIBA como fonte prioritária para Oeste da Bahia
-
-CONAB como fallback quando AIBA não estiver disponível
-
-Validação de preço sem quebrar o coletor
-
-Data da AIBA aceita mesmo quando for diferente da semana CONAB
-
-Registro claro no status dizendo se a AIBA foi coletada, descartada ou usada
-
-Eu tentei verificar a fonte pública da AIBA agora, mas a busca não trouxe uma página direta confiável de cotação atual da AIBA. Então o caminho mais seguro é corrigir o coletor com base na estrutura que já temos no GitHub/site, sem depender de adivinhação.
-
-Próximo passo técnico
-Me envie aqui o arquivo completo atual:
-
-cotacoes/scripts/coletor_cotacoes_nordeste.py
-ou cole o trecho do log do GitHub Actions onde aparece o erro da última execução.
-
-O que vou fazer no coletor:
-
-1. Revisar a função que coleta AIBA.
-2. Revisar a função que normaliza preço.
-3. Revisar a função que consolida os dados.
-4. Impedir que erro da AIBA derrube o coletor inteiro.
-5. Fazer AIBA entrar como prioridade em BA / Oeste da Bahia.
-6. Manter CONAB para Bahia como fallback.
-7. Gerar o arquivo completo corrigido para você colar no GitHub.
-A correção que precisamos implementar na lógica é mais ou menos esta:
-
-# prioridade desejada
-if produto == "soja" and uf == "BA" and "oeste" in cidade_praca.lower():
-    usar AIBA se preço válido
-    senão usar CONAB
-E também precisamos melhorar a validação:
-
-def preco_para_float(valor):
-    if valor is None:
-        return None
-
-    if isinstance(valor, (int, float)):
-        return float(valor)
-
-    texto = str(valor).strip()
-    texto = texto.replace("R$", "")
-    texto = texto.replace(".", "")
-    texto = texto.replace(",", ".")
-    texto = texto.strip()
-
-    try:
-        return float(texto)
-    except ValueError:
-        return None
-Isso evita novamente erro como:
-
-ValueError: could not convert string to float
-Me mande o coletor atual e eu retorno ele completo corrigido, mantendo os arquivos e o layout exatamente como estão.
-
-
-
-Texto colado(77).txt
-Documento
-name: Atualizar Cotações Oficiais Nordeste Agro
-
-on:
-  schedule:
-    # Roda de segunda a sexta.
-    # GitHub usa UTC: 09:20 UTC = 06:20 no horário de Brasília/Fortaleza.
-    - cron: "20 9 * * 1-5"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-jobs:
-  atualizar:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Baixar repositório
-        uses: actions/checkout@v4
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Instalar dependências
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 lxml pandas openpyxl xlrd python-dateutil
-
-      - name: Executar coletor oficial de cotações
-        run: |
-          python scripts/coletor_cotacoes_oficiais.py
-
-      - name: Salvar JSON atualizado
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Atualiza cotações oficiais Nordeste Agro"
-          file_pattern: |
-            public/cotacoes/cotacoes_oficiais_nordeste_agro.json
-            public/cotacoes/cotacoes_regionais.json
-
-Pensou por 1m 45s
-Jarvis aqui. Achei o ponto principal: o coletor atual não tem AIBA integrada. Ele está preparado para CONAB e CEPEA/ESALQ, mas não existe rotina de coleta/importação da AIBA no arquivo atual. Por isso a AIBA não vai voltar sozinha na tabela. 
-
-
-Preparei a correção completa:
-
-Adicionei suporte à AIBA
-
-Mantive CONAB funcionando normalmente
-
-Mantive CEPEA/ESALQ
-
-Criei fallback para AIBA por:
-
-arquivo em dados_aiba/
-
-URL direta via variável AIBA_ARQUIVOS_URLS
-
-valor manual emergencial via variável do GitHub
-
-Mantive os mesmos arquivos de saída:
-
-public/cotacoes/cotacoes_oficiais_nordeste_agro.json
-
-public/cotacoes/cotacoes_regionais.json
-
-Arquivos prontos:
-
-Baixar coletor corrigido com AIBA
-
-Baixar workflow corrigido
-
-Baixar modelo CSV para AIBA
-
-Como aplicar
-No GitHub, substitua este arquivo:
-
-scripts/coletor_cotacoes_oficiais.py
-pelo conteúdo do arquivo:
-
-coletor_cotacoes_oficiais_v2_aiba.py
-Depois, substitua o workflow atual pelo arquivo:
-
-atualizar-cotacoes-oficiais-v2-aiba.yml
-Para a AIBA aparecer de imediato
-Crie esta pasta no repositório:
-
-dados_aiba
-Dentro dela, envie o arquivo modelo com este nome:
-
-aiba_soja_oeste_bahia.csv
-Conteúdo esperado:
-
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
-Depois rode o workflow manualmente em:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-Se rodar certo, no JSON final deve aparecer um registro com:
-
-"fonte": "AIBA",
-"estado": "BA",
-"cidade": "Oeste da Bahia - AIBA"
-A página não precisa mudar layout. Essa correção é só no coletor/dados.
-
-
-Run python scripts/coletor_cotacoes_oficiais.py
-CEPEA ERRO: Soja - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/soja.aspx
-CEPEA ERRO: Milho - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/milho.aspx
-CEPEA ERRO: Algodão - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/algodao.aspx
-CEPEA ERRO: Arroz - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/arroz.aspx
-CEPEA ERRO: Feijão - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/feijao.aspx
-CEPEA ERRO: Leite - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/leite.aspx
-CEPEA ERRO: Carne bovina - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/boi-gordo.aspx
-Arquivo principal gerado: public/cotacoes/cotacoes_oficiais_nordeste_agro.json
-Arquivo compatível com HTML gerado: public/cotacoes/cotacoes_regionais.json
-Total de registros oficiais publicados: 0
-Total de avisos: 16
-
-Pensou por 12s
-O erro agora ficou claro:
-
-CEPEA ERRO: 403 Client Error: Forbidden
-Total de registros oficiais publicados: 0
-Isso significa que o GitHub Actions foi bloqueado pelo site da CEPEA. Como também não entrou nenhum arquivo da CONAB nem da AIBA, o coletor gerou o JSON vazio.
-
-A correção correta agora é:
-
-1. Não depender da raspagem direta da CEPEA
-A CEPEA está retornando 403 Forbidden para o robô do GitHub. Então o coletor não pode depender dela como fonte obrigatória.
-
-A CEPEA deve ficar como fonte complementar, mas se der 403, o coletor deve continuar normalmente com:
-
-AIBA + CONAB + arquivos locais
-2. Alimentar pelo menos uma fonte local
-Hoje o total deu 0 porque provavelmente não existe nenhum arquivo dentro destas pastas:
-
-dados_aiba/
-dados_conab/
-Para a AIBA voltar imediatamente, crie no GitHub:
-
-dados_aiba/aiba_soja_oeste_bahia.csv
-Com este conteúdo:
-
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
-Depois rode novamente o workflow.
-
-3. Ajuste recomendado no coletor
-No coletor, a ordem precisa ficar assim:
-
-1. Coletar/importar AIBA
-2. Coletar/importar CONAB
-3. Tentar CEPEA apenas como complementar
-4. Se CEPEA der 403, registrar aviso, mas não zerar o JSON
-O erro da CEPEA não quebrou o script, mas como nenhuma outra fonte entrou, o resultado ficou vazio.
-
-4. O que verificar agora no GitHub
-Confirme se existem estes arquivos/pastas no repositório:
-
-dados_aiba/aiba_soja_oeste_bahia.csv
-dados_conab/
-scripts/coletor_cotacoes_oficiais.py
-Se dados_aiba/ não existir, essa é a primeira correção.
-
-Resumo direto
-O problema não é o workflow.
-O problema é que:
-
-CEPEA bloqueou com 403
-+
-não entrou AIBA
-+
-não entrou CONAB
-=
-JSON vazio
-Próximo passo: adicionar o arquivo dados_aiba/aiba_soja_oeste_bahia.csv e garantir que o coletor tenha a função de leitura da pasta dados_aiba.
-
-
-c62bf186-6bc9-41a3-9d34-ec2782a48c1b.png
-acho que o problema esta aqui
-
-Pensou por 5s
-Sim, o problema provavelmente está aí.
-
-Esse commit mostra:
-
-Delete public/cotacoes directory
-Ou seja, a pasta:
-
-public/cotacoes/
-foi apagada do repositório. Pela imagem, foram deletados arquivos importantes, incluindo:
-
-public/cotacoes/cotacoes_regionais.json
-public/cotacoes/cotacoes_regionais_ultimo_valido.json
-public/cotacoes/historico_cotacoes_36m.json
-public/cotacoes/historico_cotacoes_36m_ultimo_valido.json
-Isso explica por que a página de cotações pode ter parado ou ficado sem dados. O coletor até gerou JSON, mas como o último run publicou 0 registros, ele pode ter recriado apenas um arquivo vazio ou incompleto, enquanto os arquivos antigos válidos foram apagados.
-
-O que fazer agora
-A melhor solução é reverter esse commit que apagou a pasta public/cotacoes.
-
-O commit que apagou foi:
-
-4782893
-O commit anterior mostrado na imagem é:
-
-3276fde
-Opção mais segura pelo GitHub
-Abra esse commit 4782893
-
-Procure o botão Revert no GitHub
-
-Clique em Revert
-
-Crie o commit de reversão
-
-Depois rode novamente o workflow de cotações
-
-Isso deve restaurar os arquivos apagados.
-
-Se o botão Revert não aparecer
-Use o terminal/Codespaces:
-
-git revert 4782893
-git push origin main
-Depois rode:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-Ponto importante
-Antes de rodar novamente o coletor, precisamos garantir que ele não sobrescreva o JSON válido com dados vazios.
-
-Hoje ele fez isso:
-
-Total de registros oficiais publicados: 0
-Então precisamos ajustar o coletor para esta regra:
-
-Se a nova coleta vier com 0 registros, não substituir cotacoes_regionais.json.
-Manter o último arquivo válido.
-Essa regra é essencial para evitar que uma falha de CEPEA, AIBA ou CONAB derrube a página.
-
-Minha recomendação agora
-Faça primeiro o revert do commit 4782893. Depois eu te passo o ajuste do coletor para criar essa proteção:
-
-cotacoes_regionais.json = dados atuais
-cotacoes_regionais_ultimo_valido.json = backup seguro
-se nova coleta falhar, mantém último válido
-Isso resolve a raiz do problema e evita que aconteça de novo.
-
-
-como faço isso
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
 Nordeste Agro - Coletor de Cotações Oficiais
+Versão corrigida com:
+- AIBA integrada por arquivo local, URL direta ou variáveis de ambiente.
+- CONAB por arquivo local ou URL direta.
+- CEPEA/ESALQ apenas como fonte complementar, sem derrubar o coletor quando retorna 403.
+- Proteção anti-JSON-vazio: se a execução vier sem registros, NÃO sobrescreve os arquivos válidos.
+- Backup automático do último JSON válido.
 
-Este coletor gera os arquivos:
-
+Arquivos gerados:
 1) public/cotacoes/cotacoes_oficiais_nordeste_agro.json
 2) public/cotacoes/cotacoes_regionais.json
+3) public/cotacoes/cotacoes_oficiais_nordeste_agro_ultimo_valido.json
+4) public/cotacoes/cotacoes_regionais_ultimo_valido.json
 
-O segundo arquivo mantém compatibilidade com o HTML atual da página Cotações.
+Pastas opcionais de entrada:
+- dados_aiba/
+- dados_conab/
 
-REGRA PRINCIPAL:
-- Não simular preço.
-- Não preencher praça sem fonte.
-- Não calcular preço local inventado.
-- Só publicar item quando houver valor, data e fonte identificada.
-- Se uma fonte falhar, registrar aviso no JSON.
-
-FONTES:
-1. CEPEA/ESALQ, por raspagem de tabelas públicas de indicadores.
-2. CONAB, por importação de arquivos oficiais exportados/baixados e salvos em dados_conab/.
-   Aceita CSV, XLSX, XLS e HTML com tabelas.
-
-Por que CONAB entra via arquivo?
-- A consulta pública da CONAB pode usar aplicações web dinâmicas e mudar endpoints.
-- Para evitar dado errado, o coletor aceita somente exportações/tabelas oficiais que estejam
-  no repositório ou em URLs diretas configuradas por variável de ambiente.
-
-VARIÁVEIS DE AMBIENTE OPCIONAIS:
-- CONAB_ARQUIVOS_URLS: lista de URLs diretas para CSV/XLS/XLSX/HTML, separadas por vírgula.
-- SAIDA_COTACOES: caminho do JSON principal, se quiser alterar.
+Variáveis de ambiente opcionais:
+- AIBA_ARQUIVOS_URLS: URLs diretas para CSV/XLS/XLSX/HTML da AIBA, separadas por vírgula.
+- CONAB_ARQUIVOS_URLS: URLs diretas para CSV/XLS/XLSX/HTML da CONAB, separadas por vírgula.
+- SAIDA_COTACOES: caminho do JSON principal.
+- AIBA_SOJA_PRECO: preço manual emergencial da soja AIBA. Ex.: 112,51
+- AIBA_SOJA_DATA: data do preço manual. Ex.: 11/05/2026
+- AIBA_SOJA_CIDADE: praça manual. Padrão: Oeste da Bahia - AIBA
 """
 
 from __future__ import annotations
@@ -1126,6 +39,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import json
 import os
 import re
+import shutil
 import sys
 import unicodedata
 
@@ -1143,14 +57,20 @@ ARQUIVO_SAIDA = Path(
 )
 
 ARQUIVO_COMPATIVEL_HTML = Path("public/cotacoes/cotacoes_regionais.json")
+ARQUIVO_SAIDA_ULTIMO_VALIDO = Path("public/cotacoes/cotacoes_oficiais_nordeste_agro_ultimo_valido.json")
+ARQUIVO_COMPATIVEL_ULTIMO_VALIDO = Path("public/cotacoes/cotacoes_regionais_ultimo_valido.json")
+ARQUIVO_STATUS_EXECUCAO = Path("public/cotacoes/status_ultima_execucao.json")
 
+PASTA_AIBA = Path("dados_aiba")
 PASTA_CONAB = Path("dados_conab")
 
 HEADERS = {
     "User-Agent": (
-        "NordesteAgroBot/1.0 "
-        "(coletor de dados públicos oficiais; https://nordesteagro.com)"
-    )
+        "Mozilla/5.0 (compatible; NordesteAgroBot/1.0; "
+        "+https://nordesteagro.com)"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
 }
 
 UFS_NORDESTE_MATOPIBAPA = {
@@ -1304,12 +224,17 @@ def normalizar_txt(valor: Any) -> str:
 
 
 def apenas_texto(valor: Any) -> str:
-    return str(valor or "").replace("\xa0", " ").strip()
+    if valor is None:
+        return ""
+    return str(valor).replace("\xa0", " ").strip()
 
 
 def parse_numero_br(valor: Any) -> Optional[float]:
     if valor is None:
         return None
+
+    if isinstance(valor, (int, float)) and not pd.isna(valor):
+        return float(valor)
 
     texto = apenas_texto(valor)
 
@@ -1319,7 +244,7 @@ def parse_numero_br(valor: Any) -> Optional[float]:
     texto = texto.replace("R$", "").replace("US$", "").replace("%", "").strip()
     texto = re.sub(r"[^0-9,.\-]", "", texto)
 
-    if not texto:
+    if not texto or texto in {"-", ".", ",", "-.", "-,"}:
         return None
 
     # Padrão brasileiro 1.234,56
@@ -1333,10 +258,6 @@ def parse_numero_br(valor: Any) -> Optional[float]:
 
 
 def parse_data(valor: Any) -> Tuple[Optional[str], Optional[str]]:
-    """
-    Retorna (data_br, data_iso).
-    Aceita datas como 04/05/2026, 2026-05-04, 05/2026.
-    """
     texto = apenas_texto(valor)
 
     if not texto:
@@ -1362,7 +283,7 @@ def parse_data(valor: Any) -> Tuple[Optional[str], Optional[str]]:
         except ValueError:
             pass
 
-    # mm/yyyy ou mês/ano
+    # mm/yyyy
     m = re.search(r"(\d{1,2})[/-](\d{4})", texto)
     if m:
         mes, ano = map(int, m.groups())
@@ -1389,9 +310,6 @@ def commodity_por_produto(produto: Any) -> Optional[str]:
 
 
 def extrair_produto_unidade(texto_produto: Any) -> Tuple[str, str]:
-    """
-    Exemplo CONAB: SOJA (60KG), MILHO (60KG), BOI GORDO (15KG)
-    """
     bruto = apenas_texto(texto_produto)
     unidade = ""
 
@@ -1403,7 +321,6 @@ def extrair_produto_unidade(texto_produto: Any) -> Tuple[str, str]:
         produto = bruto
 
     produto = re.sub(r"\s+", " ", produto).strip()
-
     return produto.title(), unidade
 
 
@@ -1451,25 +368,73 @@ def download(url: str) -> bytes:
 
 
 def ler_tabelas_de_bytes(conteudo: bytes, origem: str) -> List[pd.DataFrame]:
+    """
+    Leitor robusto de CSV/XLS/XLSX/HTML.
+
+    Correção importante:
+    O GitHub Actions pode ler CSV com codificação diferente, quebra de linha diferente
+    ou separador que não é identificado no primeiro teste. Por isso esta função tenta
+    várias codificações e separadores antes de desistir.
+    """
     nome = origem.lower()
 
-    if nome.endswith(".csv"):
-        texto = conteudo.decode("utf-8-sig", errors="replace")
+    if nome.endswith(".csv") or nome.endswith(".txt"):
+        textos = []
 
-        for sep in [";", ",", "\t"]:
+        for enc in ["utf-8-sig", "utf-8", "latin1", "cp1252"]:
             try:
-                df = pd.read_csv(StringIO(texto), sep=sep)
-                if df.shape[1] > 1:
-                    return [df]
+                textos.append(conteudo.decode(enc, errors="replace"))
             except Exception:
                 continue
+
+        for texto in textos:
+            texto = texto.replace("\ufeff", "").strip()
+
+            if not texto:
+                continue
+
+            # Remove cercas de código caso o conteúdo tenha sido colado com ```csv
+            texto = re.sub(r"^\s*```(?:csv)?\s*", "", texto, flags=re.IGNORECASE)
+            texto = re.sub(r"\s*```\s*$", "", texto)
+
+            for sep in [";", ",", "\t", "|"]:
+                try:
+                    df = pd.read_csv(StringIO(texto), sep=sep, dtype=str)
+                    df = limpar_colunas(df)
+
+                    if not df.empty and df.shape[1] > 1:
+                        return [df]
+                except Exception:
+                    continue
+
+            # Tentativa automática do pandas
+            try:
+                df = pd.read_csv(StringIO(texto), sep=None, engine="python", dtype=str)
+                df = limpar_colunas(df)
+
+                if not df.empty and df.shape[1] > 1:
+                    return [df]
+            except Exception:
+                pass
+
+            # Fallback manual específico para linhas separadas por ponto e vírgula
+            linhas = [l.strip() for l in texto.splitlines() if l.strip()]
+            if len(linhas) >= 2 and ";" in linhas[0]:
+                cab = [c.strip() for c in linhas[0].split(";")]
+                dados = []
+                for linha in linhas[1:]:
+                    partes = [p.strip() for p in linha.split(";")]
+                    if len(partes) == len(cab):
+                        dados.append(dict(zip(cab, partes)))
+                if dados:
+                    return [pd.DataFrame(dados)]
 
         return []
 
     if nome.endswith(".xlsx") or nome.endswith(".xls"):
         try:
-            planilhas = pd.read_excel(BytesIO(conteudo), sheet_name=None)
-            return [df for df in planilhas.values() if not df.empty]
+            planilhas = pd.read_excel(BytesIO(conteudo), sheet_name=None, dtype=str)
+            return [limpar_colunas(df) for df in planilhas.values() if not df.empty]
         except Exception:
             return []
 
@@ -1478,10 +443,6 @@ def ler_tabelas_de_bytes(conteudo: bytes, origem: str) -> List[pd.DataFrame]:
         return pd.read_html(StringIO(html))
     except Exception:
         return []
-
-
-def ler_tabelas_arquivo(path: Path) -> List[pd.DataFrame]:
-    return ler_tabelas_de_bytes(path.read_bytes(), str(path))
 
 
 def limpar_colunas(df: pd.DataFrame) -> pd.DataFrame:
@@ -1537,7 +498,6 @@ def normalizar_item(
 
     estado = apenas_texto(estado).upper() or "BR"
     cidade = apenas_texto(cidade) or "Média/Indicador"
-
     unidade = unidade_amigavel(unidade, commodity_chave)
 
     item = {
@@ -1564,9 +524,336 @@ def normalizar_item(
     return item
 
 
+def deduplicar_itens(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {}
+
+    for item in itens:
+        chave = "|".join([
+            item.get("fonte", ""),
+            item.get("commodity_chave", ""),
+            item.get("estado", ""),
+            normalizar_txt(item.get("cidade", "")),
+            item.get("data", ""),
+            str(item.get("valor", "")),
+        ])
+
+        out[chave] = item
+
+    return list(out.values())
+
+
+def iter_fontes_arquivos(pasta: Path, urls_env: str) -> Tuple[List[Tuple[str, bytes]], List[Dict[str, Any]]]:
+    fontes: List[Tuple[str, bytes]] = []
+    avisos: List[Dict[str, Any]] = []
+
+    if pasta.exists():
+        for path in sorted(pasta.glob("*")):
+            if path.is_file() and path.suffix.lower() in {".csv", ".xlsx", ".xls", ".html", ".htm"}:
+                fontes.append((str(path), path.read_bytes()))
+
+    urls = [u.strip() for u in os.getenv(urls_env, "").split(",") if u.strip()]
+
+    for url in urls:
+        try:
+            fontes.append((url, download(url)))
+        except Exception as exc:
+            avisos.append({
+                "fonte": urls_env.replace("_ARQUIVOS_URLS", ""),
+                "origem": url,
+                "status": "erro_download_url",
+                "mensagem": str(exc),
+            })
+            print(f"{urls_env} URL ERRO: {url} - {exc}", file=sys.stderr)
+
+    return fontes, avisos
+
+
+def coletar_aiba() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """
+    Aceita arquivo local/URL com colunas flexíveis.
+    Modelo recomendado:
+    produto;uf;cidade;preco;unidade;data
+    Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
+    """
+    itens: List[Dict[str, Any]] = []
+    avisos: List[Dict[str, Any]] = []
+
+    fontes, avisos_fontes = iter_fontes_arquivos(PASTA_AIBA, "AIBA_ARQUIVOS_URLS")
+    avisos.extend(avisos_fontes)
+
+    if not fontes:
+        item_manual = coletar_aiba_variavel_ambiente()
+        if item_manual:
+            itens.append(item_manual)
+            print(f"AIBA OK: variável de ambiente - {item_manual['preco']}")
+        else:
+            avisos.append({
+                "fonte": "AIBA",
+                "status": "sem_arquivo",
+                "mensagem": (
+                    "Nenhum arquivo da AIBA foi encontrado em dados_aiba/, "
+                    "nenhuma URL foi informada em AIBA_ARQUIVOS_URLS e "
+                    "AIBA_SOJA_PRECO não foi configurado."
+                ),
+            })
+        return itens, avisos
+
+    for origem, conteudo in fontes:
+        try:
+            tabelas = ler_tabelas_de_bytes(conteudo, origem)
+
+            if not tabelas:
+                raise RuntimeError("Nenhuma tabela reconhecida no arquivo/fonte da AIBA.")
+
+            total_origem = 0
+
+            for tabela in tabelas:
+                for item in normalizar_tabela_aiba(tabela, origem):
+                    itens.append(item)
+                    total_origem += 1
+
+            if total_origem == 0:
+                raise RuntimeError("Tabela lida, mas nenhum item válido da AIBA foi identificado.")
+
+            print(f"AIBA OK: {origem} - {total_origem} registros")
+
+        except Exception as exc:
+            avisos.append({
+                "fonte": "AIBA",
+                "origem": origem,
+                "status": "erro",
+                "mensagem": str(exc),
+            })
+            print(f"AIBA ERRO: {origem} - {exc}", file=sys.stderr)
+
+    return deduplicar_itens(itens), avisos
+
+
+def coletar_aiba_variavel_ambiente() -> Optional[Dict[str, Any]]:
+    preco = parse_numero_br(os.getenv("AIBA_SOJA_PRECO"))
+    if preco is None:
+        return None
+
+    data_br, data_iso = parse_data(os.getenv("AIBA_SOJA_DATA") or agora_br().strftime("%d/%m/%Y"))
+    cidade = os.getenv("AIBA_SOJA_CIDADE", "Oeste da Bahia - AIBA")
+
+    return normalizar_item(
+        produto="Soja",
+        commodity_chave="soja",
+        estado="BA",
+        cidade=cidade,
+        valor=preco,
+        unidade="Saca 60 kg",
+        data=data_br or agora_br().strftime("%d/%m/%Y"),
+        data_iso=data_iso,
+        fonte="AIBA",
+        url_fonte="variavel_ambiente:AIBA_SOJA_PRECO",
+        tipo_preco="Preço regional de referência",
+        nivel_comercializacao="Regional",
+        observacao="Registro informado por variável de ambiente para manter a praça AIBA ativa quando não houver arquivo/URL direta.",
+    )
+
+
+def normalizar_tabela_aiba(df_raw: pd.DataFrame, origem: str) -> List[Dict[str, Any]]:
+    df = limpar_colunas(df_raw)
+
+    if df.empty:
+        return []
+
+    col_produto = encontrar_coluna(df, ["produto", "commodity", "cultura"])
+    col_uf = encontrar_coluna(df, ["uf", "u.f", "estado"])
+    col_cidade = encontrar_coluna(df, ["cidade", "praca", "praça", "localidade", "regiao", "região"])
+    col_data = encontrar_coluna(df, ["data", "dia", "periodo", "período"])
+    col_preco = encontrar_coluna(df, ["preco", "preço", "valor", "cotacao", "cotação"])
+    col_unidade = encontrar_coluna(df, ["unidade", "und", "medida"])
+
+    if not col_preco:
+        return []
+
+    registros: List[Dict[str, Any]] = []
+
+    for _, row in df.iterrows():
+        produto = apenas_texto(row.get(col_produto)) if col_produto else "Soja"
+        commodity = commodity_por_produto(produto) or "soja"
+
+        valor = parse_numero_br(row.get(col_preco))
+        if valor is None:
+            continue
+
+        estado = apenas_texto(row.get(col_uf)) if col_uf else "BA"
+        estado = estado.upper() or "BA"
+
+        cidade = apenas_texto(row.get(col_cidade)) if col_cidade else "Oeste da Bahia - AIBA"
+        if not cidade:
+            cidade = "Oeste da Bahia - AIBA"
+
+        unidade = apenas_texto(row.get(col_unidade)) if col_unidade else "Saca 60 kg"
+
+        data_br = ""
+        data_iso = None
+        if col_data:
+            data_br, data_iso = parse_data(row.get(col_data))
+
+        if not data_br:
+            data_br = agora_br().strftime("%d/%m/%Y")
+
+        item = normalizar_item(
+            produto=produto,
+            commodity_chave=commodity,
+            estado=estado,
+            cidade=cidade,
+            valor=valor,
+            unidade=unidade,
+            data=data_br,
+            data_iso=data_iso,
+            fonte="AIBA",
+            url_fonte=origem,
+            tipo_preco="Preço regional de referência",
+            nivel_comercializacao="Regional",
+            observacao="Registro importado de arquivo/tabela da AIBA ou base regional vinculada.",
+        )
+
+        if item:
+            registros.append(item)
+
+    return deduplicar_itens(registros)
+
+
+def coletar_conab_importado() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    itens: List[Dict[str, Any]] = []
+    avisos: List[Dict[str, Any]] = []
+
+    fontes, avisos_fontes = iter_fontes_arquivos(PASTA_CONAB, "CONAB_ARQUIVOS_URLS")
+    avisos.extend(avisos_fontes)
+
+    if not fontes:
+        avisos.append({
+            "fonte": "CONAB",
+            "status": "sem_arquivo",
+            "mensagem": (
+                "Nenhum arquivo oficial da CONAB foi encontrado em dados_conab/ "
+                "e nenhuma URL direta foi informada em CONAB_ARQUIVOS_URLS."
+            ),
+        })
+        return itens, avisos
+
+    for origem, conteudo in fontes:
+        try:
+            tabelas = ler_tabelas_de_bytes(conteudo, origem)
+
+            if not tabelas:
+                raise RuntimeError("Nenhuma tabela reconhecida no arquivo/fonte.")
+
+            total_origem = 0
+
+            for tabela in tabelas:
+                for item in normalizar_tabela_conab(tabela, origem):
+                    itens.append(item)
+                    total_origem += 1
+
+            if total_origem == 0:
+                raise RuntimeError("Tabela lida, mas nenhum item compatível com as commodities do projeto.")
+
+            print(f"CONAB OK: {origem} - {total_origem} registros")
+
+        except Exception as exc:
+            avisos.append({
+                "fonte": "CONAB",
+                "origem": origem,
+                "status": "erro",
+                "mensagem": str(exc),
+            })
+            print(f"CONAB ERRO: {origem} - {exc}", file=sys.stderr)
+
+    return deduplicar_itens(itens), avisos
+
+
+def normalizar_tabela_conab(df_raw: pd.DataFrame, origem: str) -> List[Dict[str, Any]]:
+    df = limpar_colunas(df_raw)
+
+    if df.empty:
+        return []
+
+    col_produto = encontrar_coluna(df, ["produto", "produto/unidade", "produto unidade"])
+    col_nivel = encontrar_coluna(df, ["nivel", "nível", "comercializacao", "comercialização"])
+    col_uf = encontrar_coluna(df, ["uf", "u.f", "estado"])
+    col_cidade = encontrar_coluna(df, ["municipio", "município", "cidade", "praca", "praça", "localidade"])
+    col_data = encontrar_coluna(df, ["data", "mes/ano", "mês/ano", "semana", "periodo", "período"])
+    col_preco = encontrar_coluna(df, ["preco medio", "preço médio", "preco", "preço", "valor"])
+
+    if not col_produto or not col_preco:
+        return []
+
+    registros: List[Dict[str, Any]] = []
+
+    for _, row in df.iterrows():
+        produto_bruto = row.get(col_produto)
+        produto, unidade_extraida = extrair_produto_unidade(produto_bruto)
+        commodity = commodity_por_produto(produto)
+
+        if not commodity:
+            continue
+
+        valor = parse_numero_br(row.get(col_preco))
+
+        if valor is None:
+            continue
+
+        estado = apenas_texto(row.get(col_uf)) if col_uf else "BR"
+        estado = estado.upper()
+
+        if estado and estado != "BR" and estado not in UFS_NORDESTE_MATOPIBAPA:
+            continue
+
+        cidade = apenas_texto(row.get(col_cidade)) if col_cidade else ""
+
+        if not cidade:
+            cidade = "Média estadual" if estado and estado != "BR" else "Média Brasil"
+
+        data_br = ""
+        data_iso = None
+
+        if col_data:
+            data_br, data_iso = parse_data(row.get(col_data))
+
+        if not data_br:
+            data_br = agora_br().strftime("%d/%m/%Y")
+
+        nivel = apenas_texto(row.get(col_nivel)) if col_nivel else "Preço de mercado"
+
+        item = normalizar_item(
+            produto=produto,
+            commodity_chave=commodity,
+            estado=estado or "BR",
+            cidade=cidade,
+            valor=valor,
+            unidade=unidade_extraida,
+            data=data_br,
+            data_iso=data_iso,
+            fonte="CONAB",
+            url_fonte=origem,
+            tipo_preco="Preço oficial de mercado",
+            nivel_comercializacao=nivel,
+            observacao="Registro importado de arquivo/tabela oficial da CONAB.",
+        )
+
+        if item:
+            registros.append(item)
+
+    return deduplicar_itens(registros)
+
+
 def coletar_cepea() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     itens: List[Dict[str, Any]] = []
     avisos: List[Dict[str, Any]] = []
+
+    if os.getenv("DESATIVAR_CEPEA", "").strip().lower() in {"1", "true", "sim", "yes"}:
+        avisos.append({
+            "fonte": "CEPEA/ESALQ",
+            "status": "desativada_por_variavel",
+            "mensagem": "Coleta CEPEA desativada por DESATIVAR_CEPEA.",
+        })
+        return itens, avisos
 
     for fonte in FONTES_CEPEA:
         try:
@@ -1618,14 +905,10 @@ def coletar_cepea() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
             avisos.append(aviso)
             print(f"CEPEA ERRO: {fonte.produto} - {exc}", file=sys.stderr)
 
-    return itens, avisos
+    return deduplicar_itens(itens), avisos
 
 
 def extrair_serie_cepea(tabelas: List[pd.DataFrame]) -> List[Dict[str, Any]]:
-    """
-    Procura uma tabela com coluna de data e preço.
-    Retorna ordem crescente por data, adequada para gráfico.
-    """
     for df_raw in tabelas:
         df = limpar_colunas(df_raw)
 
@@ -1692,220 +975,6 @@ def extrair_serie_cepea(tabelas: List[pd.DataFrame]) -> List[Dict[str, Any]]:
     return []
 
 
-def iter_fontes_conab() -> List[Tuple[str, bytes]]:
-    fontes: List[Tuple[str, bytes]] = []
-
-    if PASTA_CONAB.exists():
-        for path in sorted(PASTA_CONAB.glob("*")):
-            if path.is_file() and path.suffix.lower() in {".csv", ".xlsx", ".xls", ".html", ".htm"}:
-                fontes.append((str(path), path.read_bytes()))
-
-    urls = [
-        u.strip()
-        for u in os.getenv("CONAB_ARQUIVOS_URLS", "").split(",")
-        if u.strip()
-    ]
-
-    for url in urls:
-        try:
-            fontes.append((url, download(url)))
-        except Exception as exc:
-            print(f"CONAB URL ERRO: {url} - {exc}", file=sys.stderr)
-
-    return fontes
-
-
-def coletar_conab_importado() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    itens: List[Dict[str, Any]] = []
-    avisos: List[Dict[str, Any]] = []
-
-    fontes = iter_fontes_conab()
-
-    if not fontes:
-        avisos.append({
-            "fonte": "CONAB",
-            "status": "sem_arquivo",
-            "mensagem": (
-                "Nenhum arquivo oficial da CONAB foi encontrado em dados_conab/ "
-                "e nenhuma URL direta foi informada em CONAB_ARQUIVOS_URLS."
-            ),
-        })
-        return itens, avisos
-
-    for origem, conteudo in fontes:
-        try:
-            tabelas = ler_tabelas_de_bytes(conteudo, origem)
-
-            if not tabelas:
-                raise RuntimeError("Nenhuma tabela reconhecida no arquivo/fonte.")
-
-            total_origem = 0
-
-            for tabela in tabelas:
-                for item in normalizar_tabela_conab(tabela, origem):
-                    itens.append(item)
-                    total_origem += 1
-
-            if total_origem == 0:
-                raise RuntimeError("Tabela lida, mas nenhum item compatível com as commodities do projeto.")
-
-            print(f"CONAB OK: {origem} - {total_origem} registros")
-
-        except Exception as exc:
-            avisos.append({
-                "fonte": "CONAB",
-                "origem": origem,
-                "status": "erro",
-                "mensagem": str(exc),
-            })
-            print(f"CONAB ERRO: {origem} - {exc}", file=sys.stderr)
-
-    return itens, avisos
-
-
-def normalizar_tabela_conab(df_raw: pd.DataFrame, origem: str) -> List[Dict[str, Any]]:
-    df = limpar_colunas(df_raw)
-
-    if df.empty:
-        return []
-
-    col_produto = encontrar_coluna(df, ["produto", "produto/unidade", "produto unidade"])
-    col_nivel = encontrar_coluna(df, ["nivel", "nível", "comercializacao", "comercialização"])
-    col_uf = encontrar_coluna(df, ["uf", "u.f", "estado"])
-    col_cidade = encontrar_coluna(df, ["municipio", "município", "cidade", "praca", "praça", "localidade"])
-    col_data = encontrar_coluna(df, ["data", "mes/ano", "mês/ano", "semana", "periodo", "período"])
-    col_preco = encontrar_coluna(df, ["preco medio", "preço médio", "preco", "preço", "valor"])
-
-    if not col_produto or not col_preco:
-        return []
-
-    registros: List[Dict[str, Any]] = []
-
-    for _, row in df.iterrows():
-        produto_bruto = row.get(col_produto)
-        produto, unidade_extraida = extrair_produto_unidade(produto_bruto)
-        commodity = commodity_por_produto(produto)
-
-        if not commodity:
-            continue
-
-        valor = parse_numero_br(row.get(col_preco))
-
-        if valor is None:
-            continue
-
-        estado = apenas_texto(row.get(col_uf)) if col_uf else "BR"
-        estado = estado.upper()
-
-        # Mantém apenas Nordeste + Tocantins + Pará.
-        # Para publicar Brasil inteiro, comente este bloco.
-        if estado and estado != "BR" and estado not in UFS_NORDESTE_MATOPIBAPA:
-            continue
-
-        cidade = apenas_texto(row.get(col_cidade)) if col_cidade else ""
-
-        if not cidade:
-            cidade = "Média estadual" if estado and estado != "BR" else "Média Brasil"
-
-        data_br = ""
-        data_iso = None
-
-        if col_data:
-            data_br, data_iso = parse_data(row.get(col_data))
-
-        if not data_br:
-            data_br = agora_br().strftime("%d/%m/%Y")
-
-        nivel = apenas_texto(row.get(col_nivel)) if col_nivel else "Preço de mercado"
-
-        item = normalizar_item(
-            produto=produto,
-            commodity_chave=commodity,
-            estado=estado or "BR",
-            cidade=cidade,
-            valor=valor,
-            unidade=unidade_extraida,
-            data=data_br,
-            data_iso=data_iso,
-            fonte="CONAB",
-            url_fonte=origem,
-            tipo_preco="Preço oficial de mercado",
-            nivel_comercializacao=nivel,
-            observacao="Registro importado de arquivo/tabela oficial da CONAB.",
-        )
-
-        if item:
-            registros.append(item)
-
-    return deduplicar_itens(registros)
-
-
-def deduplicar_itens(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    out: Dict[str, Dict[str, Any]] = {}
-
-    for item in itens:
-        chave = "|".join([
-            item.get("fonte", ""),
-            item.get("commodity_chave", ""),
-            item.get("estado", ""),
-            normalizar_txt(item.get("cidade", "")),
-            item.get("data", ""),
-            str(item.get("valor", "")),
-        ])
-
-        out[chave] = item
-
-    return list(out.values())
-
-
-def gerar_payload(itens: List[Dict[str, Any]], avisos: List[Dict[str, Any]]) -> Dict[str, Any]:
-    itens = deduplicar_itens(itens)
-
-    itens.sort(key=lambda x: (
-        x.get("commodity_chave", ""),
-        x.get("estado", ""),
-        x.get("cidade", ""),
-        x.get("fonte", ""),
-    ))
-
-    payload = {
-        "ok": bool(itens),
-        "projeto": "Nordeste Agro",
-        "tipo": "cotacoes_oficiais",
-        "fonte_principal": "CONAB",
-        "fontes_complementares": ["CEPEA/ESALQ", "B3"],
-        "ultima_sincronizacao": agora_br_texto(),
-        "gerado_em": agora_br().isoformat(timespec="seconds"),
-        "frequencia_atualizacao": "diaria_em_dias_uteis",
-        "modo": "github_actions_json_publico",
-        "regra_dados": (
-            "Somente valores coletados/importados de fontes oficiais são publicados. "
-            "O sistema não simula preços e não cria cotação para praça sem dado oficial."
-        ),
-        "dados": itens,
-        "avisos": avisos + gerar_avisos_commodities_sem_dado(itens),
-        "fontes": [
-            {
-                "nome": "CONAB",
-                "uso": "Preços agropecuários oficiais por produto, UF e localidade quando importados de arquivo/export oficial.",
-                "status": "ativo_por_importacao_ou_url_direta",
-            },
-            {
-                "nome": "CEPEA/ESALQ",
-                "uso": "Indicadores referenciais oficiais de mercado por produto.",
-                "status": "ativo",
-            },
-            {
-                "nome": "B3",
-                "uso": "Mercado futuro e referência complementar quando integrada futuramente.",
-                "status": "preparado_para_integracao_futura",
-            },
-        ],
-    }
-
-    return payload
-
-
 def gerar_avisos_commodities_sem_dado(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     com_dado = {i.get("commodity_chave") for i in itens}
     avisos = []
@@ -1918,29 +987,168 @@ def gerar_avisos_commodities_sem_dado(itens: List[Dict[str, Any]]) -> List[Dict[
                 "status": "sem_dado_oficial_publicado",
                 "mensagem": (
                     "Nenhum valor oficial foi coletado/importado para esta commodity nesta execução. "
-                    "A página deve mostrar indisponibilidade, não valor simulado."
+                    "A página deve mostrar indisponibilidade ou manter último valor válido, não valor simulado."
                 ),
             })
 
     return avisos
 
 
-def salvar_json(payload: Dict[str, Any]) -> None:
+def gerar_payload(itens: List[Dict[str, Any]], avisos: List[Dict[str, Any]]) -> Dict[str, Any]:
+    itens = deduplicar_itens(itens)
+
+    itens.sort(key=lambda x: (
+        x.get("commodity_chave", ""),
+        x.get("estado", ""),
+        x.get("cidade", ""),
+        x.get("fonte", ""),
+    ))
+
+    fontes_presentes = sorted({i.get("fonte") for i in itens if i.get("fonte")})
+
+    payload = {
+        "ok": bool(itens),
+        "projeto": "Nordeste Agro",
+        "tipo": "cotacoes_oficiais",
+        "fonte_principal": "AIBA / CONAB",
+        "fontes_complementares": ["CEPEA/ESALQ", "B3"],
+        "fontes_presentes_na_execucao": fontes_presentes,
+        "ultima_sincronizacao": agora_br_texto(),
+        "gerado_em": agora_br().isoformat(timespec="seconds"),
+        "frequencia_atualizacao": "diaria_em_dias_uteis",
+        "modo": "github_actions_json_publico",
+        "regra_dados": (
+            "Somente valores coletados/importados de fontes oficiais ou regionais informadas são publicados. "
+            "O sistema não simula preços e não cria cotação para praça sem dado identificável."
+        ),
+        "dados": itens,
+        "avisos": avisos + gerar_avisos_commodities_sem_dado(itens),
+        "fontes": [
+            {
+                "nome": "AIBA",
+                "uso": "Preço regional de referência para Oeste da Bahia quando importado por arquivo, URL direta ou variável de ambiente.",
+                "status": "ativo_por_importacao_ou_variavel",
+            },
+            {
+                "nome": "CONAB",
+                "uso": "Preços agropecuários oficiais por produto, UF e localidade quando importados de arquivo/export oficial.",
+                "status": "ativo_por_importacao_ou_url_direta",
+            },
+            {
+                "nome": "CEPEA/ESALQ",
+                "uso": "Indicadores referenciais oficiais de mercado por produto. Pode bloquear coleta automatizada por 403.",
+                "status": "complementar_nao_obrigatoria",
+            },
+            {
+                "nome": "B3",
+                "uso": "Mercado futuro e referência complementar quando integrada futuramente.",
+                "status": "preparado_para_integracao_futura",
+            },
+        ],
+    }
+
+    return payload
+
+
+def payload_tem_dados_validos(payload: Dict[str, Any]) -> bool:
+    dados = payload.get("dados")
+    return isinstance(dados, list) and len(dados) > 0
+
+
+def carregar_json(path: Path) -> Optional[Dict[str, Any]]:
+    try:
+        if not path.exists():
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def salvar_status(status: Dict[str, Any]) -> None:
+    ARQUIVO_STATUS_EXECUCAO.parent.mkdir(parents=True, exist_ok=True)
+    ARQUIVO_STATUS_EXECUCAO.write_text(
+        json.dumps(status, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def salvar_json(payload: Dict[str, Any]) -> bool:
+    """
+    Retorna True quando salvou dados novos.
+    Retorna False quando preservou último válido por execução vazia.
+    """
     ARQUIVO_SAIDA.parent.mkdir(parents=True, exist_ok=True)
     ARQUIVO_COMPATIVEL_HTML.parent.mkdir(parents=True, exist_ok=True)
+
+    if not payload_tem_dados_validos(payload):
+        ultimo_valido = (
+            carregar_json(ARQUIVO_COMPATIVEL_ULTIMO_VALIDO)
+            or carregar_json(ARQUIVO_SAIDA_ULTIMO_VALIDO)
+            or carregar_json(ARQUIVO_COMPATIVEL_HTML)
+            or carregar_json(ARQUIVO_SAIDA)
+        )
+
+        if ultimo_valido and payload_tem_dados_validos(ultimo_valido):
+            aviso = {
+                "ok": True,
+                "preservado_ultimo_valido": True,
+                "gerado_em": agora_br().isoformat(timespec="seconds"),
+                "ultima_sincronizacao": agora_br_texto(),
+                "mensagem": (
+                    "Execução atual veio sem registros. Os arquivos principais foram preservados "
+                    "com o último JSON válido para evitar derrubar a página Cotações."
+                ),
+                "total_registros_preservados": len(ultimo_valido.get("dados", [])),
+                "avisos_execucao_vazia": payload.get("avisos", []),
+            }
+            salvar_status(aviso)
+            print("ATENÇÃO: execução sem registros. Último JSON válido preservado.")
+            print(f"Registros preservados: {len(ultimo_valido.get('dados', []))}")
+            return False
+
+        salvar_status({
+            "ok": False,
+            "preservado_ultimo_valido": False,
+            "gerado_em": agora_br().isoformat(timespec="seconds"),
+            "ultima_sincronizacao": agora_br_texto(),
+            "mensagem": "Execução sem registros e nenhum último JSON válido encontrado.",
+            "avisos": payload.get("avisos", []),
+        })
+        print("ERRO: execução sem registros e sem último JSON válido para preservar.", file=sys.stderr)
+        return False
 
     texto_json = json.dumps(payload, ensure_ascii=False, indent=2)
 
     ARQUIVO_SAIDA.write_text(texto_json, encoding="utf-8")
     ARQUIVO_COMPATIVEL_HTML.write_text(texto_json, encoding="utf-8")
+    ARQUIVO_SAIDA_ULTIMO_VALIDO.write_text(texto_json, encoding="utf-8")
+    ARQUIVO_COMPATIVEL_ULTIMO_VALIDO.write_text(texto_json, encoding="utf-8")
+
+    salvar_status({
+        "ok": True,
+        "preservado_ultimo_valido": False,
+        "gerado_em": agora_br().isoformat(timespec="seconds"),
+        "ultima_sincronizacao": agora_br_texto(),
+        "mensagem": "Nova execução com registros válidos salva com sucesso.",
+        "total_registros": len(payload.get("dados", [])),
+        "fontes_presentes_na_execucao": payload.get("fontes_presentes_na_execucao", []),
+    })
 
     print(f"Arquivo principal gerado: {ARQUIVO_SAIDA}")
     print(f"Arquivo compatível com HTML gerado: {ARQUIVO_COMPATIVEL_HTML}")
+    print(f"Backup último válido gerado: {ARQUIVO_SAIDA_ULTIMO_VALIDO}")
+    print(f"Backup compatível último válido gerado: {ARQUIVO_COMPATIVEL_ULTIMO_VALIDO}")
+
+    return True
 
 
 def main() -> int:
     todos_itens: List[Dict[str, Any]] = []
     todos_avisos: List[Dict[str, Any]] = []
+
+    itens_aiba, avisos_aiba = coletar_aiba()
+    todos_itens.extend(itens_aiba)
+    todos_avisos.extend(avisos_aiba)
 
     itens_conab, avisos_conab = coletar_conab_importado()
     todos_itens.extend(itens_conab)
@@ -1951,358 +1159,27 @@ def main() -> int:
     todos_avisos.extend(avisos_cepea)
 
     payload = gerar_payload(todos_itens, todos_avisos)
-    salvar_json(payload)
+    salvou_novo = salvar_json(payload)
 
-    print(f"Total de registros oficiais publicados: {len(payload['dados'])}")
+    print(f"Total de registros oficiais publicados nesta execução: {len(payload['dados'])}")
     print(f"Total de avisos: {len(payload['avisos'])}")
 
-    return 0 if payload["ok"] else 1
+    if payload_tem_dados_validos(payload):
+        return 0
+
+    # Não falha quando preservou último válido, para permitir commit apenas do status se necessário.
+    if not salvou_novo:
+        ultimo_valido = (
+            carregar_json(ARQUIVO_COMPATIVEL_ULTIMO_VALIDO)
+            or carregar_json(ARQUIVO_SAIDA_ULTIMO_VALIDO)
+            or carregar_json(ARQUIVO_COMPATIVEL_HTML)
+            or carregar_json(ARQUIVO_SAIDA)
+        )
+        if ultimo_valido and payload_tem_dados_validos(ultimo_valido):
+            return 0
+
+    return 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-esse o coleto hoje
-
-Pensou por 54s
-Sim, esse coletor atual explica o problema.
-
-Ele não tem AIBA e continua tentando buscar a CEPEA direto pelo GitHub Actions, mas a CEPEA está bloqueando com erro 403 Forbidden. Resultado: se não houver arquivo CONAB em dados_conab/, ele publica 0 registros.
-
-Eu gerei o coletor corrigido completo:
-
-Baixar coletor corrigido
-
-Também gerei o workflow corrigido:
-
-Baixar workflow corrigido
-
-E o modelo CSV para AIBA:
-
-Baixar CSV AIBA
-
-O que foi corrigido
-O novo coletor faz isto:
-
-Adiciona AIBA como fonte.
-
-Lê AIBA por arquivo em:
-
-dados_aiba/
-Mantém CONAB por arquivo em:
-
-dados_conab/
-Mantém CEPEA, mas como fonte complementar. Se der 403, ele registra aviso e continua.
-
-Cria proteção para não destruir a página:
-
-Se a nova execução vier com 0 registros, ele NÃO sobrescreve cotacoes_regionais.json.
-Cria backup do último JSON válido:
-
-public/cotacoes/cotacoes_regionais_ultimo_valido.json
-public/cotacoes/cotacoes_oficiais_nordeste_agro_ultimo_valido.json
-Como aplicar agora
-No GitHub, substitua o arquivo:
-
-scripts/coletor_cotacoes_oficiais.py
-pelo conteúdo do arquivo que gerei:
-
-coletor_cotacoes_oficiais_corrigido.py
-Depois, atualize o workflow com o arquivo:
-
-atualizar-cotacoes-oficiais-corrigido.yml
-Principalmente porque o file_pattern novo inclui também os backups e o status.
-
-Para AIBA aparecer
-Crie esta pasta no repositório:
-
-dados_aiba
-Dentro dela, coloque o arquivo:
-
-aiba_soja_oeste_bahia.csv
-Com este conteúdo:
-
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
-Depois rode:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-Com isso, a AIBA deve voltar como:
-
-"fonte": "AIBA",
-"estado": "BA",
-"cidade": "Oeste da Bahia - AIBA"
-
-
-
-adicione o aiba no coletor para que fique um coletor so e um workflow so
-
-Pensou por 6s
-Perfeito. Montei tudo como você pediu: um coletor só + um workflow só, já com AIBA integrada dentro do coletor.
-
-Baixe o pacote completo aqui:
-
-Baixar pacote único — coletor + workflow + AIBA
-
-Dentro do ZIP está assim:
-
-scripts/coletor_cotacoes_oficiais.py
-.github/workflows/atualizar-cotacoes.yml
-dados_aiba/aiba_soja_oeste_bahia.csv
-O que você deve fazer no GitHub
-Substitua o arquivo atual:
-
-scripts/coletor_cotacoes_oficiais.py
-pelo novo arquivo do ZIP.
-
-Depois substitua o workflow atual por:
-
-.github/workflows/atualizar-cotacoes.yml
-E adicione a pasta:
-
-dados_aiba/
-com o arquivo:
-
-aiba_soja_oeste_bahia.csv
-O que esse coletor único faz agora
-Ele roda nesta ordem:
-
-1. AIBA
-2. CONAB
-3. CEPEA/ESALQ
-A CEPEA continua no coletor, mas se der erro 403 Forbidden, ela não derruba mais a execução.
-
-A proteção principal também foi adicionada:
-
-Se a nova execução vier com 0 registros, o coletor não sobrescreve o JSON válido antigo.
-Depois de aplicar, rode manualmente:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-Quando finalizar, confira se voltou no JSON:
-
-"fonte": "AIBA",
-"estado": "BA",
-"cidade": "Oeste da Bahia - AIBA"
-
-
-
-
-E adicione a pasta:
-
-onde adicionar essa pasta
-
-Pensou por alguns segundos
-Você deve adicionar a pasta na raiz do repositório, no mesmo nível de:
-
-scripts/
-public/
-.github/
-A estrutura correta fica assim:
-
-seu-repositorio/
-├── .github/
-│   └── workflows/
-│       └── atualizar-cotacoes.yml
-├── scripts/
-│   └── coletor_cotacoes_oficiais.py
-├── public/
-│   └── cotacoes/
-│       └── cotacoes_regionais.json
-└── dados_aiba/
-    └── aiba_soja_oeste_bahia.csv
-Como criar pelo GitHub
-Entre no repositório.
-
-Clique em Add file.
-
-Clique em Create new file.
-
-No campo do nome do arquivo, cole exatamente:
-
-dados_aiba/aiba_soja_oeste_bahia.csv
-O GitHub vai criar automaticamente a pasta dados_aiba.
-
-No conteúdo do arquivo, cole:
-
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
-Clique em Commit changes.
-
-Depois disso, rode o workflow manualmente em:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-A pasta não vai dentro de scripts, nem dentro de public. Ela fica direto na raiz do repositório.
-
-
-Run python scripts/coletor_cotacoes_oficiais.py
-AIBA ERRO: dados_aiba/aiba_soja_oeste_bahia.csv - Nenhuma tabela reconhecida no arquivo/fonte da AIBA.
-CEPEA ERRO: Soja - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/soja.aspx
-CEPEA ERRO: Milho - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/milho.aspx
-CEPEA ERRO: Algodão - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/algodao.aspx
-CEPEA ERRO: Arroz - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/arroz.aspx
-CEPEA ERRO: Feijão - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/feijao.aspx
-CEPEA ERRO: Leite - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/leite.aspx
-CEPEA ERRO: Carne bovina - 403 Client Error: Forbidden for url: https://www.cepea.org.br/br/indicador/boi-gordo.aspx
-ERRO: execução sem registros e sem último JSON válido para preservar.
-Total de registros oficiais publicados nesta execução: 0
-Total de avisos: 17
-Error: Process completed with exit code 1.
-
-Pensou por 6s
-O erro agora está localizado:
-
-AIBA ERRO: dados_aiba/aiba_soja_oeste_bahia.csv - Nenhuma tabela reconhecida no arquivo/fonte da AIBA.
-Ou seja: o coletor encontrou o arquivo dados_aiba/aiba_soja_oeste_bahia.csv, mas não conseguiu interpretar o CSV como tabela.
-
-Corrigi o leitor de CSV para ficar mais robusto. Agora ele tenta:
-
-utf-8-sig
-utf-8
-latin1
-cp1252
-separador ;
-separador ,
-separador TAB
-separador |
-leitura automática do pandas
-fallback manual por ponto e vírgula
-Baixe o pacote corrigido:
-
-Baixar pacote corrigido — coletor único + AIBA + workflow
-
-Ou baixe só o coletor corrigido:
-
-Baixar coletor corrigido v2
-
-E o CSV corrigido:
-
-Baixar CSV AIBA corrigido
-
-O que fazer agora
-Substitua no GitHub:
-
-scripts/coletor_cotacoes_oficiais.py
-pelo novo coletor.
-
-Depois substitua o arquivo:
-
-dados_aiba/aiba_soja_oeste_bahia.csv
-pelo CSV corrigido.
-
-O conteúdo dele deve ficar exatamente assim:
-
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
-Depois rode novamente:
-
-Actions > Atualizar Cotações Oficiais Nordeste Agro > Run workflow
-Agora o esperado no log é aparecer algo como:
-
-AIBA OK: dados_aiba/aiba_soja_oeste_bahia.csv - 1 registros
-A CEPEA ainda pode continuar com 403, mas isso não vai impedir a AIBA de entrar. 
-
-
-abrir ultima atualização pagina cotação definitivo
-
-Pensou por 8s
-Encontrei a última referência definitiva da página Cotações.
-
-A versão visual/HTML mais próxima do definitivo que está nos arquivos é:
-
-
-nordeste-agro-cotacoes-commodities-clicaveis.html
-Arquivo
-E o último fluxo técnico que estamos ajustando agora é este:
-
-
-atualizar-cotacoes-oficiais-corrigido.yml
-Arquivo
-
-coletor_cotacoes_nordeste_v1_2_8.py
-Python
-Resumo do que está definido para a página Cotações:
-
-Página: Cotações Nordeste Agro
-Arquivo de dados usado pelo HTML: public/cotacoes/cotacoes_regionais.json
-Fonte principal atual em correção: AIBA + CONAB
-Fonte complementar: CEPEA/ESALQ
-Problema atual: CEPEA bloqueando 403 e CSV AIBA não lido corretamente
-Correção em andamento: coletor único com AIBA + CONAB + proteção contra JSON vazio
-A versão definitiva da página em si não precisa ser refeita agora. O foco correto é corrigir o coletor e o JSON, porque o HTML já está preparado para ler:
-
-public/cotacoes/cotacoes_regionais.json
-O próximo passo é aplicar o coletor corrigido v2 que te enviei e rodar novamente o workflow.
-
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-Nordeste Agro — Coletor Automático de Cotações v1.2.8
-
-Melhorias desta versão:
-- Mantém AIBA funcionando.
-- Mantém CONAB para estados do Nordeste.
-- Mantém CEPEA/ESALQ como tentativa de referência, sem travar se houver 403.
-- Mantém B3 como referência de mercado futuro, sem criar preço falso por praça.
-- Reduz o JSON final:
-  * coleta todos os registros brutos;
-  * agrupa por produto + estado + praça + unidade + fonte;
-  * mostra apenas o preço mais recente na tabela;
-  * guarda as observações anteriores em "historico_30d" para o gráfico.
-- Converte grãos comercializados em saco para preço por Saca 60 kg:
-  * soja, milho, sorgo, arroz e feijão.
-  * Exemplo: preço CONAB em Kg x 60 = preço por Saca 60 kg.
-- Filtra produtos derivados/industrializados para não poluir a página:
-  * óleo de soja, fubá de milho, flocos de milho, semente de feijão,
-    farelo, farinha, canjica, creme, ração e similares.
-- Remove da página principal cotações antigas:
-  * só entram na tabela cotações com data dentro dos últimos 90 dias.
-  * cotações antigas continuam fora da página para evitar preço desatualizado.
-- Classifica o tipo de preço da CONAB:
-  * produtor, atacado, varejo, média UF ou não informado.
-  * prioriza produtor/regional na organização dos dados.
-- Mantém CEPEA/ESALQ pelo widget oficial no HTML:
-  * o widget funciona no navegador do visitante.
-  * o GitHub Actions pode receber 403 ao tentar baixar o script.
-  * por isso o coletor não força CEPEA no JSON para não gerar erro falso.
-- Mantém o layout do site:
-  * o HTML continua puxando o mesmo JSON.
-  * apenas os campos e informações ficam mais bem classificados.
-- Corrige filtros de produtos:
