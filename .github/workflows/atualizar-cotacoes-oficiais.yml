@@ -2270,6 +2270,15 @@ O próximo passo é aplicar o coletor corrigido v2 que te enviei e rodar novamen
 34
 35
 36
+37
+38
+39
+40
+41
+42
+43
+44
+45
 name: Atualizar Cotações Oficiais Nordeste Agro
 
 on:
@@ -2306,3 +2315,11 @@ jobs:
 
       - name: Salvar JSON atualizado
         uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Atualiza cotações oficiais Nordeste Agro"
+          file_pattern: |
+            public/cotacoes/cotacoes_oficiais_nordeste_agro.json
+            public/cotacoes/cotacoes_regionais.json
+            public/cotacoes/cotacoes_oficiais_nordeste_agro_ultimo_valido.json
+            public/cotacoes/cotacoes_regionais_ultimo_valido.json
+            public/cotacoes/status_ultima_execucao.json
