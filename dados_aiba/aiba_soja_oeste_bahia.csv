@@ -1,2 +1,2 @@
-produto;uf;cidade;preco;unidade;data
-Soja;BA;Oeste da Bahia - AIBA;112,51;Saca 60 kg;11/05/2026
+data,produto,estado,cidade,preco,unidade,fonte,fonte_url,observacao
+2026-05-11,Soja,BA,Oeste da Bahia - AIBA,112.51,Saca 60 kg,AIBA,https://aiba.org.br/cotacoes/,Cotação regional complementar da AIBA
