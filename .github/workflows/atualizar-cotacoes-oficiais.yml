@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/atualizar-cotacoes-oficiais.yml"
       - "scripts/coletor_cotacoes_oficiais.py"
+      - "dados_aiba/aiba_soja_oeste_bahia.csv"
 
   schedule:
     # Roda todos os dias às 09:30 UTC.
@@ -52,6 +53,294 @@ jobs:
             find . -maxdepth 5 -name "*.py" -print
             exit 1
           fi
+
+      - name: Aplicar fallback CSV local da AIBA no coletor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("scripts/coletor_cotacoes_oficiais.py")
+          texto = path.read_text(encoding="utf-8")
+
+          if 'AIBA_CSV_LOCAL = ROOT_DIR / "dados_aiba" / "aiba_soja_oeste_bahia.csv"' not in texto:
+              texto = texto.replace(
+                  'AIBA_URL = "https://aiba.org.br/cotacoes/"',
+                  'AIBA_URL = "https://aiba.org.br/cotacoes/"\nAIBA_CSV_LOCAL = ROOT_DIR / "dados_aiba" / "aiba_soja_oeste_bahia.csv"',
+              )
+
+          novo_bloco = r'''def ler_csv_aiba_local() -> list[dict[str, Any]]:
+    """
+    Lê o CSV local da AIBA já existente no repositório.
+
+    Arquivo usado:
+    dados_aiba/aiba_soja_oeste_bahia.csv
+
+    Formatos aceitos:
+    - Separador por vírgula
+    - Separador por ponto e vírgula
+    - Preço com ponto decimal: 112.51
+    - Preço com vírgula decimal: 112,51
+    - Data ISO: 2026-05-11
+    - Data BR: 11/05/2026
+    """
+    if not AIBA_CSV_LOCAL.exists():
+        return []
+
+    try:
+        conteudo = AIBA_CSV_LOCAL.read_text(encoding="utf-8-sig").strip()
+    except Exception:
+        return []
+
+    if not conteudo:
+        return []
+
+    primeira_linha = conteudo.splitlines()[0] if conteudo.splitlines() else ""
+    separador = ";" if primeira_linha.count(";") > primeira_linha.count(",") else ","
+
+    try:
+        leitor = csv.DictReader(io.StringIO(conteudo), delimiter=separador)
+        registros = list(leitor)
+    except Exception:
+        return []
+
+    itens: list[dict[str, Any]] = []
+
+    for linha in registros:
+        if not isinstance(linha, dict):
+            continue
+
+        produto_original = limpar_texto(
+            linha.get("produto")
+            or linha.get("commodity")
+            or linha.get("produto_original")
+            or "Soja"
+        )
+
+        produto_base = normalizar_produto_base(produto_original)
+
+        uf = limpar_texto(
+            linha.get("estado")
+            or linha.get("uf")
+            or linha.get("UF")
+            or "BA"
+        ).upper()
+
+        cidade = limpar_texto(
+            linha.get("cidade")
+            or linha.get("praca")
+            or linha.get("praça")
+            or "Oeste da Bahia - AIBA"
+        )
+
+        preco = parse_preco(
+            linha.get("preco")
+            or linha.get("preço")
+            or linha.get("valor")
+        )
+
+        unidade = limpar_texto(
+            linha.get("unidade")
+            or "Saca 60 kg"
+        )
+
+        data_iso = parse_data_qualquer(
+            linha.get("data")
+            or linha.get("data_iso")
+            or linha.get("data_referencia")
+        ) or agora_local().date().isoformat()
+
+        fonte_url = limpar_texto(
+            linha.get("fonte_url")
+            or AIBA_URL
+        )
+
+        observacao = limpar_texto(
+            linha.get("observacao")
+            or linha.get("observação")
+            or "Cotação regional complementar da AIBA via CSV local."
+        )
+
+        if not uf_monitorada(uf):
+            continue
+
+        if preco is None:
+            continue
+
+        if produto_base not in {"Soja", "Milho", "Algodão", "Arroz", "Feijão", "Sorgo"}:
+            continue
+
+        data_inicio, data_fim, periodo_ref = periodo_semanal_padrao(data_iso, data_iso)
+
+        converter = True
+        unidade_norm = remover_acentos(unidade).lower()
+
+        if produto_base in {"Soja", "Milho", "Arroz", "Feijão", "Sorgo"} and "saca" in unidade_norm:
+            converter = False
+            unidade = "Saca 60 kg"
+
+        if produto_base == "Algodão" and ("@" in unidade or "arroba" in unidade_norm):
+            converter = False
+            unidade = "Arroba (@)"
+
+        itens.append(
+            criar_item(
+                produto_original=produto_original,
+                produto_base=produto_base,
+                uf=uf,
+                estado=UFS_BRASIL.get(uf, uf),
+                praca=cidade,
+                unidade_original=unidade,
+                preco_original=preco,
+                data_referencia=data_fim,
+                data_inicio=data_inicio,
+                data_fim=data_fim,
+                periodo_referencia=periodo_ref,
+                fonte="AIBA",
+                fonte_url=fonte_url,
+                tipo_fonte="regional",
+                nivel="Regional",
+                converter=converter,
+                observacao=observacao,
+            )
+        )
+
+    return itens
+
+
+def coletar_aiba(status_fontes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Coleta AIBA com fallback local.
+
+    Regra:
+    1. Tenta coletar a página online da AIBA.
+    2. Se a AIBA bloquear com 403 ou falhar, usa o CSV local.
+    3. Se o CSV local estiver vazio ou inválido, não quebra o coletor.
+    """
+    itens: list[dict[str, Any]] = []
+
+    try:
+        html = baixar_texto(AIBA_URL, timeout=30)
+        soup = BeautifulSoup(html, "html.parser")
+        linhas = [limpar_texto(x) for x in soup.get_text("\n", strip=True).splitlines()]
+        linhas = [x for x in linhas if x]
+
+        for i in range(0, max(0, len(linhas) - 3)):
+            produto_original = linhas[i]
+            unidade = linhas[i + 1]
+            preco_texto = linhas[i + 2]
+            detalhe = linhas[i + 3]
+
+            if "R$" not in preco_texto:
+                continue
+
+            produto_base = normalizar_produto_base(produto_original)
+            if produto_base not in {"Soja", "Milho", "Algodão", "Arroz", "Feijão", "Sorgo"}:
+                continue
+
+            preco = parse_preco(preco_texto)
+            if preco is None:
+                continue
+
+            data_iso = None
+            m = re.search(r"(\d{2}/\d{2}/\d{4})", detalhe)
+            if m:
+                data_iso = parse_data_qualquer(m.group(1))
+            data_iso = data_iso or agora_local().date().isoformat()
+
+            unidade_final = unidade
+            converter = True
+
+            if produto_base in {"Soja", "Milho", "Arroz", "Feijão", "Sorgo"} and "saca" in remover_acentos(unidade).lower():
+                converter = False
+                unidade_final = "Saca 60 kg"
+
+            if produto_base == "Algodão" and ("@" in unidade or "arroba" in remover_acentos(unidade).lower()):
+                converter = False
+                unidade_final = "Arroba (@)"
+
+            itens.append(
+                criar_item(
+                    produto_original=produto_original,
+                    produto_base=produto_base,
+                    uf="BA",
+                    estado="Bahia",
+                    praca="Oeste da Bahia - AIBA",
+                    unidade_original=unidade_final,
+                    preco_original=preco,
+                    data_referencia=data_iso,
+                    data_inicio=data_iso,
+                    data_fim=data_iso,
+                    periodo_referencia=data_para_br(data_iso),
+                    fonte="AIBA",
+                    fonte_url=AIBA_URL,
+                    tipo_fonte="regional",
+                    nivel="Regional",
+                    converter=converter,
+                    observacao="Cotação regional AIBA preservada como referência complementar.",
+                )
+            )
+
+        if itens:
+            status_fontes.append(
+                {
+                    "fonte": "AIBA",
+                    "url": AIBA_URL,
+                    "status": "ok_online",
+                    "total_registros": len(itens),
+                    "observacao": "AIBA carregada diretamente do site oficial.",
+                }
+            )
+            return itens
+
+        itens_csv = ler_csv_aiba_local()
+
+        status_fontes.append(
+            {
+                "fonte": "AIBA",
+                "url": AIBA_URL,
+                "status": "ok_csv_local" if itens_csv else "sem_registros_online_e_csv_local_vazio",
+                "total_registros": len(itens_csv),
+                "arquivo_local": str(AIBA_CSV_LOCAL),
+                "observacao": (
+                    "AIBA online não retornou registros válidos. "
+                    "Foi usado o CSV local quando disponível."
+                ),
+            }
+        )
+
+        return itens_csv
+
+    except Exception as erro:
+        itens_csv = ler_csv_aiba_local()
+
+        status_fontes.append(
+            {
+                "fonte": "AIBA",
+                "url": AIBA_URL,
+                "status": "ok_csv_local" if itens_csv else "erro_online_sem_csv_local_valido",
+                "total_registros": len(itens_csv),
+                "arquivo_local": str(AIBA_CSV_LOCAL),
+                "erro_online": repr(erro),
+                "observacao": (
+                    "AIBA online indisponível ou bloqueada. "
+                    "Foi usado o CSV local quando havia registro válido."
+                ),
+            }
+        )
+
+        return itens_csv
+'''
+
+          padrao = r'def coletar_aiba\(status_fontes: list\[dict\[str, Any\]\]\) -> list\[dict\[str, Any\]\]:\n.*?\n(?=def carregar_regionais_anteriores\(\) -> list\[dict\[str, Any\]\]:)'
+          texto_novo, total = re.subn(padrao, novo_bloco + "\n", texto, count=1, flags=re.S)
+
+          if total != 1:
+              raise SystemExit("ERRO: não foi possível localizar/substituir a função coletar_aiba no coletor.")
+
+          path.write_text(texto_novo, encoding="utf-8")
+          print("Fallback CSV local da AIBA aplicado no coletor.")
+          PY
 
       - name: Validar sintaxe do coletor
         run: |
@@ -181,6 +470,7 @@ jobs:
           git pull --rebase --autostash origin main
 
           git add scripts/coletor_cotacoes_oficiais.py
+          git add dados_aiba/aiba_soja_oeste_bahia.csv || true
           git add public/cotacoes_nordeste.json || true
           git add public/cotacoes_regionais.json || true
           git add public/cotacoes_nordeste.csv || true
