@@ -1,0 +1,14 @@
+{
+  "versao": "1.5.8",
+  "regra": "SIAGRO é principal para Sorgo, Arroz, Feijão, Boi Gordo e Leite. CONAB Semanal é fallback quando SIAGRO não retorna dado válido. v1.5.8: AIBA acumula histórico próprio persistente e Sorgo recebe variação por histórico semanal/acumulado.",
+  "produtos_siagro_ok": [
+    "Sorgo"
+  ],
+  "produtos_fallback": [
+    "Arroz",
+    "Boi Gordo",
+    "Feijão",
+    "Leite"
+  ],
+  "total_tabela": 51
+}

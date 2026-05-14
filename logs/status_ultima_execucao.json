@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "projeto": "Nordeste Agro",
+  "modulo": "cotacoes",
+  "versao": "1.5.8",
+  "gerado_em": "2026-05-14T14:23:16-03:00",
+  "ultima_sincronizacao": "2026-05-14 14:23:16",
+  "data_limite_cotacoes_ativas": "2026-04-14",
+  "dias_maximos_cotacao_ativa": 30,
+  "politica": "CONAB é a fonte principal. Produtos 360º para Soja, Milho e Algodão; SIAGRO/Preço Médio UF para Sorgo, Arroz, Feijão, Boi Gordo e Leite; regionais como complemento; CEPEA fora da tabela principal. AIBA acumula histórico próprio persistente em cotacoes/logs/historico_aiba.json e remove duplicidades visuais por produto/praça/data.",
+  "fontes": [
+    {
+      "fonte": "CONAB - Produtos 360º",
+      "url": "https://portaldeinformacoes.conab.gov.br/produtos-360.html",
+      "status": "ok",
+      "total_registros": 19,
+      "produtos_extraidos": [
+        "Algodão",
+        "Milho",
+        "Soja"
+      ],
+      "observacao": "Fonte principal para Soja, Milho e Algodão."
+    },
+    {
+      "fonte": "CONAB - Preços Agropecuários Semanal UF / Histórico 360",
+      "url": "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalUF.txt",
+      "status": "ok",
+      "total_registros": 84,
+      "produtos_historico": [
+        "Soja",
+        "Milho",
+        "Algodão",
+        "Sorgo"
+      ],
+      "observacao": "v1.5.8: usado somente para histórico de 30 dias e variação de Soja, Milho e Algodão. O preço atual continua vindo do CONAB Produtos 360º."
+    },
+    {
+      "fonte": "CONAB - Preços Agropecuários Painel SIAGRO",
+      "url": "https://pentahoportaldeinformacoes.conab.gov.br/pentaho/api/repos/%3Ahome%3ASIAGRO%3APrecoMedio.wcdf/generatedContent?userid=pentaho&password=password",
+      "status": "ok",
+      "total_registros": 3,
+      "produtos_monitorados": [
+        "Sorgo Granífero",
+        "Arroz",
+        "Feijão",
+        "Boi Gordo",
+        "Leite"
+      ],
+      "observacao": "v1.5.8 enxuta: usa RankingPrecoMedioUF por POST. Grãos em Saca 60 kg, Boi em @, Leite em litro."
+    },
+    {
+      "fonte": "CONAB - Preços Agropecuários Semanal UF",
+      "url": "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalUF.txt",
+      "status": "ok",
+      "total_registros": 1857,
+      "produtos_fallback": [
+        "Arroz",
+        "Boi Gordo",
+        "Feijão",
+        "Leite"
+      ],
+      "observacao": "Fallback para Arroz, Feijão, Sorgo, Boi Gordo e Leite quando SIAGRO falhar; filtrado para Nordeste + Tocantins + Pará."
+    },
+    {
+      "fonte": "CONAB - Preços Agropecuários Semanal Município",
+      "url": "https://portaldeinformacoes.conab.gov.br/downloads/arquivos/PrecosSemanalMunicipio.txt",
+      "status": "ok",
+      "total_registros": 2973,
+      "produtos_fallback": [
+        "Arroz",
+        "Boi Gordo",
+        "Feijão",
+        "Leite"
+      ],
+      "observacao": "Fallback para Arroz, Feijão, Sorgo, Boi Gordo e Leite quando SIAGRO falhar; filtrado para Nordeste + Tocantins + Pará."
+    },
+    {
+      "fonte": "AIBA",
+      "url": "https://aiba.org.br/cotacoes/",
+      "status": "erro",
+      "total_registros": 0,
+      "erro": "HTTPError('403 Client Error: Forbidden for url: https://aiba.org.br/cotacoes/')"
+    }
+  ],
+  "resumo": {
+    "total_cotacoes_tabela": 51,
+    "total_dados_html": 51,
+    "total_cotacoes_brutas": 4852,
+    "total_cotacoes_descartadas_por_validacao": 0,
+    "grupos_descartados_por_data_antiga": 4703,
+    "total_sorgo_conab_tabela": 3,
+    "total_arroz_extraido": 9,
+    "total_feijao_extraido": 5,
+    "total_boi_gordo_extraido": 3,
+    "total_leite_extraido": 15
+  },
+  "total_cotacoes_tabela": 51,
+  "total_dados_html": 51,
+  "debug_conab_produtos_360": "/home/runner/work/nordeste-agro-previsao-numerica/nordeste-agro-previsao-numerica/logs/debug_conab_produtos_360.json",
+  "debug_sorgo_conab": "/home/runner/work/nordeste-agro-previsao-numerica/nordeste-agro-previsao-numerica/logs/debug_sorgo_conab.json",
+  "historico_aiba": "/home/runner/work/nordeste-agro-previsao-numerica/nordeste-agro-previsao-numerica/logs/historico_aiba.json",
+  "debug_aiba_duplicados": "/home/runner/work/nordeste-agro-previsao-numerica/nordeste-agro-previsao-numerica/logs/debug_aiba_duplicados.json"
+}
