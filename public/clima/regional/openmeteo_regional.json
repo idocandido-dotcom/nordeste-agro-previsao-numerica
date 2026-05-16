@@ -4860,5 +4860,8 @@
         }
       ]
     }
-  }
+  },
+  "fallback_usado": true,
+  "fallback_motivo": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+  "fallback_em_utc": "2026-05-16T16:27:16.229190+00:00"
 }
