@@ -10,7 +10,7 @@
   "malha": {
     "tipo": "grade_uniforme",
     "total_pontos_planejados": 200,
-    "total_pontos_validos": 200,
+    "total_pontos_validos": 165,
     "distribuicao_por_uf": {
       "AL": 2,
       "BA": 38,
@@ -25,147 +25,300 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-05-26T10:29:16.966124+00:00",
-  "total_pontos": 200,
-  "total_erros": 0,
-  "erros": [],
+  "gerado_em_utc": "2026-05-26T14:58:35.409884+00:00",
+  "total_pontos": 165,
+  "total_erros": 35,
+  "erros": [
+    {
+      "id": "P001",
+      "uf": "AL",
+      "nome": "Ponto 001",
+      "lat": -9.536539,
+      "lon": -37.161063,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 001 - AL: The read operation timed out"
+    },
+    {
+      "id": "P002",
+      "uf": "AL",
+      "nome": "Ponto 002",
+      "lat": -9.536539,
+      "lon": -35.856827,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 002 - AL: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P003",
+      "uf": "BA",
+      "nome": "Ponto 003",
+      "lat": -17.509257,
+      "lon": -39.33479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 003 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P004",
+      "uf": "BA",
+      "nome": "Ponto 004",
+      "lat": -17.08964,
+      "lon": -40.20428,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 004 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P005",
+      "uf": "BA",
+      "nome": "Ponto 005",
+      "lat": -16.250407,
+      "lon": -39.33479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 005 - BA: The read operation timed out"
+    },
+    {
+      "id": "P006",
+      "uf": "BA",
+      "nome": "Ponto 006",
+      "lat": -15.411173,
+      "lon": -40.639026,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 006 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P007",
+      "uf": "BA",
+      "nome": "Ponto 007",
+      "lat": -14.991556,
+      "lon": -45.855969,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 007 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P008",
+      "uf": "BA",
+      "nome": "Ponto 008",
+      "lat": -14.991556,
+      "lon": -39.33479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 008 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P009",
+      "uf": "BA",
+      "nome": "Ponto 009",
+      "lat": -14.57194,
+      "lon": -43.682243,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 009 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P010",
+      "uf": "BA",
+      "nome": "Ponto 010",
+      "lat": -14.57194,
+      "lon": -41.943261,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 010 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P011",
+      "uf": "BA",
+      "nome": "Ponto 011",
+      "lat": -14.57194,
+      "lon": -40.20428,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 011 - BA: HTTP Error 502: Bad Gateway"
+    },
+    {
+      "id": "P012",
+      "uf": "BA",
+      "nome": "Ponto 012",
+      "lat": -13.732706,
+      "lon": -44.986479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 012 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P013",
+      "uf": "BA",
+      "nome": "Ponto 013",
+      "lat": -13.732706,
+      "lon": -42.812752,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 013 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P014",
+      "uf": "BA",
+      "nome": "Ponto 014",
+      "lat": -13.732706,
+      "lon": -40.639026,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 014 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P015",
+      "uf": "BA",
+      "nome": "Ponto 015",
+      "lat": -13.31309,
+      "lon": -39.33479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 015 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P016",
+      "uf": "BA",
+      "nome": "Ponto 016",
+      "lat": -12.893473,
+      "lon": -45.855969,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 016 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P018",
+      "uf": "BA",
+      "nome": "Ponto 018",
+      "lat": -12.893473,
+      "lon": -41.508516,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 018 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P019",
+      "uf": "BA",
+      "nome": "Ponto 019",
+      "lat": -12.893473,
+      "lon": -40.20428,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 019 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P020",
+      "uf": "BA",
+      "nome": "Ponto 020",
+      "lat": -12.473856,
+      "lon": -44.986479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 020 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P021",
+      "uf": "BA",
+      "nome": "Ponto 021",
+      "lat": -12.473856,
+      "lon": -42.378007,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 021 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P022",
+      "uf": "BA",
+      "nome": "Ponto 022",
+      "lat": -12.473856,
+      "lon": -38.030554,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 022 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P023",
+      "uf": "BA",
+      "nome": "Ponto 023",
+      "lat": -12.054239,
+      "lon": -46.290715,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 023 - BA: The read operation timed out"
+    },
+    {
+      "id": "P024",
+      "uf": "BA",
+      "nome": "Ponto 024",
+      "lat": -12.054239,
+      "lon": -40.639026,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 024 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P026",
+      "uf": "BA",
+      "nome": "Ponto 026",
+      "lat": -11.634623,
+      "lon": -45.421224,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 026 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P027",
+      "uf": "BA",
+      "nome": "Ponto 027",
+      "lat": -11.634623,
+      "lon": -43.247497,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 027 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P028",
+      "uf": "BA",
+      "nome": "Ponto 028",
+      "lat": -11.634623,
+      "lon": -38.465299,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 028 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P029",
+      "uf": "BA",
+      "nome": "Ponto 029",
+      "lat": -11.215006,
+      "lon": -44.116988,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 029 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P030",
+      "uf": "BA",
+      "nome": "Ponto 030",
+      "lat": -11.215006,
+      "lon": -41.943261,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 030 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P031",
+      "uf": "BA",
+      "nome": "Ponto 031",
+      "lat": -10.795389,
+      "lon": -45.855969,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 031 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P032",
+      "uf": "BA",
+      "nome": "Ponto 032",
+      "lat": -10.795389,
+      "lon": -40.20428,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 032 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P033",
+      "uf": "BA",
+      "nome": "Ponto 033",
+      "lat": -10.795389,
+      "lon": -38.900044,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 033 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P035",
+      "uf": "BA",
+      "nome": "Ponto 035",
+      "lat": -10.375773,
+      "lon": -41.073771,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 035 - BA: HTTP Error 502: Bad Gateway"
+    },
+    {
+      "id": "P036",
+      "uf": "BA",
+      "nome": "Ponto 036",
+      "lat": -9.956156,
+      "lon": -39.33479,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 036 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P037",
+      "uf": "BA",
+      "nome": "Ponto 037",
+      "lat": -9.956156,
+      "lon": -38.030554,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 037 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P038",
+      "uf": "BA",
+      "nome": "Ponto 038",
+      "lat": -9.536539,
+      "lon": -43.247497,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 038 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    }
+  ],
   "periodos": {
     "24h": {
       "label": "Previsão acumulada 24h",
       "resumo": {
         "min": 0.0,
-        "media": 2.4,
-        "max": 41.7
+        "media": 2.2,
+        "max": 25.4
       },
       "pontos": [
-        {
-          "id": "P001",
-          "uf": "AL",
-          "nome": "Ponto 001",
-          "lat": -9.536539,
-          "lon": -37.161063,
-          "mm": 4.7
-        },
-        {
-          "id": "P002",
-          "uf": "AL",
-          "nome": "Ponto 002",
-          "lat": -9.536539,
-          "lon": -35.856827,
-          "mm": 6.0
-        },
-        {
-          "id": "P003",
-          "uf": "BA",
-          "nome": "Ponto 003",
-          "lat": -17.509257,
-          "lon": -39.33479,
-          "mm": 0.1
-        },
-        {
-          "id": "P004",
-          "uf": "BA",
-          "nome": "Ponto 004",
-          "lat": -17.08964,
-          "lon": -40.20428,
-          "mm": 2.6
-        },
-        {
-          "id": "P005",
-          "uf": "BA",
-          "nome": "Ponto 005",
-          "lat": -16.250407,
-          "lon": -39.33479,
-          "mm": 7.5
-        },
-        {
-          "id": "P006",
-          "uf": "BA",
-          "nome": "Ponto 006",
-          "lat": -15.411173,
-          "lon": -40.639026,
-          "mm": 8.0
-        },
-        {
-          "id": "P007",
-          "uf": "BA",
-          "nome": "Ponto 007",
-          "lat": -14.991556,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P008",
-          "uf": "BA",
-          "nome": "Ponto 008",
-          "lat": -14.991556,
-          "lon": -39.33479,
-          "mm": 1.9
-        },
-        {
-          "id": "P009",
-          "uf": "BA",
-          "nome": "Ponto 009",
-          "lat": -14.57194,
-          "lon": -43.682243,
-          "mm": 0.0
-        },
-        {
-          "id": "P010",
-          "uf": "BA",
-          "nome": "Ponto 010",
-          "lat": -14.57194,
-          "lon": -41.943261,
-          "mm": 0.8
-        },
-        {
-          "id": "P011",
-          "uf": "BA",
-          "nome": "Ponto 011",
-          "lat": -14.57194,
-          "lon": -40.20428,
-          "mm": 9.1
-        },
-        {
-          "id": "P012",
-          "uf": "BA",
-          "nome": "Ponto 012",
-          "lat": -13.732706,
-          "lon": -44.986479,
-          "mm": 0.1
-        },
-        {
-          "id": "P013",
-          "uf": "BA",
-          "nome": "Ponto 013",
-          "lat": -13.732706,
-          "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P014",
-          "uf": "BA",
-          "nome": "Ponto 014",
-          "lat": -13.732706,
-          "lon": -40.639026,
-          "mm": 0.0
-        },
-        {
-          "id": "P015",
-          "uf": "BA",
-          "nome": "Ponto 015",
-          "lat": -13.31309,
-          "lon": -39.33479,
-          "mm": 1.3
-        },
-        {
-          "id": "P016",
-          "uf": "BA",
-          "nome": "Ponto 016",
-          "lat": -12.893473,
-          "lon": -45.855969,
-          "mm": 0.1
-        },
         {
           "id": "P017",
           "uf": "BA",
@@ -175,132 +328,12 @@
           "mm": 0.0
         },
         {
-          "id": "P018",
-          "uf": "BA",
-          "nome": "Ponto 018",
-          "lat": -12.893473,
-          "lon": -41.508516,
-          "mm": 0.9
-        },
-        {
-          "id": "P019",
-          "uf": "BA",
-          "nome": "Ponto 019",
-          "lat": -12.893473,
-          "lon": -40.20428,
-          "mm": 0.1
-        },
-        {
-          "id": "P020",
-          "uf": "BA",
-          "nome": "Ponto 020",
-          "lat": -12.473856,
-          "lon": -44.986479,
-          "mm": 0.0
-        },
-        {
-          "id": "P021",
-          "uf": "BA",
-          "nome": "Ponto 021",
-          "lat": -12.473856,
-          "lon": -42.378007,
-          "mm": 0.0
-        },
-        {
-          "id": "P022",
-          "uf": "BA",
-          "nome": "Ponto 022",
-          "lat": -12.473856,
-          "lon": -38.030554,
-          "mm": 4.2
-        },
-        {
-          "id": "P023",
-          "uf": "BA",
-          "nome": "Ponto 023",
-          "lat": -12.054239,
-          "lon": -46.290715,
-          "mm": 0.0
-        },
-        {
-          "id": "P024",
-          "uf": "BA",
-          "nome": "Ponto 024",
-          "lat": -12.054239,
-          "lon": -40.639026,
-          "mm": 0.4
-        },
-        {
           "id": "P025",
           "uf": "BA",
           "nome": "Ponto 025",
           "lat": -12.054239,
           "lon": -39.33479,
-          "mm": 0.2
-        },
-        {
-          "id": "P026",
-          "uf": "BA",
-          "nome": "Ponto 026",
-          "lat": -11.634623,
-          "lon": -45.421224,
-          "mm": 0.0
-        },
-        {
-          "id": "P027",
-          "uf": "BA",
-          "nome": "Ponto 027",
-          "lat": -11.634623,
-          "lon": -43.247497,
-          "mm": 0.0
-        },
-        {
-          "id": "P028",
-          "uf": "BA",
-          "nome": "Ponto 028",
-          "lat": -11.634623,
-          "lon": -38.465299,
-          "mm": 2.3
-        },
-        {
-          "id": "P029",
-          "uf": "BA",
-          "nome": "Ponto 029",
-          "lat": -11.215006,
-          "lon": -44.116988,
-          "mm": 0.0
-        },
-        {
-          "id": "P030",
-          "uf": "BA",
-          "nome": "Ponto 030",
-          "lat": -11.215006,
-          "lon": -41.943261,
-          "mm": 0.0
-        },
-        {
-          "id": "P031",
-          "uf": "BA",
-          "nome": "Ponto 031",
-          "lat": -10.795389,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P032",
-          "uf": "BA",
-          "nome": "Ponto 032",
-          "lat": -10.795389,
-          "lon": -40.20428,
-          "mm": 1.0
-        },
-        {
-          "id": "P033",
-          "uf": "BA",
-          "nome": "Ponto 033",
-          "lat": -10.795389,
-          "lon": -38.900044,
-          "mm": 0.6
+          "mm": 0.3
         },
         {
           "id": "P034",
@@ -308,38 +341,6 @@
           "nome": "Ponto 034",
           "lat": -10.375773,
           "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P035",
-          "uf": "BA",
-          "nome": "Ponto 035",
-          "lat": -10.375773,
-          "lon": -41.073771,
-          "mm": 1.1
-        },
-        {
-          "id": "P036",
-          "uf": "BA",
-          "nome": "Ponto 036",
-          "lat": -9.956156,
-          "lon": -39.33479,
-          "mm": 0.4
-        },
-        {
-          "id": "P037",
-          "uf": "BA",
-          "nome": "Ponto 037",
-          "lat": -9.956156,
-          "lon": -38.030554,
-          "mm": 1.6
-        },
-        {
-          "id": "P038",
-          "uf": "BA",
-          "nome": "Ponto 038",
-          "lat": -9.536539,
-          "lon": -43.247497,
           "mm": 0.0
         },
         {
@@ -364,7 +365,7 @@
           "nome": "Ponto 041",
           "lat": -6.599222,
           "lon": -39.769535,
-          "mm": 0.0
+          "mm": 0.1
         },
         {
           "id": "P042",
@@ -380,7 +381,7 @@
           "nome": "Ponto 043",
           "lat": -5.340372,
           "lon": -38.900044,
-          "mm": 0.0
+          "mm": 0.5
         },
         {
           "id": "P044",
@@ -388,7 +389,7 @@
           "nome": "Ponto 044",
           "lat": -4.920755,
           "lon": -39.769535,
-          "mm": 0.0
+          "mm": 0.1
         },
         {
           "id": "P045",
@@ -396,7 +397,7 @@
           "nome": "Ponto 045",
           "lat": -4.501139,
           "lon": -38.465299,
-          "mm": 2.3
+          "mm": 1.7
         },
         {
           "id": "P046",
@@ -404,7 +405,7 @@
           "nome": "Ponto 046",
           "lat": -4.081522,
           "lon": -41.073771,
-          "mm": 2.1
+          "mm": 1.2
         },
         {
           "id": "P047",
@@ -412,7 +413,7 @@
           "nome": "Ponto 047",
           "lat": -3.661905,
           "lon": -38.900044,
-          "mm": 1.3
+          "mm": 0.8
         },
         {
           "id": "P048",
@@ -540,7 +541,7 @@
           "nome": "Ponto 063",
           "lat": -4.081522,
           "lon": -46.290715,
-          "mm": 0.6
+          "mm": 0.5
         },
         {
           "id": "P064",
@@ -548,7 +549,7 @@
           "nome": "Ponto 064",
           "lat": -3.661905,
           "lon": -44.551733,
-          "mm": 0.7
+          "mm": 0.5
         },
         {
           "id": "P065",
@@ -556,7 +557,7 @@
           "nome": "Ponto 065",
           "lat": -3.242288,
           "lon": -46.72546,
-          "mm": 1.0
+          "mm": 1.7
         },
         {
           "id": "P066",
@@ -564,7 +565,7 @@
           "nome": "Ponto 066",
           "lat": -3.242288,
           "lon": -43.682243,
-          "mm": 1.1
+          "mm": 0.5
         },
         {
           "id": "P067",
@@ -572,7 +573,7 @@
           "nome": "Ponto 067",
           "lat": -2.822672,
           "lon": -45.855969,
-          "mm": 9.4
+          "mm": 15.6
         },
         {
           "id": "P068",
@@ -580,7 +581,7 @@
           "nome": "Ponto 068",
           "lat": -2.822672,
           "lon": -41.943261,
-          "mm": 1.0
+          "mm": 2.1
         },
         {
           "id": "P069",
@@ -588,7 +589,7 @@
           "nome": "Ponto 069",
           "lat": -2.403055,
           "lon": -44.551733,
-          "mm": 3.0
+          "mm": 8.4
         },
         {
           "id": "P070",
@@ -596,7 +597,7 @@
           "nome": "Ponto 070",
           "lat": -2.403055,
           "lon": -43.247497,
-          "mm": 2.5
+          "mm": 5.2
         },
         {
           "id": "P071",
@@ -604,7 +605,7 @@
           "nome": "Ponto 071",
           "lat": -1.563822,
           "lon": -45.421224,
-          "mm": 2.9
+          "mm": 4.7
         },
         {
           "id": "P072",
@@ -700,7 +701,7 @@
           "nome": "Ponto 083",
           "lat": -7.438456,
           "lon": -58.028838,
-          "mm": 0.7
+          "mm": 1.1
         },
         {
           "id": "P084",
@@ -756,7 +757,7 @@
           "nome": "Ponto 090",
           "lat": -6.599222,
           "lon": -57.159347,
-          "mm": 0.4
+          "mm": 0.3
         },
         {
           "id": "P091",
@@ -788,7 +789,7 @@
           "nome": "Ponto 094",
           "lat": -6.179605,
           "lon": -58.028838,
-          "mm": 0.4
+          "mm": 0.7
         },
         {
           "id": "P095",
@@ -836,7 +837,7 @@
           "nome": "Ponto 100",
           "lat": -5.340372,
           "lon": -57.594092,
-          "mm": 0.8
+          "mm": 0.2
         },
         {
           "id": "P101",
@@ -868,7 +869,7 @@
           "nome": "Ponto 104",
           "lat": -4.501139,
           "lon": -56.289857,
-          "mm": 0.4
+          "mm": 0.5
         },
         {
           "id": "P105",
@@ -892,7 +893,7 @@
           "nome": "Ponto 107",
           "lat": -4.501139,
           "lon": -51.507658,
-          "mm": 0.1
+          "mm": 0.2
         },
         {
           "id": "P108",
@@ -900,7 +901,7 @@
           "nome": "Ponto 108",
           "lat": -4.501139,
           "lon": -49.333932,
-          "mm": 0.2
+          "mm": 0.3
         },
         {
           "id": "P109",
@@ -916,7 +917,7 @@
           "nome": "Ponto 110",
           "lat": -4.081522,
           "lon": -48.464441,
-          "mm": 0.1
+          "mm": 0.4
         },
         {
           "id": "P111",
@@ -924,7 +925,7 @@
           "nome": "Ponto 111",
           "lat": -3.661905,
           "lon": -56.724602,
-          "mm": 0.4
+          "mm": 0.7
         },
         {
           "id": "P112",
@@ -932,7 +933,7 @@
           "nome": "Ponto 112",
           "lat": -3.661905,
           "lon": -55.420366,
-          "mm": 0.6
+          "mm": 1.0
         },
         {
           "id": "P113",
@@ -948,7 +949,7 @@
           "nome": "Ponto 114",
           "lat": -3.661905,
           "lon": -47.59495,
-          "mm": 0.9
+          "mm": 1.0
         },
         {
           "id": "P115",
@@ -956,7 +957,7 @@
           "nome": "Ponto 115",
           "lat": -3.242288,
           "lon": -54.550875,
-          "mm": 0.6
+          "mm": 0.3
         },
         {
           "id": "P116",
@@ -964,7 +965,7 @@
           "nome": "Ponto 116",
           "lat": -3.242288,
           "lon": -52.811894,
-          "mm": 0.6
+          "mm": 0.9
         },
         {
           "id": "P117",
@@ -980,7 +981,7 @@
           "nome": "Ponto 118",
           "lat": -2.822672,
           "lon": -56.289857,
-          "mm": 1.3
+          "mm": 0.8
         },
         {
           "id": "P119",
@@ -988,7 +989,7 @@
           "nome": "Ponto 119",
           "lat": -2.822672,
           "lon": -53.681385,
-          "mm": 0.5
+          "mm": 1.2
         },
         {
           "id": "P120",
@@ -996,7 +997,7 @@
           "nome": "Ponto 120",
           "lat": -2.822672,
           "lon": -51.507658,
-          "mm": 1.2
+          "mm": 3.1
         },
         {
           "id": "P121",
@@ -1004,7 +1005,7 @@
           "nome": "Ponto 121",
           "lat": -2.822672,
           "lon": -50.203422,
-          "mm": 0.6
+          "mm": 3.2
         },
         {
           "id": "P122",
@@ -1012,7 +1013,7 @@
           "nome": "Ponto 122",
           "lat": -2.822672,
           "lon": -48.029696,
-          "mm": 3.1
+          "mm": 5.2
         },
         {
           "id": "P123",
@@ -1020,7 +1021,7 @@
           "nome": "Ponto 123",
           "lat": -2.403055,
           "lon": -54.985621,
-          "mm": 5.1
+          "mm": 2.2
         },
         {
           "id": "P124",
@@ -1028,7 +1029,7 @@
           "nome": "Ponto 124",
           "lat": -2.403055,
           "lon": -49.333932,
-          "mm": 5.7
+          "mm": 8.7
         },
         {
           "id": "P125",
@@ -1036,7 +1037,7 @@
           "nome": "Ponto 125",
           "lat": -2.403055,
           "lon": -47.160205,
-          "mm": 12.8
+          "mm": 8.5
         },
         {
           "id": "P126",
@@ -1044,7 +1045,7 @@
           "nome": "Ponto 126",
           "lat": -1.983438,
           "lon": -52.377149,
-          "mm": 4.5
+          "mm": 8.2
         },
         {
           "id": "P127",
@@ -1052,7 +1053,7 @@
           "nome": "Ponto 127",
           "lat": -1.983438,
           "lon": -50.638168,
-          "mm": 14.1
+          "mm": 15.6
         },
         {
           "id": "P128",
@@ -1060,7 +1061,7 @@
           "nome": "Ponto 128",
           "lat": -1.983438,
           "lon": -48.464441,
-          "mm": 9.3
+          "mm": 6.5
         },
         {
           "id": "P129",
@@ -1068,7 +1069,7 @@
           "nome": "Ponto 129",
           "lat": -1.563822,
           "lon": -56.724602,
-          "mm": 2.0
+          "mm": 0.8
         },
         {
           "id": "P130",
@@ -1076,7 +1077,7 @@
           "nome": "Ponto 130",
           "lat": -1.563822,
           "lon": -55.420366,
-          "mm": 1.8
+          "mm": 1.6
         },
         {
           "id": "P131",
@@ -1084,7 +1085,7 @@
           "nome": "Ponto 131",
           "lat": -1.563822,
           "lon": -53.681385,
-          "mm": 2.9
+          "mm": 0.8
         },
         {
           "id": "P132",
@@ -1092,7 +1093,7 @@
           "nome": "Ponto 132",
           "lat": -1.563822,
           "lon": -49.768677,
-          "mm": 6.0
+          "mm": 4.4
         },
         {
           "id": "P133",
@@ -1100,7 +1101,7 @@
           "nome": "Ponto 133",
           "lat": -1.144205,
           "lon": -54.550875,
-          "mm": 7.4
+          "mm": 3.5
         },
         {
           "id": "P134",
@@ -1108,7 +1109,7 @@
           "nome": "Ponto 134",
           "lat": -1.144205,
           "lon": -51.507658,
-          "mm": 5.9
+          "mm": 8.3
         },
         {
           "id": "P135",
@@ -1116,7 +1117,7 @@
           "nome": "Ponto 135",
           "lat": -1.144205,
           "lon": -46.290715,
-          "mm": 6.8
+          "mm": 4.0
         },
         {
           "id": "P136",
@@ -1124,7 +1125,7 @@
           "nome": "Ponto 136",
           "lat": -0.724588,
           "lon": -58.028838,
-          "mm": 5.4
+          "mm": 3.2
         },
         {
           "id": "P137",
@@ -1132,7 +1133,7 @@
           "nome": "Ponto 137",
           "lat": -0.724588,
           "lon": -50.203422,
-          "mm": 9.0
+          "mm": 7.8
         },
         {
           "id": "P138",
@@ -1140,7 +1141,7 @@
           "nome": "Ponto 138",
           "lat": -0.724588,
           "lon": -47.59495,
-          "mm": 13.6
+          "mm": 5.7
         },
         {
           "id": "P139",
@@ -1156,7 +1157,7 @@
           "nome": "Ponto 140",
           "lat": -0.304971,
           "lon": -52.811894,
-          "mm": 5.4
+          "mm": 3.9
         },
         {
           "id": "P141",
@@ -1164,7 +1165,7 @@
           "nome": "Ponto 141",
           "lat": -0.304971,
           "lon": -48.899186,
-          "mm": 10.5
+          "mm": 15.4
         },
         {
           "id": "P142",
@@ -1172,7 +1173,7 @@
           "nome": "Ponto 142",
           "lat": 0.114645,
           "lon": -58.463583,
-          "mm": 11.3
+          "mm": 2.5
         },
         {
           "id": "P143",
@@ -1180,7 +1181,7 @@
           "nome": "Ponto 143",
           "lat": 0.114645,
           "lon": -54.550875,
-          "mm": 4.3
+          "mm": 7.0
         },
         {
           "id": "P144",
@@ -1188,7 +1189,7 @@
           "nome": "Ponto 144",
           "lat": 0.114645,
           "lon": -50.638168,
-          "mm": 6.8
+          "mm": 4.9
         },
         {
           "id": "P145",
@@ -1196,7 +1197,7 @@
           "nome": "Ponto 145",
           "lat": 0.534262,
           "lon": -57.159347,
-          "mm": 6.8
+          "mm": 11.3
         },
         {
           "id": "P146",
@@ -1204,7 +1205,7 @@
           "nome": "Ponto 146",
           "lat": 0.534262,
           "lon": -53.246639,
-          "mm": 7.6
+          "mm": 8.9
         },
         {
           "id": "P147",
@@ -1212,7 +1213,7 @@
           "nome": "Ponto 147",
           "lat": 0.953879,
           "lon": -55.855111,
-          "mm": 21.3
+          "mm": 9.6
         },
         {
           "id": "P148",
@@ -1220,7 +1221,7 @@
           "nome": "Ponto 148",
           "lat": 1.373495,
           "lon": -58.463583,
-          "mm": 13.5
+          "mm": 11.0
         },
         {
           "id": "P149",
@@ -1228,7 +1229,7 @@
           "nome": "Ponto 149",
           "lat": 1.373495,
           "lon": -53.681385,
-          "mm": 7.4
+          "mm": 8.3
         },
         {
           "id": "P150",
@@ -1236,7 +1237,7 @@
           "nome": "Ponto 150",
           "lat": 1.793112,
           "lon": -57.159347,
-          "mm": 24.6
+          "mm": 25.4
         },
         {
           "id": "P151",
@@ -1244,7 +1245,7 @@
           "nome": "Ponto 151",
           "lat": 1.793112,
           "lon": -54.985621,
-          "mm": 41.7
+          "mm": 18.6
         },
         {
           "id": "P152",
@@ -1252,7 +1253,7 @@
           "nome": "Ponto 152",
           "lat": 2.212729,
           "lon": -55.855111,
-          "mm": 27.0
+          "mm": 21.8
         },
         {
           "id": "P153",
@@ -1260,7 +1261,7 @@
           "nome": "Ponto 153",
           "lat": -7.438456,
           "lon": -38.465299,
-          "mm": 6.5
+          "mm": 4.5
         },
         {
           "id": "P154",
@@ -1268,7 +1269,7 @@
           "nome": "Ponto 154",
           "lat": -7.438456,
           "lon": -36.291572,
-          "mm": 6.0
+          "mm": 5.5
         },
         {
           "id": "P155",
@@ -1276,7 +1277,7 @@
           "nome": "Ponto 155",
           "lat": -7.018839,
           "lon": -37.161063,
-          "mm": 4.1
+          "mm": 5.1
         },
         {
           "id": "P156",
@@ -1284,7 +1285,7 @@
           "nome": "Ponto 156",
           "lat": -7.018839,
           "lon": -35.422082,
-          "mm": 10.9
+          "mm": 7.6
         },
         {
           "id": "P157",
@@ -1300,7 +1301,7 @@
           "nome": "Ponto 158",
           "lat": -8.697306,
           "lon": -38.900044,
-          "mm": 0.2
+          "mm": 0.8
         },
         {
           "id": "P159",
@@ -1308,7 +1309,7 @@
           "nome": "Ponto 159",
           "lat": -8.697306,
           "lon": -36.726318,
-          "mm": 2.3
+          "mm": 2.5
         },
         {
           "id": "P160",
@@ -1316,7 +1317,7 @@
           "nome": "Ponto 160",
           "lat": -8.277689,
           "lon": -39.769535,
-          "mm": 1.8
+          "mm": 0.4
         },
         {
           "id": "P161",
@@ -1324,7 +1325,7 @@
           "nome": "Ponto 161",
           "lat": -8.277689,
           "lon": -37.595808,
-          "mm": 6.1
+          "mm": 3.5
         },
         {
           "id": "P162",
@@ -1332,7 +1333,7 @@
           "nome": "Ponto 162",
           "lat": -8.277689,
           "lon": -34.987337,
-          "mm": 22.9
+          "mm": 22.2
         },
         {
           "id": "P163",
@@ -1340,7 +1341,7 @@
           "nome": "Ponto 163",
           "lat": -7.438456,
           "lon": -40.639026,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P164",
@@ -1428,7 +1429,7 @@
           "nome": "Ponto 174",
           "lat": -4.501139,
           "lon": -41.943261,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P175",
@@ -1444,7 +1445,7 @@
           "nome": "Ponto 176",
           "lat": -6.179605,
           "lon": -38.465299,
-          "mm": 1.6
+          "mm": 1.9
         },
         {
           "id": "P177",
@@ -1452,7 +1453,7 @@
           "nome": "Ponto 177",
           "lat": -6.179605,
           "lon": -36.291572,
-          "mm": 2.0
+          "mm": 1.8
         },
         {
           "id": "P178",
@@ -1460,7 +1461,7 @@
           "nome": "Ponto 178",
           "lat": -5.340372,
           "lon": -37.161063,
-          "mm": 1.8
+          "mm": 1.1
         },
         {
           "id": "P179",
@@ -1476,7 +1477,7 @@
           "nome": "Ponto 180",
           "lat": -11.215006,
           "lon": -37.595808,
-          "mm": 2.5
+          "mm": 1.3
         },
         {
           "id": "P181",
@@ -1484,7 +1485,7 @@
           "nome": "Ponto 181",
           "lat": -10.375773,
           "lon": -36.726318,
-          "mm": 2.2
+          "mm": 4.3
         },
         {
           "id": "P182",
@@ -1644,138 +1645,10 @@
       "label": "Previsão acumulada 48h",
       "resumo": {
         "min": 0.0,
-        "media": 2.4,
-        "max": 20.7
+        "media": 3.1,
+        "max": 38.4
       },
       "pontos": [
-        {
-          "id": "P001",
-          "uf": "AL",
-          "nome": "Ponto 001",
-          "lat": -9.536539,
-          "lon": -37.161063,
-          "mm": 1.9
-        },
-        {
-          "id": "P002",
-          "uf": "AL",
-          "nome": "Ponto 002",
-          "lat": -9.536539,
-          "lon": -35.856827,
-          "mm": 0.0
-        },
-        {
-          "id": "P003",
-          "uf": "BA",
-          "nome": "Ponto 003",
-          "lat": -17.509257,
-          "lon": -39.33479,
-          "mm": 4.6
-        },
-        {
-          "id": "P004",
-          "uf": "BA",
-          "nome": "Ponto 004",
-          "lat": -17.08964,
-          "lon": -40.20428,
-          "mm": 5.7
-        },
-        {
-          "id": "P005",
-          "uf": "BA",
-          "nome": "Ponto 005",
-          "lat": -16.250407,
-          "lon": -39.33479,
-          "mm": 3.6
-        },
-        {
-          "id": "P006",
-          "uf": "BA",
-          "nome": "Ponto 006",
-          "lat": -15.411173,
-          "lon": -40.639026,
-          "mm": 2.7
-        },
-        {
-          "id": "P007",
-          "uf": "BA",
-          "nome": "Ponto 007",
-          "lat": -14.991556,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P008",
-          "uf": "BA",
-          "nome": "Ponto 008",
-          "lat": -14.991556,
-          "lon": -39.33479,
-          "mm": 2.3
-        },
-        {
-          "id": "P009",
-          "uf": "BA",
-          "nome": "Ponto 009",
-          "lat": -14.57194,
-          "lon": -43.682243,
-          "mm": 0.0
-        },
-        {
-          "id": "P010",
-          "uf": "BA",
-          "nome": "Ponto 010",
-          "lat": -14.57194,
-          "lon": -41.943261,
-          "mm": 1.2
-        },
-        {
-          "id": "P011",
-          "uf": "BA",
-          "nome": "Ponto 011",
-          "lat": -14.57194,
-          "lon": -40.20428,
-          "mm": 3.6
-        },
-        {
-          "id": "P012",
-          "uf": "BA",
-          "nome": "Ponto 012",
-          "lat": -13.732706,
-          "lon": -44.986479,
-          "mm": 0.0
-        },
-        {
-          "id": "P013",
-          "uf": "BA",
-          "nome": "Ponto 013",
-          "lat": -13.732706,
-          "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P014",
-          "uf": "BA",
-          "nome": "Ponto 014",
-          "lat": -13.732706,
-          "lon": -40.639026,
-          "mm": 0.3
-        },
-        {
-          "id": "P015",
-          "uf": "BA",
-          "nome": "Ponto 015",
-          "lat": -13.31309,
-          "lon": -39.33479,
-          "mm": 0.8
-        },
-        {
-          "id": "P016",
-          "uf": "BA",
-          "nome": "Ponto 016",
-          "lat": -12.893473,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
         {
           "id": "P017",
           "uf": "BA",
@@ -1785,132 +1658,12 @@
           "mm": 0.0
         },
         {
-          "id": "P018",
-          "uf": "BA",
-          "nome": "Ponto 018",
-          "lat": -12.893473,
-          "lon": -41.508516,
-          "mm": 0.1
-        },
-        {
-          "id": "P019",
-          "uf": "BA",
-          "nome": "Ponto 019",
-          "lat": -12.893473,
-          "lon": -40.20428,
-          "mm": 0.1
-        },
-        {
-          "id": "P020",
-          "uf": "BA",
-          "nome": "Ponto 020",
-          "lat": -12.473856,
-          "lon": -44.986479,
-          "mm": 0.0
-        },
-        {
-          "id": "P021",
-          "uf": "BA",
-          "nome": "Ponto 021",
-          "lat": -12.473856,
-          "lon": -42.378007,
-          "mm": 0.0
-        },
-        {
-          "id": "P022",
-          "uf": "BA",
-          "nome": "Ponto 022",
-          "lat": -12.473856,
-          "lon": -38.030554,
-          "mm": 4.8
-        },
-        {
-          "id": "P023",
-          "uf": "BA",
-          "nome": "Ponto 023",
-          "lat": -12.054239,
-          "lon": -46.290715,
-          "mm": 0.0
-        },
-        {
-          "id": "P024",
-          "uf": "BA",
-          "nome": "Ponto 024",
-          "lat": -12.054239,
-          "lon": -40.639026,
-          "mm": 0.5
-        },
-        {
           "id": "P025",
           "uf": "BA",
           "nome": "Ponto 025",
           "lat": -12.054239,
           "lon": -39.33479,
-          "mm": 2.6
-        },
-        {
-          "id": "P026",
-          "uf": "BA",
-          "nome": "Ponto 026",
-          "lat": -11.634623,
-          "lon": -45.421224,
-          "mm": 0.0
-        },
-        {
-          "id": "P027",
-          "uf": "BA",
-          "nome": "Ponto 027",
-          "lat": -11.634623,
-          "lon": -43.247497,
-          "mm": 0.0
-        },
-        {
-          "id": "P028",
-          "uf": "BA",
-          "nome": "Ponto 028",
-          "lat": -11.634623,
-          "lon": -38.465299,
-          "mm": 2.0
-        },
-        {
-          "id": "P029",
-          "uf": "BA",
-          "nome": "Ponto 029",
-          "lat": -11.215006,
-          "lon": -44.116988,
-          "mm": 0.0
-        },
-        {
-          "id": "P030",
-          "uf": "BA",
-          "nome": "Ponto 030",
-          "lat": -11.215006,
-          "lon": -41.943261,
-          "mm": 0.0
-        },
-        {
-          "id": "P031",
-          "uf": "BA",
-          "nome": "Ponto 031",
-          "lat": -10.795389,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P032",
-          "uf": "BA",
-          "nome": "Ponto 032",
-          "lat": -10.795389,
-          "lon": -40.20428,
-          "mm": 2.7
-        },
-        {
-          "id": "P033",
-          "uf": "BA",
-          "nome": "Ponto 033",
-          "lat": -10.795389,
-          "lon": -38.900044,
-          "mm": 0.9
+          "mm": 3.0
         },
         {
           "id": "P034",
@@ -1918,38 +1671,6 @@
           "nome": "Ponto 034",
           "lat": -10.375773,
           "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P035",
-          "uf": "BA",
-          "nome": "Ponto 035",
-          "lat": -10.375773,
-          "lon": -41.073771,
-          "mm": 5.2
-        },
-        {
-          "id": "P036",
-          "uf": "BA",
-          "nome": "Ponto 036",
-          "lat": -9.956156,
-          "lon": -39.33479,
-          "mm": 0.1
-        },
-        {
-          "id": "P037",
-          "uf": "BA",
-          "nome": "Ponto 037",
-          "lat": -9.956156,
-          "lon": -38.030554,
-          "mm": 2.6
-        },
-        {
-          "id": "P038",
-          "uf": "BA",
-          "nome": "Ponto 038",
-          "lat": -9.536539,
-          "lon": -43.247497,
           "mm": 0.0
         },
         {
@@ -1974,7 +1695,7 @@
           "nome": "Ponto 041",
           "lat": -6.599222,
           "lon": -39.769535,
-          "mm": 2.8
+          "mm": 7.1
         },
         {
           "id": "P042",
@@ -1982,7 +1703,7 @@
           "nome": "Ponto 042",
           "lat": -5.759989,
           "lon": -40.20428,
-          "mm": 3.3
+          "mm": 4.1
         },
         {
           "id": "P043",
@@ -1990,7 +1711,7 @@
           "nome": "Ponto 043",
           "lat": -5.340372,
           "lon": -38.900044,
-          "mm": 9.0
+          "mm": 9.6
         },
         {
           "id": "P044",
@@ -1998,7 +1719,7 @@
           "nome": "Ponto 044",
           "lat": -4.920755,
           "lon": -39.769535,
-          "mm": 13.3
+          "mm": 5.0
         },
         {
           "id": "P045",
@@ -2006,7 +1727,7 @@
           "nome": "Ponto 045",
           "lat": -4.501139,
           "lon": -38.465299,
-          "mm": 1.7
+          "mm": 1.2
         },
         {
           "id": "P046",
@@ -2014,7 +1735,7 @@
           "nome": "Ponto 046",
           "lat": -4.081522,
           "lon": -41.073771,
-          "mm": 0.6
+          "mm": 0.4
         },
         {
           "id": "P047",
@@ -2022,7 +1743,7 @@
           "nome": "Ponto 047",
           "lat": -3.661905,
           "lon": -38.900044,
-          "mm": 0.8
+          "mm": 1.1
         },
         {
           "id": "P048",
@@ -2030,7 +1751,7 @@
           "nome": "Ponto 048",
           "lat": -3.242288,
           "lon": -39.769535,
-          "mm": 4.1
+          "mm": 0.4
         },
         {
           "id": "P049",
@@ -2102,7 +1823,7 @@
           "nome": "Ponto 057",
           "lat": -5.759989,
           "lon": -43.247497,
-          "mm": 0.9
+          "mm": 1.7
         },
         {
           "id": "P058",
@@ -2118,7 +1839,7 @@
           "nome": "Ponto 059",
           "lat": -5.340372,
           "lon": -44.116988,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P060",
@@ -2134,7 +1855,7 @@
           "nome": "Ponto 061",
           "lat": -4.920755,
           "lon": -45.421224,
-          "mm": 0.3
+          "mm": 0.0
         },
         {
           "id": "P062",
@@ -2142,7 +1863,7 @@
           "nome": "Ponto 062",
           "lat": -4.501139,
           "lon": -43.682243,
-          "mm": 1.2
+          "mm": 1.4
         },
         {
           "id": "P063",
@@ -2150,7 +1871,7 @@
           "nome": "Ponto 063",
           "lat": -4.081522,
           "lon": -46.290715,
-          "mm": 2.6
+          "mm": 0.8
         },
         {
           "id": "P064",
@@ -2158,7 +1879,7 @@
           "nome": "Ponto 064",
           "lat": -3.661905,
           "lon": -44.551733,
-          "mm": 1.1
+          "mm": 1.3
         },
         {
           "id": "P065",
@@ -2166,7 +1887,7 @@
           "nome": "Ponto 065",
           "lat": -3.242288,
           "lon": -46.72546,
-          "mm": 1.0
+          "mm": 1.6
         },
         {
           "id": "P066",
@@ -2174,7 +1895,7 @@
           "nome": "Ponto 066",
           "lat": -3.242288,
           "lon": -43.682243,
-          "mm": 0.8
+          "mm": 0.7
         },
         {
           "id": "P067",
@@ -2182,7 +1903,7 @@
           "nome": "Ponto 067",
           "lat": -2.822672,
           "lon": -45.855969,
-          "mm": 8.6
+          "mm": 10.6
         },
         {
           "id": "P068",
@@ -2190,7 +1911,7 @@
           "nome": "Ponto 068",
           "lat": -2.822672,
           "lon": -41.943261,
-          "mm": 0.8
+          "mm": 4.5
         },
         {
           "id": "P069",
@@ -2198,7 +1919,7 @@
           "nome": "Ponto 069",
           "lat": -2.403055,
           "lon": -44.551733,
-          "mm": 4.9
+          "mm": 6.6
         },
         {
           "id": "P070",
@@ -2206,7 +1927,7 @@
           "nome": "Ponto 070",
           "lat": -2.403055,
           "lon": -43.247497,
-          "mm": 4.6
+          "mm": 2.0
         },
         {
           "id": "P071",
@@ -2214,7 +1935,7 @@
           "nome": "Ponto 071",
           "lat": -1.563822,
           "lon": -45.421224,
-          "mm": 12.7
+          "mm": 6.9
         },
         {
           "id": "P072",
@@ -2502,7 +2223,7 @@
           "nome": "Ponto 107",
           "lat": -4.501139,
           "lon": -51.507658,
-          "mm": 0.5
+          "mm": 0.2
         },
         {
           "id": "P108",
@@ -2510,7 +2231,7 @@
           "nome": "Ponto 108",
           "lat": -4.501139,
           "lon": -49.333932,
-          "mm": 0.4
+          "mm": 0.2
         },
         {
           "id": "P109",
@@ -2526,7 +2247,7 @@
           "nome": "Ponto 110",
           "lat": -4.081522,
           "lon": -48.464441,
-          "mm": 0.3
+          "mm": 0.0
         },
         {
           "id": "P111",
@@ -2550,7 +2271,7 @@
           "nome": "Ponto 113",
           "lat": -3.661905,
           "lon": -51.942403,
-          "mm": 1.0
+          "mm": 2.6
         },
         {
           "id": "P114",
@@ -2558,7 +2279,7 @@
           "nome": "Ponto 114",
           "lat": -3.661905,
           "lon": -47.59495,
-          "mm": 2.7
+          "mm": 0.7
         },
         {
           "id": "P115",
@@ -2566,7 +2287,7 @@
           "nome": "Ponto 115",
           "lat": -3.242288,
           "lon": -54.550875,
-          "mm": 0.0
+          "mm": 0.2
         },
         {
           "id": "P116",
@@ -2574,7 +2295,7 @@
           "nome": "Ponto 116",
           "lat": -3.242288,
           "lon": -52.811894,
-          "mm": 5.1
+          "mm": 2.0
         },
         {
           "id": "P117",
@@ -2582,7 +2303,7 @@
           "nome": "Ponto 117",
           "lat": -3.242288,
           "lon": -48.899186,
-          "mm": 0.1
+          "mm": 0.6
         },
         {
           "id": "P118",
@@ -2590,7 +2311,7 @@
           "nome": "Ponto 118",
           "lat": -2.822672,
           "lon": -56.289857,
-          "mm": 0.1
+          "mm": 0.3
         },
         {
           "id": "P119",
@@ -2598,7 +2319,7 @@
           "nome": "Ponto 119",
           "lat": -2.822672,
           "lon": -53.681385,
-          "mm": 1.1
+          "mm": 3.8
         },
         {
           "id": "P120",
@@ -2606,7 +2327,7 @@
           "nome": "Ponto 120",
           "lat": -2.822672,
           "lon": -51.507658,
-          "mm": 1.6
+          "mm": 7.9
         },
         {
           "id": "P121",
@@ -2622,7 +2343,7 @@
           "nome": "Ponto 122",
           "lat": -2.822672,
           "lon": -48.029696,
-          "mm": 1.2
+          "mm": 1.0
         },
         {
           "id": "P123",
@@ -2630,7 +2351,7 @@
           "nome": "Ponto 123",
           "lat": -2.403055,
           "lon": -54.985621,
-          "mm": 1.7
+          "mm": 5.1
         },
         {
           "id": "P124",
@@ -2638,7 +2359,7 @@
           "nome": "Ponto 124",
           "lat": -2.403055,
           "lon": -49.333932,
-          "mm": 0.9
+          "mm": 3.1
         },
         {
           "id": "P125",
@@ -2646,7 +2367,7 @@
           "nome": "Ponto 125",
           "lat": -2.403055,
           "lon": -47.160205,
-          "mm": 3.2
+          "mm": 4.0
         },
         {
           "id": "P126",
@@ -2654,7 +2375,7 @@
           "nome": "Ponto 126",
           "lat": -1.983438,
           "lon": -52.377149,
-          "mm": 8.5
+          "mm": 18.6
         },
         {
           "id": "P127",
@@ -2662,7 +2383,7 @@
           "nome": "Ponto 127",
           "lat": -1.983438,
           "lon": -50.638168,
-          "mm": 2.5
+          "mm": 7.6
         },
         {
           "id": "P128",
@@ -2670,7 +2391,7 @@
           "nome": "Ponto 128",
           "lat": -1.983438,
           "lon": -48.464441,
-          "mm": 5.6
+          "mm": 6.8
         },
         {
           "id": "P129",
@@ -2678,7 +2399,7 @@
           "nome": "Ponto 129",
           "lat": -1.563822,
           "lon": -56.724602,
-          "mm": 3.0
+          "mm": 12.9
         },
         {
           "id": "P130",
@@ -2686,7 +2407,7 @@
           "nome": "Ponto 130",
           "lat": -1.563822,
           "lon": -55.420366,
-          "mm": 1.7
+          "mm": 4.6
         },
         {
           "id": "P131",
@@ -2694,7 +2415,7 @@
           "nome": "Ponto 131",
           "lat": -1.563822,
           "lon": -53.681385,
-          "mm": 14.1
+          "mm": 6.3
         },
         {
           "id": "P132",
@@ -2702,7 +2423,7 @@
           "nome": "Ponto 132",
           "lat": -1.563822,
           "lon": -49.768677,
-          "mm": 6.0
+          "mm": 9.9
         },
         {
           "id": "P133",
@@ -2710,7 +2431,7 @@
           "nome": "Ponto 133",
           "lat": -1.144205,
           "lon": -54.550875,
-          "mm": 3.2
+          "mm": 3.1
         },
         {
           "id": "P134",
@@ -2718,7 +2439,7 @@
           "nome": "Ponto 134",
           "lat": -1.144205,
           "lon": -51.507658,
-          "mm": 6.4
+          "mm": 11.0
         },
         {
           "id": "P135",
@@ -2726,7 +2447,7 @@
           "nome": "Ponto 135",
           "lat": -1.144205,
           "lon": -46.290715,
-          "mm": 20.2
+          "mm": 8.6
         },
         {
           "id": "P136",
@@ -2734,7 +2455,7 @@
           "nome": "Ponto 136",
           "lat": -0.724588,
           "lon": -58.028838,
-          "mm": 6.3
+          "mm": 5.6
         },
         {
           "id": "P137",
@@ -2742,7 +2463,7 @@
           "nome": "Ponto 137",
           "lat": -0.724588,
           "lon": -50.203422,
-          "mm": 7.6
+          "mm": 10.2
         },
         {
           "id": "P138",
@@ -2750,7 +2471,7 @@
           "nome": "Ponto 138",
           "lat": -0.724588,
           "lon": -47.59495,
-          "mm": 17.5
+          "mm": 11.1
         },
         {
           "id": "P139",
@@ -2758,7 +2479,7 @@
           "nome": "Ponto 139",
           "lat": -0.304971,
           "lon": -55.855111,
-          "mm": 7.3
+          "mm": 22.0
         },
         {
           "id": "P140",
@@ -2766,7 +2487,7 @@
           "nome": "Ponto 140",
           "lat": -0.304971,
           "lon": -52.811894,
-          "mm": 12.2
+          "mm": 8.8
         },
         {
           "id": "P141",
@@ -2774,7 +2495,7 @@
           "nome": "Ponto 141",
           "lat": -0.304971,
           "lon": -48.899186,
-          "mm": 16.5
+          "mm": 23.3
         },
         {
           "id": "P142",
@@ -2782,7 +2503,7 @@
           "nome": "Ponto 142",
           "lat": 0.114645,
           "lon": -58.463583,
-          "mm": 10.3
+          "mm": 17.7
         },
         {
           "id": "P143",
@@ -2790,7 +2511,7 @@
           "nome": "Ponto 143",
           "lat": 0.114645,
           "lon": -54.550875,
-          "mm": 2.4
+          "mm": 13.2
         },
         {
           "id": "P144",
@@ -2798,7 +2519,7 @@
           "nome": "Ponto 144",
           "lat": 0.114645,
           "lon": -50.638168,
-          "mm": 13.6
+          "mm": 11.4
         },
         {
           "id": "P145",
@@ -2806,7 +2527,7 @@
           "nome": "Ponto 145",
           "lat": 0.534262,
           "lon": -57.159347,
-          "mm": 20.7
+          "mm": 38.4
         },
         {
           "id": "P146",
@@ -2814,7 +2535,7 @@
           "nome": "Ponto 146",
           "lat": 0.534262,
           "lon": -53.246639,
-          "mm": 9.3
+          "mm": 8.6
         },
         {
           "id": "P147",
@@ -2822,7 +2543,7 @@
           "nome": "Ponto 147",
           "lat": 0.953879,
           "lon": -55.855111,
-          "mm": 19.6
+          "mm": 32.0
         },
         {
           "id": "P148",
@@ -2830,7 +2551,7 @@
           "nome": "Ponto 148",
           "lat": 1.373495,
           "lon": -58.463583,
-          "mm": 17.8
+          "mm": 16.7
         },
         {
           "id": "P149",
@@ -2838,7 +2559,7 @@
           "nome": "Ponto 149",
           "lat": 1.373495,
           "lon": -53.681385,
-          "mm": 4.2
+          "mm": 13.7
         },
         {
           "id": "P150",
@@ -2846,7 +2567,7 @@
           "nome": "Ponto 150",
           "lat": 1.793112,
           "lon": -57.159347,
-          "mm": 16.2
+          "mm": 11.9
         },
         {
           "id": "P151",
@@ -2854,7 +2575,7 @@
           "nome": "Ponto 151",
           "lat": 1.793112,
           "lon": -54.985621,
-          "mm": 18.3
+          "mm": 13.6
         },
         {
           "id": "P152",
@@ -2862,7 +2583,7 @@
           "nome": "Ponto 152",
           "lat": 2.212729,
           "lon": -55.855111,
-          "mm": 14.0
+          "mm": 15.3
         },
         {
           "id": "P153",
@@ -2870,7 +2591,7 @@
           "nome": "Ponto 153",
           "lat": -7.438456,
           "lon": -38.465299,
-          "mm": 2.7
+          "mm": 5.6
         },
         {
           "id": "P154",
@@ -2878,7 +2599,7 @@
           "nome": "Ponto 154",
           "lat": -7.438456,
           "lon": -36.291572,
-          "mm": 5.6
+          "mm": 4.4
         },
         {
           "id": "P155",
@@ -2886,7 +2607,7 @@
           "nome": "Ponto 155",
           "lat": -7.018839,
           "lon": -37.161063,
-          "mm": 1.8
+          "mm": 1.3
         },
         {
           "id": "P156",
@@ -2894,7 +2615,7 @@
           "nome": "Ponto 156",
           "lat": -7.018839,
           "lon": -35.422082,
-          "mm": 8.3
+          "mm": 5.8
         },
         {
           "id": "P157",
@@ -2910,7 +2631,7 @@
           "nome": "Ponto 158",
           "lat": -8.697306,
           "lon": -38.900044,
-          "mm": 0.0
+          "mm": 1.0
         },
         {
           "id": "P159",
@@ -2918,7 +2639,7 @@
           "nome": "Ponto 159",
           "lat": -8.697306,
           "lon": -36.726318,
-          "mm": 0.9
+          "mm": 0.0
         },
         {
           "id": "P160",
@@ -2926,7 +2647,7 @@
           "nome": "Ponto 160",
           "lat": -8.277689,
           "lon": -39.769535,
-          "mm": 0.9
+          "mm": 0.8
         },
         {
           "id": "P161",
@@ -2934,7 +2655,7 @@
           "nome": "Ponto 161",
           "lat": -8.277689,
           "lon": -37.595808,
-          "mm": 0.9
+          "mm": 2.2
         },
         {
           "id": "P162",
@@ -2942,7 +2663,7 @@
           "nome": "Ponto 162",
           "lat": -8.277689,
           "lon": -34.987337,
-          "mm": 6.9
+          "mm": 10.8
         },
         {
           "id": "P163",
@@ -2950,7 +2671,7 @@
           "nome": "Ponto 163",
           "lat": -7.438456,
           "lon": -40.639026,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P164",
@@ -3014,7 +2735,7 @@
           "nome": "Ponto 171",
           "lat": -6.599222,
           "lon": -41.943261,
-          "mm": 0.3
+          "mm": 0.0
         },
         {
           "id": "P172",
@@ -3022,7 +2743,7 @@
           "nome": "Ponto 172",
           "lat": -5.340372,
           "lon": -42.378007,
-          "mm": 2.4
+          "mm": 3.7
         },
         {
           "id": "P173",
@@ -3030,7 +2751,7 @@
           "nome": "Ponto 173",
           "lat": -5.340372,
           "lon": -41.073771,
-          "mm": 0.7
+          "mm": 1.1
         },
         {
           "id": "P174",
@@ -3038,7 +2759,7 @@
           "nome": "Ponto 174",
           "lat": -4.501139,
           "lon": -41.943261,
-          "mm": 2.8
+          "mm": 1.8
         },
         {
           "id": "P175",
@@ -3046,7 +2767,7 @@
           "nome": "Ponto 175",
           "lat": -4.081522,
           "lon": -42.812752,
-          "mm": 1.7
+          "mm": 2.6
         },
         {
           "id": "P176",
@@ -3054,7 +2775,7 @@
           "nome": "Ponto 176",
           "lat": -6.179605,
           "lon": -38.465299,
-          "mm": 2.8
+          "mm": 3.5
         },
         {
           "id": "P177",
@@ -3062,7 +2783,7 @@
           "nome": "Ponto 177",
           "lat": -6.179605,
           "lon": -36.291572,
-          "mm": 1.6
+          "mm": 1.1
         },
         {
           "id": "P178",
@@ -3070,7 +2791,7 @@
           "nome": "Ponto 178",
           "lat": -5.340372,
           "lon": -37.161063,
-          "mm": 1.2
+          "mm": 0.8
         },
         {
           "id": "P179",
@@ -3078,7 +2799,7 @@
           "nome": "Ponto 179",
           "lat": -5.340372,
           "lon": -35.422082,
-          "mm": 0.5
+          "mm": 0.7
         },
         {
           "id": "P180",
@@ -3086,7 +2807,7 @@
           "nome": "Ponto 180",
           "lat": -11.215006,
           "lon": -37.595808,
-          "mm": 0.8
+          "mm": 0.5
         },
         {
           "id": "P181",
@@ -3094,7 +2815,7 @@
           "nome": "Ponto 181",
           "lat": -10.375773,
           "lon": -36.726318,
-          "mm": 1.4
+          "mm": 0.0
         },
         {
           "id": "P182",
@@ -3246,7 +2967,7 @@
           "nome": "Ponto 200",
           "lat": -5.340372,
           "lon": -48.464441,
-          "mm": 0.1
+          "mm": 0.0
         }
       ]
     },
@@ -3254,138 +2975,10 @@
       "label": "Previsão acumulada 72h",
       "resumo": {
         "min": 0.0,
-        "media": 2.9,
-        "max": 28.9
+        "media": 3.5,
+        "max": 43.0
       },
       "pontos": [
-        {
-          "id": "P001",
-          "uf": "AL",
-          "nome": "Ponto 001",
-          "lat": -9.536539,
-          "lon": -37.161063,
-          "mm": 0.0
-        },
-        {
-          "id": "P002",
-          "uf": "AL",
-          "nome": "Ponto 002",
-          "lat": -9.536539,
-          "lon": -35.856827,
-          "mm": 0.0
-        },
-        {
-          "id": "P003",
-          "uf": "BA",
-          "nome": "Ponto 003",
-          "lat": -17.509257,
-          "lon": -39.33479,
-          "mm": 2.1
-        },
-        {
-          "id": "P004",
-          "uf": "BA",
-          "nome": "Ponto 004",
-          "lat": -17.08964,
-          "lon": -40.20428,
-          "mm": 2.8
-        },
-        {
-          "id": "P005",
-          "uf": "BA",
-          "nome": "Ponto 005",
-          "lat": -16.250407,
-          "lon": -39.33479,
-          "mm": 1.5
-        },
-        {
-          "id": "P006",
-          "uf": "BA",
-          "nome": "Ponto 006",
-          "lat": -15.411173,
-          "lon": -40.639026,
-          "mm": 1.3
-        },
-        {
-          "id": "P007",
-          "uf": "BA",
-          "nome": "Ponto 007",
-          "lat": -14.991556,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P008",
-          "uf": "BA",
-          "nome": "Ponto 008",
-          "lat": -14.991556,
-          "lon": -39.33479,
-          "mm": 0.0
-        },
-        {
-          "id": "P009",
-          "uf": "BA",
-          "nome": "Ponto 009",
-          "lat": -14.57194,
-          "lon": -43.682243,
-          "mm": 0.0
-        },
-        {
-          "id": "P010",
-          "uf": "BA",
-          "nome": "Ponto 010",
-          "lat": -14.57194,
-          "lon": -41.943261,
-          "mm": 0.3
-        },
-        {
-          "id": "P011",
-          "uf": "BA",
-          "nome": "Ponto 011",
-          "lat": -14.57194,
-          "lon": -40.20428,
-          "mm": 1.6
-        },
-        {
-          "id": "P012",
-          "uf": "BA",
-          "nome": "Ponto 012",
-          "lat": -13.732706,
-          "lon": -44.986479,
-          "mm": 0.0
-        },
-        {
-          "id": "P013",
-          "uf": "BA",
-          "nome": "Ponto 013",
-          "lat": -13.732706,
-          "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P014",
-          "uf": "BA",
-          "nome": "Ponto 014",
-          "lat": -13.732706,
-          "lon": -40.639026,
-          "mm": 0.0
-        },
-        {
-          "id": "P015",
-          "uf": "BA",
-          "nome": "Ponto 015",
-          "lat": -13.31309,
-          "lon": -39.33479,
-          "mm": 3.2
-        },
-        {
-          "id": "P016",
-          "uf": "BA",
-          "nome": "Ponto 016",
-          "lat": -12.893473,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
         {
           "id": "P017",
           "uf": "BA",
@@ -3395,132 +2988,12 @@
           "mm": 0.0
         },
         {
-          "id": "P018",
-          "uf": "BA",
-          "nome": "Ponto 018",
-          "lat": -12.893473,
-          "lon": -41.508516,
-          "mm": 0.3
-        },
-        {
-          "id": "P019",
-          "uf": "BA",
-          "nome": "Ponto 019",
-          "lat": -12.893473,
-          "lon": -40.20428,
-          "mm": 1.3
-        },
-        {
-          "id": "P020",
-          "uf": "BA",
-          "nome": "Ponto 020",
-          "lat": -12.473856,
-          "lon": -44.986479,
-          "mm": 0.0
-        },
-        {
-          "id": "P021",
-          "uf": "BA",
-          "nome": "Ponto 021",
-          "lat": -12.473856,
-          "lon": -42.378007,
-          "mm": 0.0
-        },
-        {
-          "id": "P022",
-          "uf": "BA",
-          "nome": "Ponto 022",
-          "lat": -12.473856,
-          "lon": -38.030554,
-          "mm": 1.6
-        },
-        {
-          "id": "P023",
-          "uf": "BA",
-          "nome": "Ponto 023",
-          "lat": -12.054239,
-          "lon": -46.290715,
-          "mm": 0.0
-        },
-        {
-          "id": "P024",
-          "uf": "BA",
-          "nome": "Ponto 024",
-          "lat": -12.054239,
-          "lon": -40.639026,
-          "mm": 0.4
-        },
-        {
           "id": "P025",
           "uf": "BA",
           "nome": "Ponto 025",
           "lat": -12.054239,
           "lon": -39.33479,
-          "mm": 2.3
-        },
-        {
-          "id": "P026",
-          "uf": "BA",
-          "nome": "Ponto 026",
-          "lat": -11.634623,
-          "lon": -45.421224,
-          "mm": 0.0
-        },
-        {
-          "id": "P027",
-          "uf": "BA",
-          "nome": "Ponto 027",
-          "lat": -11.634623,
-          "lon": -43.247497,
-          "mm": 0.0
-        },
-        {
-          "id": "P028",
-          "uf": "BA",
-          "nome": "Ponto 028",
-          "lat": -11.634623,
-          "lon": -38.465299,
-          "mm": 0.0
-        },
-        {
-          "id": "P029",
-          "uf": "BA",
-          "nome": "Ponto 029",
-          "lat": -11.215006,
-          "lon": -44.116988,
-          "mm": 0.0
-        },
-        {
-          "id": "P030",
-          "uf": "BA",
-          "nome": "Ponto 030",
-          "lat": -11.215006,
-          "lon": -41.943261,
-          "mm": 0.0
-        },
-        {
-          "id": "P031",
-          "uf": "BA",
-          "nome": "Ponto 031",
-          "lat": -10.795389,
-          "lon": -45.855969,
-          "mm": 0.0
-        },
-        {
-          "id": "P032",
-          "uf": "BA",
-          "nome": "Ponto 032",
-          "lat": -10.795389,
-          "lon": -40.20428,
-          "mm": 1.0
-        },
-        {
-          "id": "P033",
-          "uf": "BA",
-          "nome": "Ponto 033",
-          "lat": -10.795389,
-          "lon": -38.900044,
-          "mm": 0.2
+          "mm": 0.4
         },
         {
           "id": "P034",
@@ -3528,38 +3001,6 @@
           "nome": "Ponto 034",
           "lat": -10.375773,
           "lon": -42.812752,
-          "mm": 0.0
-        },
-        {
-          "id": "P035",
-          "uf": "BA",
-          "nome": "Ponto 035",
-          "lat": -10.375773,
-          "lon": -41.073771,
-          "mm": 0.4
-        },
-        {
-          "id": "P036",
-          "uf": "BA",
-          "nome": "Ponto 036",
-          "lat": -9.956156,
-          "lon": -39.33479,
-          "mm": 0.0
-        },
-        {
-          "id": "P037",
-          "uf": "BA",
-          "nome": "Ponto 037",
-          "lat": -9.956156,
-          "lon": -38.030554,
-          "mm": 0.0
-        },
-        {
-          "id": "P038",
-          "uf": "BA",
-          "nome": "Ponto 038",
-          "lat": -9.536539,
-          "lon": -43.247497,
           "mm": 0.0
         },
         {
@@ -3600,7 +3041,7 @@
           "nome": "Ponto 043",
           "lat": -5.340372,
           "lon": -38.900044,
-          "mm": 0.8
+          "mm": 0.6
         },
         {
           "id": "P044",
@@ -3608,7 +3049,7 @@
           "nome": "Ponto 044",
           "lat": -4.920755,
           "lon": -39.769535,
-          "mm": 2.1
+          "mm": 1.2
         },
         {
           "id": "P045",
@@ -3616,7 +3057,7 @@
           "nome": "Ponto 045",
           "lat": -4.501139,
           "lon": -38.465299,
-          "mm": 9.0
+          "mm": 4.9
         },
         {
           "id": "P046",
@@ -3624,7 +3065,7 @@
           "nome": "Ponto 046",
           "lat": -4.081522,
           "lon": -41.073771,
-          "mm": 0.9
+          "mm": 0.1
         },
         {
           "id": "P047",
@@ -3632,7 +3073,7 @@
           "nome": "Ponto 047",
           "lat": -3.661905,
           "lon": -38.900044,
-          "mm": 0.5
+          "mm": 0.4
         },
         {
           "id": "P048",
@@ -3640,7 +3081,7 @@
           "nome": "Ponto 048",
           "lat": -3.242288,
           "lon": -39.769535,
-          "mm": 4.3
+          "mm": 2.1
         },
         {
           "id": "P049",
@@ -3672,7 +3113,7 @@
           "nome": "Ponto 052",
           "lat": -6.599222,
           "lon": -46.72546,
-          "mm": 0.0
+          "mm": 0.4
         },
         {
           "id": "P053",
@@ -3688,7 +3129,7 @@
           "nome": "Ponto 054",
           "lat": -6.179605,
           "lon": -45.855969,
-          "mm": 0.1
+          "mm": 0.2
         },
         {
           "id": "P055",
@@ -3696,7 +3137,7 @@
           "nome": "Ponto 055",
           "lat": -5.759989,
           "lon": -47.160205,
-          "mm": 0.8
+          "mm": 0.5
         },
         {
           "id": "P056",
@@ -3712,7 +3153,7 @@
           "nome": "Ponto 057",
           "lat": -5.759989,
           "lon": -43.247497,
-          "mm": 0.3
+          "mm": 1.1
         },
         {
           "id": "P058",
@@ -3720,7 +3161,7 @@
           "nome": "Ponto 058",
           "lat": -5.340372,
           "lon": -46.290715,
-          "mm": 1.6
+          "mm": 1.1
         },
         {
           "id": "P059",
@@ -3728,7 +3169,7 @@
           "nome": "Ponto 059",
           "lat": -5.340372,
           "lon": -44.116988,
-          "mm": 0.6
+          "mm": 1.3
         },
         {
           "id": "P060",
@@ -3736,7 +3177,7 @@
           "nome": "Ponto 060",
           "lat": -4.920755,
           "lon": -47.59495,
-          "mm": 2.4
+          "mm": 1.1
         },
         {
           "id": "P061",
@@ -3744,7 +3185,7 @@
           "nome": "Ponto 061",
           "lat": -4.920755,
           "lon": -45.421224,
-          "mm": 1.3
+          "mm": 0.9
         },
         {
           "id": "P062",
@@ -3752,7 +3193,7 @@
           "nome": "Ponto 062",
           "lat": -4.501139,
           "lon": -43.682243,
-          "mm": 1.9
+          "mm": 4.0
         },
         {
           "id": "P063",
@@ -3760,7 +3201,7 @@
           "nome": "Ponto 063",
           "lat": -4.081522,
           "lon": -46.290715,
-          "mm": 2.7
+          "mm": 1.8
         },
         {
           "id": "P064",
@@ -3768,7 +3209,7 @@
           "nome": "Ponto 064",
           "lat": -3.661905,
           "lon": -44.551733,
-          "mm": 8.1
+          "mm": 4.4
         },
         {
           "id": "P065",
@@ -3776,7 +3217,7 @@
           "nome": "Ponto 065",
           "lat": -3.242288,
           "lon": -46.72546,
-          "mm": 4.2
+          "mm": 2.4
         },
         {
           "id": "P066",
@@ -3784,7 +3225,7 @@
           "nome": "Ponto 066",
           "lat": -3.242288,
           "lon": -43.682243,
-          "mm": 13.5
+          "mm": 3.8
         },
         {
           "id": "P067",
@@ -3792,7 +3233,7 @@
           "nome": "Ponto 067",
           "lat": -2.822672,
           "lon": -45.855969,
-          "mm": 7.1
+          "mm": 9.6
         },
         {
           "id": "P068",
@@ -3800,7 +3241,7 @@
           "nome": "Ponto 068",
           "lat": -2.822672,
           "lon": -41.943261,
-          "mm": 4.5
+          "mm": 2.6
         },
         {
           "id": "P069",
@@ -3808,7 +3249,7 @@
           "nome": "Ponto 069",
           "lat": -2.403055,
           "lon": -44.551733,
-          "mm": 12.7
+          "mm": 11.0
         },
         {
           "id": "P070",
@@ -3816,7 +3257,7 @@
           "nome": "Ponto 070",
           "lat": -2.403055,
           "lon": -43.247497,
-          "mm": 4.2
+          "mm": 4.0
         },
         {
           "id": "P071",
@@ -3824,7 +3265,7 @@
           "nome": "Ponto 071",
           "lat": -1.563822,
           "lon": -45.421224,
-          "mm": 7.9
+          "mm": 13.4
         },
         {
           "id": "P072",
@@ -4000,7 +3441,7 @@
           "nome": "Ponto 093",
           "lat": -6.599222,
           "lon": -48.899186,
-          "mm": 0.2
+          "mm": 0.0
         },
         {
           "id": "P094",
@@ -4040,7 +3481,7 @@
           "nome": "Ponto 098",
           "lat": -5.759989,
           "lon": -55.420366,
-          "mm": 0.5
+          "mm": 0.1
         },
         {
           "id": "P099",
@@ -4064,7 +3505,7 @@
           "nome": "Ponto 101",
           "lat": -5.340372,
           "lon": -49.768677,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P102",
@@ -4072,7 +3513,7 @@
           "nome": "Ponto 102",
           "lat": -4.920755,
           "lon": -54.11613,
-          "mm": 0.1
+          "mm": 0.3
         },
         {
           "id": "P103",
@@ -4080,7 +3521,7 @@
           "nome": "Ponto 103",
           "lat": -4.920755,
           "lon": -52.377149,
-          "mm": 0.0
+          "mm": 0.1
         },
         {
           "id": "P104",
@@ -4088,7 +3529,7 @@
           "nome": "Ponto 104",
           "lat": -4.501139,
           "lon": -56.289857,
-          "mm": 1.0
+          "mm": 0.6
         },
         {
           "id": "P105",
@@ -4096,7 +3537,7 @@
           "nome": "Ponto 105",
           "lat": -4.501139,
           "lon": -54.985621,
-          "mm": 1.7
+          "mm": 1.5
         },
         {
           "id": "P106",
@@ -4104,7 +3545,7 @@
           "nome": "Ponto 106",
           "lat": -4.501139,
           "lon": -53.246639,
-          "mm": 0.7
+          "mm": 0.9
         },
         {
           "id": "P107",
@@ -4120,7 +3561,7 @@
           "nome": "Ponto 108",
           "lat": -4.501139,
           "lon": -49.333932,
-          "mm": 1.5
+          "mm": 2.1
         },
         {
           "id": "P109",
@@ -4128,7 +3569,7 @@
           "nome": "Ponto 109",
           "lat": -4.081522,
           "lon": -50.203422,
-          "mm": 2.6
+          "mm": 0.8
         },
         {
           "id": "P110",
@@ -4136,7 +3577,7 @@
           "nome": "Ponto 110",
           "lat": -4.081522,
           "lon": -48.464441,
-          "mm": 6.5
+          "mm": 3.7
         },
         {
           "id": "P111",
@@ -4144,7 +3585,7 @@
           "nome": "Ponto 111",
           "lat": -3.661905,
           "lon": -56.724602,
-          "mm": 4.3
+          "mm": 4.2
         },
         {
           "id": "P112",
@@ -4152,7 +3593,7 @@
           "nome": "Ponto 112",
           "lat": -3.661905,
           "lon": -55.420366,
-          "mm": 3.8
+          "mm": 1.0
         },
         {
           "id": "P113",
@@ -4160,7 +3601,7 @@
           "nome": "Ponto 113",
           "lat": -3.661905,
           "lon": -51.942403,
-          "mm": 1.5
+          "mm": 1.6
         },
         {
           "id": "P114",
@@ -4168,7 +3609,7 @@
           "nome": "Ponto 114",
           "lat": -3.661905,
           "lon": -47.59495,
-          "mm": 4.5
+          "mm": 3.8
         },
         {
           "id": "P115",
@@ -4176,7 +3617,7 @@
           "nome": "Ponto 115",
           "lat": -3.242288,
           "lon": -54.550875,
-          "mm": 2.5
+          "mm": 0.4
         },
         {
           "id": "P116",
@@ -4184,7 +3625,7 @@
           "nome": "Ponto 116",
           "lat": -3.242288,
           "lon": -52.811894,
-          "mm": 7.9
+          "mm": 3.5
         },
         {
           "id": "P117",
@@ -4192,7 +3633,7 @@
           "nome": "Ponto 117",
           "lat": -3.242288,
           "lon": -48.899186,
-          "mm": 9.2
+          "mm": 6.0
         },
         {
           "id": "P118",
@@ -4200,7 +3641,7 @@
           "nome": "Ponto 118",
           "lat": -2.822672,
           "lon": -56.289857,
-          "mm": 4.3
+          "mm": 7.4
         },
         {
           "id": "P119",
@@ -4208,7 +3649,7 @@
           "nome": "Ponto 119",
           "lat": -2.822672,
           "lon": -53.681385,
-          "mm": 2.4
+          "mm": 1.5
         },
         {
           "id": "P120",
@@ -4216,7 +3657,7 @@
           "nome": "Ponto 120",
           "lat": -2.822672,
           "lon": -51.507658,
-          "mm": 7.9
+          "mm": 9.6
         },
         {
           "id": "P121",
@@ -4224,7 +3665,7 @@
           "nome": "Ponto 121",
           "lat": -2.822672,
           "lon": -50.203422,
-          "mm": 5.5
+          "mm": 5.2
         },
         {
           "id": "P122",
@@ -4232,7 +3673,7 @@
           "nome": "Ponto 122",
           "lat": -2.822672,
           "lon": -48.029696,
-          "mm": 7.9
+          "mm": 4.9
         },
         {
           "id": "P123",
@@ -4240,7 +3681,7 @@
           "nome": "Ponto 123",
           "lat": -2.403055,
           "lon": -54.985621,
-          "mm": 16.9
+          "mm": 10.0
         },
         {
           "id": "P124",
@@ -4248,7 +3689,7 @@
           "nome": "Ponto 124",
           "lat": -2.403055,
           "lon": -49.333932,
-          "mm": 5.3
+          "mm": 13.0
         },
         {
           "id": "P125",
@@ -4256,7 +3697,7 @@
           "nome": "Ponto 125",
           "lat": -2.403055,
           "lon": -47.160205,
-          "mm": 9.0
+          "mm": 7.0
         },
         {
           "id": "P126",
@@ -4264,7 +3705,7 @@
           "nome": "Ponto 126",
           "lat": -1.983438,
           "lon": -52.377149,
-          "mm": 18.6
+          "mm": 21.4
         },
         {
           "id": "P127",
@@ -4288,7 +3729,7 @@
           "nome": "Ponto 129",
           "lat": -1.563822,
           "lon": -56.724602,
-          "mm": 6.4
+          "mm": 6.6
         },
         {
           "id": "P130",
@@ -4296,7 +3737,7 @@
           "nome": "Ponto 130",
           "lat": -1.563822,
           "lon": -55.420366,
-          "mm": 8.3
+          "mm": 1.6
         },
         {
           "id": "P131",
@@ -4304,7 +3745,7 @@
           "nome": "Ponto 131",
           "lat": -1.563822,
           "lon": -53.681385,
-          "mm": 5.4
+          "mm": 8.3
         },
         {
           "id": "P132",
@@ -4312,7 +3753,7 @@
           "nome": "Ponto 132",
           "lat": -1.563822,
           "lon": -49.768677,
-          "mm": 9.5
+          "mm": 5.4
         },
         {
           "id": "P133",
@@ -4320,7 +3761,7 @@
           "nome": "Ponto 133",
           "lat": -1.144205,
           "lon": -54.550875,
-          "mm": 8.8
+          "mm": 11.5
         },
         {
           "id": "P134",
@@ -4328,7 +3769,7 @@
           "nome": "Ponto 134",
           "lat": -1.144205,
           "lon": -51.507658,
-          "mm": 8.5
+          "mm": 9.0
         },
         {
           "id": "P135",
@@ -4336,7 +3777,7 @@
           "nome": "Ponto 135",
           "lat": -1.144205,
           "lon": -46.290715,
-          "mm": 10.9
+          "mm": 6.4
         },
         {
           "id": "P136",
@@ -4344,7 +3785,7 @@
           "nome": "Ponto 136",
           "lat": -0.724588,
           "lon": -58.028838,
-          "mm": 2.5
+          "mm": 9.3
         },
         {
           "id": "P137",
@@ -4352,7 +3793,7 @@
           "nome": "Ponto 137",
           "lat": -0.724588,
           "lon": -50.203422,
-          "mm": 9.3
+          "mm": 11.0
         },
         {
           "id": "P138",
@@ -4360,7 +3801,7 @@
           "nome": "Ponto 138",
           "lat": -0.724588,
           "lon": -47.59495,
-          "mm": 10.5
+          "mm": 19.5
         },
         {
           "id": "P139",
@@ -4368,7 +3809,7 @@
           "nome": "Ponto 139",
           "lat": -0.304971,
           "lon": -55.855111,
-          "mm": 9.6
+          "mm": 5.6
         },
         {
           "id": "P140",
@@ -4376,7 +3817,7 @@
           "nome": "Ponto 140",
           "lat": -0.304971,
           "lon": -52.811894,
-          "mm": 11.8
+          "mm": 8.3
         },
         {
           "id": "P141",
@@ -4384,7 +3825,7 @@
           "nome": "Ponto 141",
           "lat": -0.304971,
           "lon": -48.899186,
-          "mm": 7.2
+          "mm": 16.1
         },
         {
           "id": "P142",
@@ -4392,7 +3833,7 @@
           "nome": "Ponto 142",
           "lat": 0.114645,
           "lon": -58.463583,
-          "mm": 14.3
+          "mm": 20.6
         },
         {
           "id": "P143",
@@ -4400,7 +3841,7 @@
           "nome": "Ponto 143",
           "lat": 0.114645,
           "lon": -54.550875,
-          "mm": 7.7
+          "mm": 11.5
         },
         {
           "id": "P144",
@@ -4408,7 +3849,7 @@
           "nome": "Ponto 144",
           "lat": 0.114645,
           "lon": -50.638168,
-          "mm": 13.3
+          "mm": 14.3
         },
         {
           "id": "P145",
@@ -4416,7 +3857,7 @@
           "nome": "Ponto 145",
           "lat": 0.534262,
           "lon": -57.159347,
-          "mm": 10.7
+          "mm": 24.8
         },
         {
           "id": "P146",
@@ -4424,7 +3865,7 @@
           "nome": "Ponto 146",
           "lat": 0.534262,
           "lon": -53.246639,
-          "mm": 16.1
+          "mm": 15.6
         },
         {
           "id": "P147",
@@ -4432,7 +3873,7 @@
           "nome": "Ponto 147",
           "lat": 0.953879,
           "lon": -55.855111,
-          "mm": 13.8
+          "mm": 23.7
         },
         {
           "id": "P148",
@@ -4440,7 +3881,7 @@
           "nome": "Ponto 148",
           "lat": 1.373495,
           "lon": -58.463583,
-          "mm": 16.2
+          "mm": 17.9
         },
         {
           "id": "P149",
@@ -4448,7 +3889,7 @@
           "nome": "Ponto 149",
           "lat": 1.373495,
           "lon": -53.681385,
-          "mm": 18.1
+          "mm": 15.7
         },
         {
           "id": "P150",
@@ -4456,7 +3897,7 @@
           "nome": "Ponto 150",
           "lat": 1.793112,
           "lon": -57.159347,
-          "mm": 28.9
+          "mm": 43.0
         },
         {
           "id": "P151",
@@ -4464,7 +3905,7 @@
           "nome": "Ponto 151",
           "lat": 1.793112,
           "lon": -54.985621,
-          "mm": 22.9
+          "mm": 16.4
         },
         {
           "id": "P152",
@@ -4472,7 +3913,7 @@
           "nome": "Ponto 152",
           "lat": 2.212729,
           "lon": -55.855111,
-          "mm": 21.4
+          "mm": 33.8
         },
         {
           "id": "P153",
@@ -4480,7 +3921,7 @@
           "nome": "Ponto 153",
           "lat": -7.438456,
           "lon": -38.465299,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P154",
@@ -4488,7 +3929,7 @@
           "nome": "Ponto 154",
           "lat": -7.438456,
           "lon": -36.291572,
-          "mm": 2.8
+          "mm": 0.6
         },
         {
           "id": "P155",
@@ -4504,7 +3945,7 @@
           "nome": "Ponto 156",
           "lat": -7.018839,
           "lon": -35.422082,
-          "mm": 0.4
+          "mm": 1.7
         },
         {
           "id": "P157",
@@ -4552,7 +3993,7 @@
           "nome": "Ponto 162",
           "lat": -8.277689,
           "lon": -34.987337,
-          "mm": 1.0
+          "mm": 2.7
         },
         {
           "id": "P163",
@@ -4624,7 +4065,7 @@
           "nome": "Ponto 171",
           "lat": -6.599222,
           "lon": -41.943261,
-          "mm": 0.1
+          "mm": 0.0
         },
         {
           "id": "P172",
@@ -4632,7 +4073,7 @@
           "nome": "Ponto 172",
           "lat": -5.340372,
           "lon": -42.378007,
-          "mm": 1.0
+          "mm": 2.5
         },
         {
           "id": "P173",
@@ -4640,7 +4081,7 @@
           "nome": "Ponto 173",
           "lat": -5.340372,
           "lon": -41.073771,
-          "mm": 0.4
+          "mm": 0.3
         },
         {
           "id": "P174",
@@ -4648,7 +4089,7 @@
           "nome": "Ponto 174",
           "lat": -4.501139,
           "lon": -41.943261,
-          "mm": 7.3
+          "mm": 1.4
         },
         {
           "id": "P175",
@@ -4656,7 +4097,7 @@
           "nome": "Ponto 175",
           "lat": -4.081522,
           "lon": -42.812752,
-          "mm": 3.7
+          "mm": 0.7
         },
         {
           "id": "P176",
@@ -4664,7 +4105,7 @@
           "nome": "Ponto 176",
           "lat": -6.179605,
           "lon": -38.465299,
-          "mm": 0.3
+          "mm": 0.5
         },
         {
           "id": "P177",
@@ -4672,7 +4113,7 @@
           "nome": "Ponto 177",
           "lat": -6.179605,
           "lon": -36.291572,
-          "mm": 1.5
+          "mm": 1.1
         },
         {
           "id": "P178",
@@ -4680,7 +4121,7 @@
           "nome": "Ponto 178",
           "lat": -5.340372,
           "lon": -37.161063,
-          "mm": 1.4
+          "mm": 1.1
         },
         {
           "id": "P179",
@@ -4688,7 +4129,7 @@
           "nome": "Ponto 179",
           "lat": -5.340372,
           "lon": -35.422082,
-          "mm": 3.2
+          "mm": 1.9
         },
         {
           "id": "P180",
@@ -4696,7 +4137,7 @@
           "nome": "Ponto 180",
           "lat": -11.215006,
           "lon": -37.595808,
-          "mm": 0.0
+          "mm": 0.8
         },
         {
           "id": "P181",
@@ -4704,7 +4145,7 @@
           "nome": "Ponto 181",
           "lat": -10.375773,
           "lon": -36.726318,
-          "mm": 0.3
+          "mm": 0.0
         },
         {
           "id": "P182",
@@ -4848,7 +4289,7 @@
           "nome": "Ponto 199",
           "lat": -6.179605,
           "lon": -48.029696,
-          "mm": 0.1
+          "mm": 0.4
         },
         {
           "id": "P200",
@@ -4856,7 +4297,7 @@
           "nome": "Ponto 200",
           "lat": -5.340372,
           "lon": -48.464441,
-          "mm": 0.5
+          "mm": 0.7
         }
       ]
     }
