@@ -4860,5 +4860,8 @@
         }
       ]
     }
-  }
+  },
+  "fallback_usado": true,
+  "fallback_motivo": "<urlopen error timed out>",
+  "fallback_em_utc": "2026-06-02T07:29:17.786310+00:00"
 }
