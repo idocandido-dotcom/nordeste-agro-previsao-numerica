@@ -25,7 +25,7 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-06-02T16:31:00.669743+00:00",
+  "gerado_em_utc": "2026-06-02T18:31:00.162296+00:00",
   "total_pontos": 200,
   "total_erros": 0,
   "erros": [],
@@ -4860,8 +4860,5 @@
         }
       ]
     }
-  },
-  "fallback_usado": true,
-  "fallback_motivo": "<urlopen error timed out>",
-  "fallback_em_utc": "2026-06-02T17:29:20.074828+00:00"
+  }
 }
