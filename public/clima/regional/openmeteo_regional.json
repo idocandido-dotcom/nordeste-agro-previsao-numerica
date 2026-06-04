@@ -10,7 +10,7 @@
   "malha": {
     "tipo": "grade_uniforme",
     "total_pontos_planejados": 200,
-    "total_pontos_validos": 181,
+    "total_pontos_validos": 200,
     "distribuicao_por_uf": {
       "AL": 2,
       "BA": 38,
@@ -25,172 +25,171 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-06-04T14:21:05.383084+00:00",
-  "total_pontos": 181,
-  "total_erros": 19,
-  "erros": [
-    {
-      "id": "P001",
-      "uf": "AL",
-      "nome": "Ponto 001",
-      "lat": -9.536539,
-      "lon": -37.161063,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 001 - AL: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P002",
-      "uf": "AL",
-      "nome": "Ponto 002",
-      "lat": -9.536539,
-      "lon": -35.856827,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 002 - AL: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P003",
-      "uf": "BA",
-      "nome": "Ponto 003",
-      "lat": -17.509257,
-      "lon": -39.33479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 003 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P004",
-      "uf": "BA",
-      "nome": "Ponto 004",
-      "lat": -17.08964,
-      "lon": -40.20428,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 004 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P005",
-      "uf": "BA",
-      "nome": "Ponto 005",
-      "lat": -16.250407,
-      "lon": -39.33479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 005 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P006",
-      "uf": "BA",
-      "nome": "Ponto 006",
-      "lat": -15.411173,
-      "lon": -40.639026,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 006 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P007",
-      "uf": "BA",
-      "nome": "Ponto 007",
-      "lat": -14.991556,
-      "lon": -45.855969,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 007 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P008",
-      "uf": "BA",
-      "nome": "Ponto 008",
-      "lat": -14.991556,
-      "lon": -39.33479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 008 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P009",
-      "uf": "BA",
-      "nome": "Ponto 009",
-      "lat": -14.57194,
-      "lon": -43.682243,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 009 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P010",
-      "uf": "BA",
-      "nome": "Ponto 010",
-      "lat": -14.57194,
-      "lon": -41.943261,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 010 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P011",
-      "uf": "BA",
-      "nome": "Ponto 011",
-      "lat": -14.57194,
-      "lon": -40.20428,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 011 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P012",
-      "uf": "BA",
-      "nome": "Ponto 012",
-      "lat": -13.732706,
-      "lon": -44.986479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 012 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P013",
-      "uf": "BA",
-      "nome": "Ponto 013",
-      "lat": -13.732706,
-      "lon": -42.812752,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 013 - BA: The read operation timed out"
-    },
-    {
-      "id": "P014",
-      "uf": "BA",
-      "nome": "Ponto 014",
-      "lat": -13.732706,
-      "lon": -40.639026,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 014 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P015",
-      "uf": "BA",
-      "nome": "Ponto 015",
-      "lat": -13.31309,
-      "lon": -39.33479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 015 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P016",
-      "uf": "BA",
-      "nome": "Ponto 016",
-      "lat": -12.893473,
-      "lon": -45.855969,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 016 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    },
-    {
-      "id": "P017",
-      "uf": "BA",
-      "nome": "Ponto 017",
-      "lat": -12.893473,
-      "lon": -44.116988,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 017 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P018",
-      "uf": "BA",
-      "nome": "Ponto 018",
-      "lat": -12.893473,
-      "lon": -41.508516,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 018 - BA: HTTP Error 502: Bad Gateway"
-    },
-    {
-      "id": "P019",
-      "uf": "BA",
-      "nome": "Ponto 019",
-      "lat": -12.893473,
-      "lon": -40.20428,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 019 - BA: <urlopen error _ssl.c:999: The handshake operation timed out>"
-    }
-  ],
+  "gerado_em_utc": "2026-06-04T14:31:04.131510+00:00",
+  "total_pontos": 200,
+  "total_erros": 0,
+  "erros": [],
   "periodos": {
     "24h": {
       "label": "Previsão acumulada 24h",
       "resumo": {
         "min": 0.0,
-        "media": 2.4,
+        "media": 2.3,
         "max": 16.2
       },
       "pontos": [
+        {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 1.6
+        },
+        {
+          "id": "P002",
+          "uf": "AL",
+          "nome": "Ponto 002",
+          "lat": -9.536539,
+          "lon": -35.856827,
+          "mm": 6.3
+        },
+        {
+          "id": "P003",
+          "uf": "BA",
+          "nome": "Ponto 003",
+          "lat": -17.509257,
+          "lon": -39.33479,
+          "mm": 3.3
+        },
+        {
+          "id": "P004",
+          "uf": "BA",
+          "nome": "Ponto 004",
+          "lat": -17.08964,
+          "lon": -40.20428,
+          "mm": 6.8
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 1.5
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 0.7
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P008",
+          "uf": "BA",
+          "nome": "Ponto 008",
+          "lat": -14.991556,
+          "lon": -39.33479,
+          "mm": 1.0
+        },
+        {
+          "id": "P009",
+          "uf": "BA",
+          "nome": "Ponto 009",
+          "lat": -14.57194,
+          "lon": -43.682243,
+          "mm": 0.0
+        },
+        {
+          "id": "P010",
+          "uf": "BA",
+          "nome": "Ponto 010",
+          "lat": -14.57194,
+          "lon": -41.943261,
+          "mm": 0.0
+        },
+        {
+          "id": "P011",
+          "uf": "BA",
+          "nome": "Ponto 011",
+          "lat": -14.57194,
+          "lon": -40.20428,
+          "mm": 2.7
+        },
+        {
+          "id": "P012",
+          "uf": "BA",
+          "nome": "Ponto 012",
+          "lat": -13.732706,
+          "lon": -44.986479,
+          "mm": 0.0
+        },
+        {
+          "id": "P013",
+          "uf": "BA",
+          "nome": "Ponto 013",
+          "lat": -13.732706,
+          "lon": -42.812752,
+          "mm": 0.0
+        },
+        {
+          "id": "P014",
+          "uf": "BA",
+          "nome": "Ponto 014",
+          "lat": -13.732706,
+          "lon": -40.639026,
+          "mm": 1.3
+        },
+        {
+          "id": "P015",
+          "uf": "BA",
+          "nome": "Ponto 015",
+          "lat": -13.31309,
+          "lon": -39.33479,
+          "mm": 2.0
+        },
+        {
+          "id": "P016",
+          "uf": "BA",
+          "nome": "Ponto 016",
+          "lat": -12.893473,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P017",
+          "uf": "BA",
+          "nome": "Ponto 017",
+          "lat": -12.893473,
+          "lon": -44.116988,
+          "mm": 0.0
+        },
+        {
+          "id": "P018",
+          "uf": "BA",
+          "nome": "Ponto 018",
+          "lat": -12.893473,
+          "lon": -41.508516,
+          "mm": 0.4
+        },
+        {
+          "id": "P019",
+          "uf": "BA",
+          "nome": "Ponto 019",
+          "lat": -12.893473,
+          "lon": -40.20428,
+          "mm": 1.1
+        },
         {
           "id": "P020",
           "uf": "BA",
@@ -1645,10 +1644,162 @@
       "label": "Previsão acumulada 48h",
       "resumo": {
         "min": 0.0,
-        "media": 3.8,
+        "media": 3.6,
         "max": 34.8
       },
       "pontos": [
+        {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 6.5
+        },
+        {
+          "id": "P002",
+          "uf": "AL",
+          "nome": "Ponto 002",
+          "lat": -9.536539,
+          "lon": -35.856827,
+          "mm": 14.2
+        },
+        {
+          "id": "P003",
+          "uf": "BA",
+          "nome": "Ponto 003",
+          "lat": -17.509257,
+          "lon": -39.33479,
+          "mm": 0.3
+        },
+        {
+          "id": "P004",
+          "uf": "BA",
+          "nome": "Ponto 004",
+          "lat": -17.08964,
+          "lon": -40.20428,
+          "mm": 1.3
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 0.1
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 0.2
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P008",
+          "uf": "BA",
+          "nome": "Ponto 008",
+          "lat": -14.991556,
+          "lon": -39.33479,
+          "mm": 0.0
+        },
+        {
+          "id": "P009",
+          "uf": "BA",
+          "nome": "Ponto 009",
+          "lat": -14.57194,
+          "lon": -43.682243,
+          "mm": 0.0
+        },
+        {
+          "id": "P010",
+          "uf": "BA",
+          "nome": "Ponto 010",
+          "lat": -14.57194,
+          "lon": -41.943261,
+          "mm": 0.0
+        },
+        {
+          "id": "P011",
+          "uf": "BA",
+          "nome": "Ponto 011",
+          "lat": -14.57194,
+          "lon": -40.20428,
+          "mm": 1.5
+        },
+        {
+          "id": "P012",
+          "uf": "BA",
+          "nome": "Ponto 012",
+          "lat": -13.732706,
+          "lon": -44.986479,
+          "mm": 0.0
+        },
+        {
+          "id": "P013",
+          "uf": "BA",
+          "nome": "Ponto 013",
+          "lat": -13.732706,
+          "lon": -42.812752,
+          "mm": 0.0
+        },
+        {
+          "id": "P014",
+          "uf": "BA",
+          "nome": "Ponto 014",
+          "lat": -13.732706,
+          "lon": -40.639026,
+          "mm": 0.0
+        },
+        {
+          "id": "P015",
+          "uf": "BA",
+          "nome": "Ponto 015",
+          "lat": -13.31309,
+          "lon": -39.33479,
+          "mm": 0.7
+        },
+        {
+          "id": "P016",
+          "uf": "BA",
+          "nome": "Ponto 016",
+          "lat": -12.893473,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P017",
+          "uf": "BA",
+          "nome": "Ponto 017",
+          "lat": -12.893473,
+          "lon": -44.116988,
+          "mm": 0.0
+        },
+        {
+          "id": "P018",
+          "uf": "BA",
+          "nome": "Ponto 018",
+          "lat": -12.893473,
+          "lon": -41.508516,
+          "mm": 0.7
+        },
+        {
+          "id": "P019",
+          "uf": "BA",
+          "nome": "Ponto 019",
+          "lat": -12.893473,
+          "lon": -40.20428,
+          "mm": 0.0
+        },
         {
           "id": "P020",
           "uf": "BA",
@@ -3103,10 +3254,162 @@
       "label": "Previsão acumulada 72h",
       "resumo": {
         "min": 0.0,
-        "media": 3.6,
+        "media": 3.3,
         "max": 31.8
       },
       "pontos": [
+        {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 0.1
+        },
+        {
+          "id": "P002",
+          "uf": "AL",
+          "nome": "Ponto 002",
+          "lat": -9.536539,
+          "lon": -35.856827,
+          "mm": 13.7
+        },
+        {
+          "id": "P003",
+          "uf": "BA",
+          "nome": "Ponto 003",
+          "lat": -17.509257,
+          "lon": -39.33479,
+          "mm": 4.3
+        },
+        {
+          "id": "P004",
+          "uf": "BA",
+          "nome": "Ponto 004",
+          "lat": -17.08964,
+          "lon": -40.20428,
+          "mm": 0.0
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 3.0
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 1.3
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P008",
+          "uf": "BA",
+          "nome": "Ponto 008",
+          "lat": -14.991556,
+          "lon": -39.33479,
+          "mm": 0.4
+        },
+        {
+          "id": "P009",
+          "uf": "BA",
+          "nome": "Ponto 009",
+          "lat": -14.57194,
+          "lon": -43.682243,
+          "mm": 0.0
+        },
+        {
+          "id": "P010",
+          "uf": "BA",
+          "nome": "Ponto 010",
+          "lat": -14.57194,
+          "lon": -41.943261,
+          "mm": 0.0
+        },
+        {
+          "id": "P011",
+          "uf": "BA",
+          "nome": "Ponto 011",
+          "lat": -14.57194,
+          "lon": -40.20428,
+          "mm": 1.9
+        },
+        {
+          "id": "P012",
+          "uf": "BA",
+          "nome": "Ponto 012",
+          "lat": -13.732706,
+          "lon": -44.986479,
+          "mm": 0.0
+        },
+        {
+          "id": "P013",
+          "uf": "BA",
+          "nome": "Ponto 013",
+          "lat": -13.732706,
+          "lon": -42.812752,
+          "mm": 0.0
+        },
+        {
+          "id": "P014",
+          "uf": "BA",
+          "nome": "Ponto 014",
+          "lat": -13.732706,
+          "lon": -40.639026,
+          "mm": 0.1
+        },
+        {
+          "id": "P015",
+          "uf": "BA",
+          "nome": "Ponto 015",
+          "lat": -13.31309,
+          "lon": -39.33479,
+          "mm": 0.4
+        },
+        {
+          "id": "P016",
+          "uf": "BA",
+          "nome": "Ponto 016",
+          "lat": -12.893473,
+          "lon": -45.855969,
+          "mm": 0.0
+        },
+        {
+          "id": "P017",
+          "uf": "BA",
+          "nome": "Ponto 017",
+          "lat": -12.893473,
+          "lon": -44.116988,
+          "mm": 0.0
+        },
+        {
+          "id": "P018",
+          "uf": "BA",
+          "nome": "Ponto 018",
+          "lat": -12.893473,
+          "lon": -41.508516,
+          "mm": 0.0
+        },
+        {
+          "id": "P019",
+          "uf": "BA",
+          "nome": "Ponto 019",
+          "lat": -12.893473,
+          "lon": -40.20428,
+          "mm": 0.0
+        },
         {
           "id": "P020",
           "uf": "BA",
