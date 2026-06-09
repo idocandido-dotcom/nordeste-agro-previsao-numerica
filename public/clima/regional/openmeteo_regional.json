@@ -4860,5 +4860,8 @@
         }
       ]
     }
-  }
+  },
+  "fallback_usado": true,
+  "fallback_motivo": "The read operation timed out",
+  "fallback_em_utc": "2026-06-09T08:29:34.955683+00:00"
 }
