@@ -4860,5 +4860,8 @@
         }
       ]
     }
-  }
+  },
+  "fallback_usado": true,
+  "fallback_motivo": "HTTP Error 504: Gateway Time-out",
+  "fallback_em_utc": "2026-06-09T10:27:31.963470+00:00"
 }
