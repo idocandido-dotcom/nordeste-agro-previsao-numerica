@@ -4862,6 +4862,6 @@
     }
   },
   "fallback_usado": true,
-  "fallback_motivo": "<urlopen error timed out>",
-  "fallback_em_utc": "2026-06-10T13:29:28.927638+00:00"
+  "fallback_motivo": "HTTP Error 504: Gateway Time-out",
+  "fallback_em_utc": "2026-06-10T14:27:41.036159+00:00"
 }
