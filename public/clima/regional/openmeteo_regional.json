@@ -10,7 +10,7 @@
   "malha": {
     "tipo": "grade_uniforme",
     "total_pontos_planejados": 200,
-    "total_pontos_validos": 198,
+    "total_pontos_validos": 200,
     "distribuicao_por_uf": {
       "AL": 2,
       "BA": 38,
@@ -25,27 +25,10 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-06-11T12:37:52.006786+00:00",
-  "total_pontos": 198,
-  "total_erros": 2,
-  "erros": [
-    {
-      "id": "P061",
-      "uf": "MA",
-      "nome": "Ponto 061",
-      "lat": -4.920755,
-      "lon": -45.421224,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 061 - MA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P080",
-      "uf": "PA",
-      "nome": "Ponto 080",
-      "lat": -8.277689,
-      "lon": -53.681385,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 080 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    }
-  ],
+  "gerado_em_utc": "2026-06-11T14:31:00.161761+00:00",
+  "total_pontos": 200,
+  "total_erros": 0,
+  "erros": [],
   "periodos": {
     "24h": {
       "label": "Previsão acumulada 24h",
@@ -536,6 +519,14 @@
           "mm": 0.9
         },
         {
+          "id": "P061",
+          "uf": "MA",
+          "nome": "Ponto 061",
+          "lat": -4.920755,
+          "lon": -45.421224,
+          "mm": 1.5
+        },
+        {
           "id": "P062",
           "uf": "MA",
           "nome": "Ponto 062",
@@ -678,6 +669,14 @@
           "lat": -8.277689,
           "lon": -55.855111,
           "mm": 0.2
+        },
+        {
+          "id": "P080",
+          "uf": "PA",
+          "nome": "Ponto 080",
+          "lat": -8.277689,
+          "lon": -53.681385,
+          "mm": 2.6
         },
         {
           "id": "P081",
@@ -2130,6 +2129,14 @@
           "mm": 0.0
         },
         {
+          "id": "P061",
+          "uf": "MA",
+          "nome": "Ponto 061",
+          "lat": -4.920755,
+          "lon": -45.421224,
+          "mm": 0.0
+        },
+        {
           "id": "P062",
           "uf": "MA",
           "nome": "Ponto 062",
@@ -2272,6 +2279,14 @@
           "lat": -8.277689,
           "lon": -55.855111,
           "mm": 0.6
+        },
+        {
+          "id": "P080",
+          "uf": "PA",
+          "nome": "Ponto 080",
+          "lat": -8.277689,
+          "lon": -53.681385,
+          "mm": 0.0
         },
         {
           "id": "P081",
@@ -3724,6 +3739,14 @@
           "mm": 0.9
         },
         {
+          "id": "P061",
+          "uf": "MA",
+          "nome": "Ponto 061",
+          "lat": -4.920755,
+          "lon": -45.421224,
+          "mm": 3.1
+        },
+        {
           "id": "P062",
           "uf": "MA",
           "nome": "Ponto 062",
@@ -3866,6 +3889,14 @@
           "lat": -8.277689,
           "lon": -55.855111,
           "mm": 1.2
+        },
+        {
+          "id": "P080",
+          "uf": "PA",
+          "nome": "Ponto 080",
+          "lat": -8.277689,
+          "lon": -53.681385,
+          "mm": 0.6
         },
         {
           "id": "P081",
@@ -4829,8 +4860,5 @@
         }
       ]
     }
-  },
-  "fallback_usado": true,
-  "fallback_motivo": "The read operation timed out",
-  "fallback_em_utc": "2026-06-11T13:29:22.046309+00:00"
+  }
 }
