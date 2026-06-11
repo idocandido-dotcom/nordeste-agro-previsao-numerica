@@ -10,7 +10,7 @@
   "malha": {
     "tipo": "grade_uniforme",
     "total_pontos_planejados": 200,
-    "total_pontos_validos": 187,
+    "total_pontos_validos": 200,
     "distribuicao_por_uf": {
       "AL": 2,
       "BA": 38,
@@ -25,124 +25,27 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-06-11T11:51:18.136108+00:00",
-  "total_pontos": 187,
-  "total_erros": 13,
-  "erros": [
-    {
-      "id": "P001",
-      "uf": "AL",
-      "nome": "Ponto 001",
-      "lat": -9.536539,
-      "lon": -37.161063,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 001 - AL: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P005",
-      "uf": "BA",
-      "nome": "Ponto 005",
-      "lat": -16.250407,
-      "lon": -39.33479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 005 - BA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P006",
-      "uf": "BA",
-      "nome": "Ponto 006",
-      "lat": -15.411173,
-      "lon": -40.639026,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 006 - BA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P007",
-      "uf": "BA",
-      "nome": "Ponto 007",
-      "lat": -14.991556,
-      "lon": -45.855969,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 007 - BA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P020",
-      "uf": "BA",
-      "nome": "Ponto 020",
-      "lat": -12.473856,
-      "lon": -44.986479,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 020 - BA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P081",
-      "uf": "PA",
-      "nome": "Ponto 081",
-      "lat": -8.277689,
-      "lon": -51.072913,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 081 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P094",
-      "uf": "PA",
-      "nome": "Ponto 094",
-      "lat": -6.179605,
-      "lon": -58.028838,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 094 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P095",
-      "uf": "PA",
-      "nome": "Ponto 095",
-      "lat": -6.179605,
-      "lon": -56.289857,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 095 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P096",
-      "uf": "PA",
-      "nome": "Ponto 096",
-      "lat": -6.179605,
-      "lon": -54.11613,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 096 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P097",
-      "uf": "PA",
-      "nome": "Ponto 097",
-      "lat": -6.179605,
-      "lon": -52.377149,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 097 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P098",
-      "uf": "PA",
-      "nome": "Ponto 098",
-      "lat": -5.759989,
-      "lon": -55.420366,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 098 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P099",
-      "uf": "PA",
-      "nome": "Ponto 099",
-      "lat": -5.759989,
-      "lon": -50.638168,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 099 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    },
-    {
-      "id": "P100",
-      "uf": "PA",
-      "nome": "Ponto 100",
-      "lat": -5.340372,
-      "lon": -57.594092,
-      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 100 - PA: <urlopen error [Errno -3] Temporary failure in name resolution>"
-    }
-  ],
+  "gerado_em_utc": "2026-06-11T11:56:02.995628+00:00",
+  "total_pontos": 200,
+  "total_erros": 0,
+  "erros": [],
   "periodos": {
     "24h": {
       "label": "Previsão acumulada 24h",
       "resumo": {
         "min": 0.0,
-        "media": 2.7,
+        "media": 2.6,
         "max": 29.5
       },
       "pontos": [
+        {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 4.3
+        },
         {
           "id": "P002",
           "uf": "AL",
@@ -166,6 +69,30 @@
           "lat": -17.08964,
           "lon": -40.20428,
           "mm": 0.0
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 0.0
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 0.0
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 0.2
         },
         {
           "id": "P008",
@@ -261,6 +188,14 @@
           "nome": "Ponto 019",
           "lat": -12.893473,
           "lon": -40.20428,
+          "mm": 0.0
+        },
+        {
+          "id": "P020",
+          "uf": "BA",
+          "nome": "Ponto 020",
+          "lat": -12.473856,
+          "lon": -44.986479,
           "mm": 0.0
         },
         {
@@ -744,6 +679,14 @@
           "mm": 2.6
         },
         {
+          "id": "P081",
+          "uf": "PA",
+          "nome": "Ponto 081",
+          "lat": -8.277689,
+          "lon": -51.072913,
+          "mm": 0.0
+        },
+        {
           "id": "P082",
           "uf": "PA",
           "nome": "Ponto 082",
@@ -838,6 +781,62 @@
           "lat": -6.599222,
           "lon": -48.899186,
           "mm": 0.6
+        },
+        {
+          "id": "P094",
+          "uf": "PA",
+          "nome": "Ponto 094",
+          "lat": -6.179605,
+          "lon": -58.028838,
+          "mm": 0.8
+        },
+        {
+          "id": "P095",
+          "uf": "PA",
+          "nome": "Ponto 095",
+          "lat": -6.179605,
+          "lon": -56.289857,
+          "mm": 0.7
+        },
+        {
+          "id": "P096",
+          "uf": "PA",
+          "nome": "Ponto 096",
+          "lat": -6.179605,
+          "lon": -54.11613,
+          "mm": 7.6
+        },
+        {
+          "id": "P097",
+          "uf": "PA",
+          "nome": "Ponto 097",
+          "lat": -6.179605,
+          "lon": -52.377149,
+          "mm": 1.3
+        },
+        {
+          "id": "P098",
+          "uf": "PA",
+          "nome": "Ponto 098",
+          "lat": -5.759989,
+          "lon": -55.420366,
+          "mm": 3.0
+        },
+        {
+          "id": "P099",
+          "uf": "PA",
+          "nome": "Ponto 099",
+          "lat": -5.759989,
+          "lon": -50.638168,
+          "mm": 1.3
+        },
+        {
+          "id": "P100",
+          "uf": "PA",
+          "nome": "Ponto 100",
+          "lat": -5.340372,
+          "lon": -57.594092,
+          "mm": 1.0
         },
         {
           "id": "P101",
@@ -1650,6 +1649,14 @@
       },
       "pontos": [
         {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 0.6
+        },
+        {
           "id": "P002",
           "uf": "AL",
           "nome": "Ponto 002",
@@ -1672,6 +1679,30 @@
           "lat": -17.08964,
           "lon": -40.20428,
           "mm": 0.0
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 0.0
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 0.0
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 0.2
         },
         {
           "id": "P008",
@@ -1767,6 +1798,14 @@
           "nome": "Ponto 019",
           "lat": -12.893473,
           "lon": -40.20428,
+          "mm": 0.0
+        },
+        {
+          "id": "P020",
+          "uf": "BA",
+          "nome": "Ponto 020",
+          "lat": -12.473856,
+          "lon": -44.986479,
           "mm": 0.0
         },
         {
@@ -2250,6 +2289,14 @@
           "mm": 0.0
         },
         {
+          "id": "P081",
+          "uf": "PA",
+          "nome": "Ponto 081",
+          "lat": -8.277689,
+          "lon": -51.072913,
+          "mm": 0.3
+        },
+        {
           "id": "P082",
           "uf": "PA",
           "nome": "Ponto 082",
@@ -2344,6 +2391,62 @@
           "lat": -6.599222,
           "lon": -48.899186,
           "mm": 1.5
+        },
+        {
+          "id": "P094",
+          "uf": "PA",
+          "nome": "Ponto 094",
+          "lat": -6.179605,
+          "lon": -58.028838,
+          "mm": 1.4
+        },
+        {
+          "id": "P095",
+          "uf": "PA",
+          "nome": "Ponto 095",
+          "lat": -6.179605,
+          "lon": -56.289857,
+          "mm": 0.9
+        },
+        {
+          "id": "P096",
+          "uf": "PA",
+          "nome": "Ponto 096",
+          "lat": -6.179605,
+          "lon": -54.11613,
+          "mm": 0.8
+        },
+        {
+          "id": "P097",
+          "uf": "PA",
+          "nome": "Ponto 097",
+          "lat": -6.179605,
+          "lon": -52.377149,
+          "mm": 0.4
+        },
+        {
+          "id": "P098",
+          "uf": "PA",
+          "nome": "Ponto 098",
+          "lat": -5.759989,
+          "lon": -55.420366,
+          "mm": 0.7
+        },
+        {
+          "id": "P099",
+          "uf": "PA",
+          "nome": "Ponto 099",
+          "lat": -5.759989,
+          "lon": -50.638168,
+          "mm": 1.5
+        },
+        {
+          "id": "P100",
+          "uf": "PA",
+          "nome": "Ponto 100",
+          "lat": -5.340372,
+          "lon": -57.594092,
+          "mm": 1.3
         },
         {
           "id": "P101",
@@ -3156,6 +3259,14 @@
       },
       "pontos": [
         {
+          "id": "P001",
+          "uf": "AL",
+          "nome": "Ponto 001",
+          "lat": -9.536539,
+          "lon": -37.161063,
+          "mm": 3.2
+        },
+        {
           "id": "P002",
           "uf": "AL",
           "nome": "Ponto 002",
@@ -3178,6 +3289,30 @@
           "lat": -17.08964,
           "lon": -40.20428,
           "mm": 7.8
+        },
+        {
+          "id": "P005",
+          "uf": "BA",
+          "nome": "Ponto 005",
+          "lat": -16.250407,
+          "lon": -39.33479,
+          "mm": 0.0
+        },
+        {
+          "id": "P006",
+          "uf": "BA",
+          "nome": "Ponto 006",
+          "lat": -15.411173,
+          "lon": -40.639026,
+          "mm": 0.6
+        },
+        {
+          "id": "P007",
+          "uf": "BA",
+          "nome": "Ponto 007",
+          "lat": -14.991556,
+          "lon": -45.855969,
+          "mm": 4.1
         },
         {
           "id": "P008",
@@ -3273,6 +3408,14 @@
           "nome": "Ponto 019",
           "lat": -12.893473,
           "lon": -40.20428,
+          "mm": 0.0
+        },
+        {
+          "id": "P020",
+          "uf": "BA",
+          "nome": "Ponto 020",
+          "lat": -12.473856,
+          "lon": -44.986479,
           "mm": 0.0
         },
         {
@@ -3756,6 +3899,14 @@
           "mm": 0.6
         },
         {
+          "id": "P081",
+          "uf": "PA",
+          "nome": "Ponto 081",
+          "lat": -8.277689,
+          "lon": -51.072913,
+          "mm": 0.2
+        },
+        {
           "id": "P082",
           "uf": "PA",
           "nome": "Ponto 082",
@@ -3850,6 +4001,62 @@
           "lat": -6.599222,
           "lon": -48.899186,
           "mm": 0.6
+        },
+        {
+          "id": "P094",
+          "uf": "PA",
+          "nome": "Ponto 094",
+          "lat": -6.179605,
+          "lon": -58.028838,
+          "mm": 1.1
+        },
+        {
+          "id": "P095",
+          "uf": "PA",
+          "nome": "Ponto 095",
+          "lat": -6.179605,
+          "lon": -56.289857,
+          "mm": 0.4
+        },
+        {
+          "id": "P096",
+          "uf": "PA",
+          "nome": "Ponto 096",
+          "lat": -6.179605,
+          "lon": -54.11613,
+          "mm": 0.4
+        },
+        {
+          "id": "P097",
+          "uf": "PA",
+          "nome": "Ponto 097",
+          "lat": -6.179605,
+          "lon": -52.377149,
+          "mm": 0.2
+        },
+        {
+          "id": "P098",
+          "uf": "PA",
+          "nome": "Ponto 098",
+          "lat": -5.759989,
+          "lon": -55.420366,
+          "mm": 0.3
+        },
+        {
+          "id": "P099",
+          "uf": "PA",
+          "nome": "Ponto 099",
+          "lat": -5.759989,
+          "lon": -50.638168,
+          "mm": 1.1
+        },
+        {
+          "id": "P100",
+          "uf": "PA",
+          "nome": "Ponto 100",
+          "lat": -5.340372,
+          "lon": -57.594092,
+          "mm": 0.2
         },
         {
           "id": "P101",
