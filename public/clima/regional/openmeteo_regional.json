@@ -10,7 +10,7 @@
   "malha": {
     "tipo": "grade_uniforme",
     "total_pontos_planejados": 200,
-    "total_pontos_validos": 200,
+    "total_pontos_validos": 197,
     "distribuicao_por_uf": {
       "AL": 2,
       "BA": 38,
@@ -25,10 +25,35 @@
       "TO": 19
     }
   },
-  "gerado_em_utc": "2026-09-01T15:04:42.115257+00:00",
-  "total_pontos": 200,
-  "total_erros": 0,
-  "erros": [],
+  "gerado_em_utc": "2026-09-01T18:53:28.036567+00:00",
+  "total_pontos": 197,
+  "total_erros": 3,
+  "erros": [
+    {
+      "id": "P082",
+      "uf": "PA",
+      "nome": "Ponto 082",
+      "lat": -7.858072,
+      "lon": -52.811894,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 082 - PA: HTTP Error 503: Service Unavailable"
+    },
+    {
+      "id": "P083",
+      "uf": "PA",
+      "nome": "Ponto 083",
+      "lat": -7.438456,
+      "lon": -58.028838,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 083 - PA: <urlopen error _ssl.c:999: The handshake operation timed out>"
+    },
+    {
+      "id": "P099",
+      "uf": "PA",
+      "nome": "Ponto 099",
+      "lat": -5.759989,
+      "lon": -50.638168,
+      "erro": "Falha após 3 tentativas em Consultando ponto individual Ponto 099 - PA: HTTP Error 500: Internal Server Error"
+    }
+  ],
   "periodos": {
     "24h": {
       "label": "Previsão acumulada 24h",
@@ -687,22 +712,6 @@
           "mm": 0.0
         },
         {
-          "id": "P082",
-          "uf": "PA",
-          "nome": "Ponto 082",
-          "lat": -7.858072,
-          "lon": -52.811894,
-          "mm": 0.0
-        },
-        {
-          "id": "P083",
-          "uf": "PA",
-          "nome": "Ponto 083",
-          "lat": -7.438456,
-          "lon": -58.028838,
-          "mm": 0.0
-        },
-        {
           "id": "P084",
           "uf": "PA",
           "nome": "Ponto 084",
@@ -821,14 +830,6 @@
           "lat": -5.759989,
           "lon": -55.420366,
           "mm": 0.0
-        },
-        {
-          "id": "P099",
-          "uf": "PA",
-          "nome": "Ponto 099",
-          "lat": -5.759989,
-          "lon": -50.638168,
-          "mm": 0.1
         },
         {
           "id": "P100",
@@ -2297,22 +2298,6 @@
           "mm": 0.1
         },
         {
-          "id": "P082",
-          "uf": "PA",
-          "nome": "Ponto 082",
-          "lat": -7.858072,
-          "lon": -52.811894,
-          "mm": 0.0
-        },
-        {
-          "id": "P083",
-          "uf": "PA",
-          "nome": "Ponto 083",
-          "lat": -7.438456,
-          "lon": -58.028838,
-          "mm": 0.4
-        },
-        {
           "id": "P084",
           "uf": "PA",
           "nome": "Ponto 084",
@@ -2431,14 +2416,6 @@
           "lat": -5.759989,
           "lon": -55.420366,
           "mm": 0.3
-        },
-        {
-          "id": "P099",
-          "uf": "PA",
-          "nome": "Ponto 099",
-          "lat": -5.759989,
-          "lon": -50.638168,
-          "mm": 0.0
         },
         {
           "id": "P100",
@@ -3907,22 +3884,6 @@
           "mm": 0.6
         },
         {
-          "id": "P082",
-          "uf": "PA",
-          "nome": "Ponto 082",
-          "lat": -7.858072,
-          "lon": -52.811894,
-          "mm": 0.7
-        },
-        {
-          "id": "P083",
-          "uf": "PA",
-          "nome": "Ponto 083",
-          "lat": -7.438456,
-          "lon": -58.028838,
-          "mm": 0.9
-        },
-        {
           "id": "P084",
           "uf": "PA",
           "nome": "Ponto 084",
@@ -4040,14 +4001,6 @@
           "nome": "Ponto 098",
           "lat": -5.759989,
           "lon": -55.420366,
-          "mm": 0.4
-        },
-        {
-          "id": "P099",
-          "uf": "PA",
-          "nome": "Ponto 099",
-          "lat": -5.759989,
-          "lon": -50.638168,
           "mm": 0.4
         },
         {
